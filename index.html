@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>インクリメンタル絶対神 — HOME PORTAL —</title>
+<style>
+:root {
+  --bg-main: #020106;
+  --bg-panel: rgba(10, 6, 20, 0.85);
+  --border-strong: rgba(255, 255, 255, 0.2);
+  
+  --color-energy: #00ffcc;
+  --color-antimatter: #ff0055;
+  --color-timeline: #9d4edd;
+  --color-galaxy: #3a86ff;
+  
+  --text-main: #f4f4f5;
+  --text-muted: #6b7280;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: 'Consolas', 'Fira Code', 'Courier New', monospace, system-ui;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+/* === リッチな背景演出用レイヤー（ホーム画面用・最初は非表示） === */
+.cyber-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1s ease;
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(157, 78, 221, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(0, 255, 204, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(58, 134, 255, 0.1) 0%, transparent 70%);
+}
+
+body.activated .cyber-bg {
+  opacity: 1;
+}
+
+/* サイバーグリッド（床面パース風） */
+.cyber-grid {
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  background-image: 
+    linear-gradient(rgba(0, 255, 204, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 204, 0.04) 1px, transparent 1px);
+  background-size: 50px 50px;
+  transform: perspective(500px) rotateX(60deg);
+  animation: grid-move 20s linear infinite;
+}
+
+@keyframes grid-move {
+  0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+  100% { transform: perspective(500px) rotateX(60deg) translateY(50px); }
+}
+
+/* 浮遊する光の粒子（パーティクル） */
+.particle {
+  position: absolute;
+  background: var(--color-energy);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--color-energy);
+  animation: float-particle 8s ease-in-out infinite;
+}
+.particle:nth-child(1) { width: 3px; height: 3px; top: 20%; left: 15%; animation-duration: 7s; }
+.particle:nth-child(2) { width: 4px; height: 4px; top: 70%; left: 80%; animation-duration: 11s; background: var(--color-antimatter); box-shadow: 0 0 10px var(--color-antimatter); }
+.particle:nth-child(3) { width: 2px; height: 2px; top: 40%; left: 85%; animation-duration: 9s; background: var(--color-timeline); box-shadow: 0 0 10px var(--color-timeline); }
+.particle:nth-child(4) { width: 5px; height: 5px; top: 80%; left: 25%; animation-duration: 13s; }
+
+@keyframes float-particle {
+  0%, 100% { transform: translateY(0) translateX(0); opacity: 0.2; }
+  50% { transform: translateY(-40px) translateX(20px); opacity: 0.8; }
+}
+
+/* === 初回「完全な真っ黒背景＋動く待機中文字」画面 === */
+.standby-screen {
+  position: fixed;
+  inset: 0;
+  background: #000000;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.8s ease;
+}
+
+.standby-content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.standby-text {
+  font-size: 0.85rem;
+  letter-spacing: 6px;
+  color: #555;
+  text-transform: uppercase;
+  animation: text-glitch-fade 2s infinite ease-in-out;
+}
+
+@keyframes text-glitch-fade {
+  0%, 100% { opacity: 0.2; transform: scale(0.98); }
+  50% { opacity: 0.9; transform: scale(1.02); color: var(--color-energy); text-shadow: 0 0 15px rgba(0,255,204,0.4); }
+}
+
+/* 動くローディングバー・ドット風アニメーション */
+.standby-dots span {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: var(--color-energy);
+  border-radius: 50%;
+  margin: 0 4px;
+  box-shadow: 0 0 8px var(--color-energy);
+  animation: dot-bounce 1.4s infinite ease-in-out both;
+}
+.standby-dots span:nth-child(1) { animation-delay: -0.32s; }
+.standby-dots span:nth-child(2) { animation-delay: -0.16s; }
+.standby-dots span:nth-child(3) { animation-delay: 0s; }
+
+@keyframes dot-bounce {
+  0%, 80%, 100% { transform: scale(0); opacity: 0.2; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+/* === メインホームパネル（最初は非表示/縮小） === */
+.home-container {
+  width: 90%;
+  max-width: 500px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  padding: 40px 30px;
+  box-shadow: 0 0 60px rgba(0, 255, 204, 0.15), inset 0 0 25px rgba(157, 78, 221, 0.1);
+  text-align: center;
+  position: relative;
+  backdrop-filter: blur(12px);
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+body.activated .home-container {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+
+.home-title {
+  font-size: 1.4rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+  background: linear-gradient(90deg, #fff, var(--color-energy), var(--color-timeline), var(--color-antimatter));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 15px rgba(0,255,204,0.3));
+}
+
+.home-subtitle {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 4px;
+  margin-bottom: 35px;
+  text-transform: uppercase;
+}
+
+.menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.btn-menu {
+  width: 100%;
+  padding: 18px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-decoration: none;
+  display: inline-block;
+  border: none;
+  outline: none;
+}
+
+.btn-start {
+  background: linear-gradient(90deg, rgba(0, 255, 204, 0.15), rgba(58, 134, 255, 0.15));
+  border: 2px solid var(--color-energy);
+  color: var(--color-energy);
+  box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-start::after {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%; width: 200%; height: 200%;
+  background: linear-gradient(60deg, transparent, rgba(0,255,204,0.4), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s;
+}
+
+.btn-start:hover::after {
+  transform: translateX(100%);
+}
+
+.btn-start:hover {
+  background: var(--color-energy);
+  color: var(--bg-main);
+  box-shadow: 0 0 40px rgba(0, 255, 204, 0.8), 0 0 80px rgba(0, 255, 204, 0.4);
+  transform: translateY(-2px);
+}
+
+.version-tag {
+  position: absolute;
+  bottom: 12px;
+  right: 18px;
+  font-size: 0.6rem;
+  color: var(--text-muted);
+}
+
+/* === 次元転移（トランジション）演出 === */
+.warp-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle, #fff 0%, var(--color-energy) 30%, var(--bg-main) 100%);
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.1);
+  transition: opacity 0.6s ease-in, transform 0.6s cubic-bezier(0.7, 0, 0.84, 0);
+}
+
+body.warping .warp-overlay {
+  opacity: 1;
+  transform: scale(20);
+  pointer-events: auto;
+}
+
+body.warping .home-container {
+  transform: scale(1.2) rotate(3deg);
+  opacity: 0;
+  filter: blur(15px);
+}
+
+@keyframes shake {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  20% { transform: translate(-8px, 6px) rotate(-1deg); }
+  40% { transform: translate(8px, -4px) rotate(1deg); }
+  60% { transform: translate(-6px, -6px) rotate(0deg); }
+  80% { transform: translate(6px, 4px) rotate(1deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+body.warping {
+  animation: shake 0.6s ease-in-out;
+}
+</style>
+</head>
+<body>
+
+<!-- 初期「真っ黒背景＋動く待機中」画面 -->
+<div class="standby-screen" id="standbyScreen">
+  <div class="standby-content">
+    <div class="standby-text">SYSTEM STANDBY... [ TOUCH TO BOOT ]</div>
+    <div class="standby-dots">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+</div>
+
+<!-- 次元転移時の閃光レイヤー -->
+<div class="warp-overlay"></div>
+
+<!-- 背景の動的エフェクト -->
+<div class="cyber-bg">
+  <div class="cyber-grid"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+</div>
+
+<div class="home-container">
+  <div class="home-subtitle">インクリメンタル絶対神</div>
+  <div class="home-title">INFINITY MATRIX OMEGA</div>
+  
+  <div class="menu-list">
+    <button class="btn-menu btn-start" id="startBtn">▶ WORLD START (次元接続)</button>
+  </div>
+
+  <div class="version-tag">API OVERDRIVE v65.0</div>
+</div>
+
+<script>
+// Web Audio API を用いた約3秒間の起動音 ＋ 連続ループBGMジェネレーター
+class SoundManager {
+  static initContext() {
+    if (!this.audioCtx) {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      this.audioCtx = new AudioContext();
+    }
+    if (this.audioCtx.state === 'suspended') {
+      this.audioCtx.resume();
+    }
+  }
+
+  // 起動時の約3秒間の起動音
+  static playBootSound(onFinished) {
+    try {
+      this.initContext();
+      const ctx = this.audioCtx;
+      const now = ctx.currentTime;
+
+      // 1. 低音コード（重厚なシンセベース・約3秒持続）
+      [110, 164.81, 220].forEach((freq, index) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.type = index === 0 ? 'sawtooth' : 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+        osc.frequency.exponentialRampToValueAtTime(freq * 1.02, now + 2.5);
+
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.12, now + 0.5);
+        gain.gain.setValueAtTime(0.12, now + 2.2);
+        gain.gain.linearRampToValueAtTime(0.001, now + 3.0);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 3.0);
+      });
+
+      // 2. 高音の起動チャイム・スイープ
+      const chime = ctx.createOscillator();
+      const chimeGain = ctx.createGain();
+      chime.type = 'triangle';
+      chime.frequency.setValueAtTime(440, now);
+      chime.frequency.exponentialRampToValueAtTime(1760, now + 1.5);
+
+      chimeGain.gain.setValueAtTime(0.001, now);
+      chimeGain.gain.linearRampToValueAtTime(0.08, now + 0.3);
+      chimeGain.gain.linearRampToValueAtTime(0.001, now + 2.8);
+
+      chime.connect(chimeGain);
+      chimeGain.connect(ctx.destination);
+      chime.start(now);
+      chime.stop(now + 2.8);
+
+      // 3秒後にBGMループを開始
+      if (typeof onFinished === 'function') {
+        setTimeout(onFinished, 3000);
+      }
+
+    } catch (e) {
+      console.log('Boot sound error', e);
+      if (typeof onFinished === 'function') onFinished();
+    }
+  }
+
+  // 近未来・サイバー調のBGMループ
+  static startBGM() {
+    if (this.bgmPlaying) return;
+    this.bgmPlaying = true;
+
+    try {
+      const ctx = this.audioCtx;
+      
+      // ループシーケンス（アルペジオ風の和音パターン）
+      const chords = [
+        [220, 329.63, 440], // A minor
+        [174.61, 261.63, 349.23], // F major
+        [130.81, 196.00, 261.63], // C major
+        [164.81, 246.94, 329.63]  // E minor
+      ];
+
+      let chordIndex = 0;
+      let noteIndex = 0;
+
+      const playStep = () => {
+        if (!this.bgmPlaying) return;
+        const now = ctx.currentTime;
+        const currentChord = chords[chordIndex];
+        const freq = currentChord[noteIndex];
+
+        // メロディ音
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq * 2, now); // 高音オクターブ
+
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.04, now + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.4);
+
+        // 次のステップへ
+        noteIndex++;
+        if (noteIndex >= currentChord.length) {
+          noteIndex = 0;
+          chordIndex = (chordIndex + 1) % chords.length;
+        }
+
+        // テンポ（1ステップあたりのミリ秒）
+        setTimeout(playStep, 250);
+      };
+
+      playStep();
+    } catch (e) {
+      console.log('BGM error', e);
+    }
+  }
+
+  // ワープ時のサウンド
+  static playWarpSound() {
+    try {
+      this.initContext();
+      this.bgmPlaying = false; // BGMを止める
+      const ctx = this.audioCtx;
+      const now = ctx.currentTime;
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(120, now);
+      osc.frequency.exponentialRampToValueAtTime(800, now + 0.6);
+
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.linearRampToValueAtTime(0.01, now + 0.7);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.7);
+    } catch (e) {
+      console.log('Warp sound error', e);
+    }
+  }
+}
+
+// 画面のどこかをタップ/クリックしたときの挙動
+let hasBooted = false;
+document.getElementById('standbyScreen').addEventListener('click', () => {
+  if (hasBooted) return;
+  hasBooted = true;
+
+  // 待機画面を即座にフェードアウト・ホーム画面を表示
+  const standby = document.getElementById('standbyScreen');
+  standby.style.opacity = '0';
+  standby.style.pointerEvents = 'none';
+
+  document.body.classList.add('activated');
+
+  setTimeout(() => {
+    standby.remove();
+  }, 800);
+
+  // 約3秒間の起動音を再生し、終わったらBGMへ突入
+  SoundManager.playBootSound(() => {
+    SoundManager.startBGM();
+  });
+});
+
+// WORLD STARTボタンの挙動（ホーム画面からゲーム本編へ）
+document.getElementById('startBtn').addEventListener('click', (e) => {
+  e.preventDefault();
+
+  SoundManager.playWarpSound();
+  document.body.classList.add('warping');
+
+  setTimeout(() => {
+    window.location.href = 'clickgame.html';
+  }, 650);
+});
+</script>
+
+</body>
+</html>
