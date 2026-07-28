@@ -1179,7 +1179,49 @@ function saveAndReloadGame() {
     alert("セーブに失敗しました。");
   }
 }
+// ==========================================
+// 修正パッチ: ModAPI の実体と安全な初期化
+// ==========================================
+window.ModAPI = window.ModAPI || {
+  hooks: {
+    onTick: [],
+    onCoreClick: [],
+    onPrestigeAm: [],
+    onPrestigeTl: [],
+    onPrestigeGx: [],
+    onBuyFactory: [],
+    onBuyUpgrade: [],
+    onSave: [],
+    onAchievement: []
+  },
 
+  // ドキュメントやサンプルで使われている登録用ヘルパーの実装
+  registerHook(eventName, callback) {
+    if (this.hooks[eventName] && typeof callback === 'function') {
+      this.hooks[eventName].push(callback);
+    }
+  },
+  unregisterHook(eventName, callback) {
+    if (this.hooks[eventName]) {
+      this.hooks[eventName] = this.hooks[eventName].filter(cb => cb !== callback);
+    }
+  },
+
+  // サンプルMOD等から呼び出される基本操作APIのブリッジ実装
+  getEnergy() { return typeof game !== 'undefined' ? game.energy : 0; },
+  setEnergy(val) { if (typeof game !== 'undefined') game.energy = new Decimal(val); },
+  addEnergy(val) { if (typeof game !== 'undefined') game.energy = game.energy.plus(val); },
+  subEnergy(val) { if (typeof game !== 'undefined') game.energy = Decimal.max(0, game.energy.sub(val)); },
+  
+  getAntimatter() { return typeof game !== 'undefined' ? game.antimatter : 0; },
+  setAntimatter(val) { if (typeof game !== 'undefined') game.antimatter = new Decimal(val); },
+  
+  setAllUpgradesToMax() {
+    if (typeof game !== 'undefined' && typeof DB_UPGRADES !== 'undefined') {
+      DB_UPGRADES.forEach((u, i) => { game.upgLevels[i] = u.max; });
+    }
+  }
+};
 /**
  * =========================================================================
  * 1. ユーティリティ・システム基盤 (先頭に配置してください)
