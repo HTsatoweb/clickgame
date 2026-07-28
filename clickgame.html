@@ -2776,51 +2776,46 @@ function refreshUI() {
   });
 
   DB_AM_UPGRADES.forEach(au => {
-    const lv = game.amUpgLevels[au.id] || 0;
-    const cost = getAmUpgradeCost(au.id); // Decimal型
-    const card = document.getElementById(`dom-amupg-${au.id}`);
-    const labelCost = document.getElementById(`dom-amupg-cost-${au.id}`);
-    const labelLv = document.getElementById(`dom-amupg-lv-${au.id}`);
+  const lv = game.amUpgLevels[au.id] || 0;
+  const cost = getAmUpgradeCost(au.id);
+  const card = document.getElementById(`dom-amupg-${au.id}`);
+  const labelCost = document.getElementById(`dom-amupg-cost-${au.id}`);
+  const labelLv = document.getElementById(`dom-amupg-lv-${au.id}`);
 
-    labelLv.textContent = `${lv} / ${au.max}`;
+  if (labelLv) labelLv.textContent = `${lv} / ${au.max}`;
+  if (card) {
     if (lv >= au.max) {
       card.className = "card-upgrade-node state-maxed";
-      labelCost.textContent = "結合最大";
+      if (labelCost) labelCost.textContent = "結合最大";
     } else {
       card.className = "card-upgrade-node";
-      labelCost.textContent = `${formatValue(cost)} AM`;
+      if (labelCost) labelCost.textContent = `${formatValue(cost)} AM`;
       if (antimatter.gte(cost)) card.classList.remove("state-disabled");
       else card.classList.add("state-disabled");
     }
-  });
+  }
+});
 
-  DB_TL_UPGRADES.forEach(tu => {
-    const lv = game.tlUpgLevels[tu.id] || 0;
-    const cost = getTlUpgradeCost(tu.id); // Decimal型
-    const card = document.getElementById(`dom-tlupg-${tu.id}`);
-    const labelCost = document.getElementById(`dom-tlupg-cost-${tu.id}`);
-    const labelLv = document.getElementById(`dom-tlupg-lv-${tu.id}`);
+DB_TL_UPGRADES.forEach(tu => {
+  const lv = game.tlUpgLevels[tu.id] || 0;
+  const cost = getTlUpgradeCost(tu.id);
+  const card = document.getElementById(`dom-tlupg-${tu.id}`);
+  const labelCost = document.getElementById(`dom-tlupg-cost-${tu.id}`);
+  const labelLv = document.getElementById(`dom-tlupg-lv-${tu.id}`);
 
-    labelLv.textContent = `${lv} / ${tu.max}`;
+  if (labelLv) labelLv.textContent = `${lv} / ${tu.max}`;
+  if (card) {
     if (lv >= tu.max) {
       card.className = "card-upgrade-node state-maxed";
-      labelCost.textContent = "超越完了";
+      if (labelCost) labelCost.textContent = "超越完了";
     } else {
       card.className = "card-upgrade-node";
-      labelCost.textContent = `${formatValue(cost)} TS`;
+      if (labelCost) labelCost.textContent = `${formatValue(cost)} TS`;
       if (timeShards.gte(cost)) card.classList.remove("state-disabled");
       else card.classList.add("state-disabled");
     }
-  });
-
-  if ((game.upgLevels?.[7] || 0) >= 1) {
-    document.getElementById("auto-locked-msg").style.display = "none";
-    document.getElementById("auto-unlocked-grid").style.display = "block";
-    if ((game.tlUpgLevels?.[3] || 0) >= 1) {
-      document.getElementById("row-auto-prestige-am").style.display = "flex";
-    }
   }
-
+});
   document.getElementById("s-run-time").textContent = (game.sessionTime || 0).toFixed(1) + "s";
   document.getElementById("s-total-time").textContent = (game.totalTime || 0).toFixed(1) + "s";
   document.getElementById("s-clicks").textContent = formatValue(game.totalClicks || 0);
@@ -2849,7 +2844,28 @@ function refreshUI() {
     }
   });
 }
+function switchMainTab(tabId) {
+  // すべてのタブを非表示
+  document.querySelectorAll('.tab-pane').forEach(pane => {
+    pane.classList.remove('active');
+  });
+  // すべてのタブボタンからactiveを外す
+  document.querySelectorAll('.tab-trigger-button').forEach(btn => {
+    btn.classList.remove('active');
+  });
 
+  // 指定されたタブを表示
+  const targetPane = document.getElementById(tabId);
+  if (targetPane) {
+    targetPane.classList.add('active');
+  }
+
+  // クリックされたボタンをactiveにする
+  const clickedBtn = document.querySelector(`.tab-trigger-button[onclick*="${tabId}"]`);
+  if (clickedBtn) {
+    clickedBtn.classList.add('active');
+  }
+}
 function loadGame() {
   const savedData = localStorage.getItem('your_game_save_key');
   if (!savedData) return;
@@ -3031,6 +3047,10 @@ if (typeof Decimal !== 'undefined') {
 // 起動時の強制クリーンアップ
 window.addEventListener("DOMContentLoaded", () => {
   try {
+    if (typeof initGameEnvironment === "function") initGameEnvironment();
+    if (typeof buildGameDOM === "function") buildGameDOM();
+    if (typeof loadGameOnLaunch === "function") loadGameOnLaunch();
+    if (typeof refreshUI === "function") refreshUI();
     // セーブデータにInfinityが混ざっていたら強制リセットする
     const raw = localStorage.getItem("INFINITY_MATRIX_OMEGA_SAVE_DATA");
   } catch(e) {}
