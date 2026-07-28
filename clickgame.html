@@ -2971,9 +2971,20 @@ function loadGameOnLaunch() {
       return Number.isFinite(v) && v >= 0 ? v : 0;
     });
 
-    // 最終防壁：もしロード結果がなぜか Infinity になっていたら強制的に0にする
-    if (!game.energy.isFinite() || game.energy.isNaN()) game.energy = new Decimal(0);
-    if (!game.antimatter.isFinite() || game.antimatter.isNaN()) game.antimatter = new Decimal(0);
+// 最終防壁：オブジェクトの型を問わず安全に Infinity/NaN を判定して 0 にリセットする
+    if (typeof game.energy.isFinite === 'function') {
+      if (!game.energy.isFinite() || game.energy.isNaN()) game.energy = new Decimal(0);
+    } else {
+      if (!Number.isFinite(Number(game.energy)) || Number.isNaN(Number(game.energy))) game.energy = new Decimal(0);
+      else game.energy = new Decimal(game.energy); // Decimal型に強制変換
+    }
+
+    if (typeof game.antimatter.isFinite === 'function') {
+      if (!game.antimatter.isFinite() || game.antimatter.isNaN()) game.antimatter = new Decimal(0);
+    } else {
+      if (!Number.isFinite(Number(game.antimatter)) || Number.isNaN(Number(game.antimatter))) game.antimatter = new Decimal(0);
+      else game.antimatter = new Decimal(game.antimatter); // Decimal型に強制変換
+    }
 
     const upg7 = game.upgLevels && Array.isArray(game.upgLevels) ? (game.upgLevels[7] || 0) : 0;
     if (upg7 >= 1) {
