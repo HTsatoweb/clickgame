@@ -1418,18 +1418,19 @@ function formatValue(n) {
   
   let dec = (n instanceof Decimal) ? n : new Decimal(n);
   
-  // Decimalの有限チェック（ライブラリ仕様に合わせて安全に判定）
   const isDecFinite = typeof dec.isFinite === 'function' ? dec.isFinite() : (dec.mag !== Infinity && !isNaN(dec.mag));
   if (!isDecFinite) return "無限宇宙 (Infinity)";
   if (typeof dec.eq === 'function' && dec.eq(0)) return "0.0";
   
-  // 1e6未満の場合
   if (typeof dec.lt === 'function' && dec.lt(1e6)) {
-    return dec.toNumber().toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    const num = dec.toNumber();
+    if (!isFinite(num)) return "無限宇宙 (Infinity)";
+    return num.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   }
   
-  // 巨大数の場合の科学表記（exponent と mantissa の安全な取得）
   const exponent = dec.exponent || dec.e || 0;
+  if (!isFinite(exponent) || exponent > 308) return "無限宇宙 (Infinity)";
+  
   const mantissa = dec.mantissa || (typeof dec.div === 'function' ? dec.div(new Decimal(10).pow(exponent)).toNumber() : 1);
   return `${Number(mantissa).toFixed(2)}e${exponent}`;
 }
@@ -1440,7 +1441,6 @@ function formatValue(n) {
  =========================================================================
  */
 
-// 1. セーブデータの自動初期化・整合性修復
 function sanitizeGameData() {
   if (typeof game === 'undefined' || !game) return;
 
@@ -1460,7 +1460,6 @@ function sanitizeGameData() {
     }
   });
 
-  // 主要リソースの Decimal サニタイジング
   game.energy = __sanitizeDecimal(game.energy, 0);
   game.antimatter = __sanitizeDecimal(game.antimatter, 0);
   game.timeShards = __sanitizeDecimal(game.timeShards, 0);
@@ -1468,7 +1467,6 @@ function sanitizeGameData() {
   game.totalTime = __sanitizeNumber(game.totalTime, 0);
 }
 
-// 2. 状態更新フレーム毎のデータ整合性チェックラッパー
 function updateGameLoopSafetyWrapper() {
   try {
     sanitizeGameData();
@@ -1483,7 +1481,6 @@ function updateGameLoopSafetyWrapper() {
  =========================================================================
  */
 
-// 汎用数値サニタイザー（通常の数値用）
 function __sanitizeNumber(val, fallback = 0) {
   if (val === null || val === undefined || typeof val !== 'number' || isNaN(val) || !isFinite(val)) {
     return fallback;
@@ -1491,12 +1488,11 @@ function __sanitizeNumber(val, fallback = 0) {
   return val;
 }
 
-// Decimal 用サニタイザー（安全な判定に変更）
 function __sanitizeDecimal(val, fallback = 0) {
   if (val === null || val === undefined) return new Decimal(fallback);
   try {
     const d = (val instanceof Decimal) ? val : new Decimal(val);
-    const checkFinite = typeof d.isFinite === 'function' ? d.isFinite() : (d.mag !== Infinity && !isNaN(d.mag));
+    const checkFinite = typeof d.isFinite === 'function' ? d.isFinite() : (d.mag !== Infinity && !isNaN(d.mag) && d.mag < 1e308);
     return checkFinite ? d : new Decimal(fallback);
   } catch (e) {
     return new Decimal(fallback);
@@ -1514,11 +1510,11 @@ function getFactoryCost(id) {
     const costMult = __sanitizeNumber(fData.costMultiplier, 1.15);
     
     const mitigatedMultiplier = costMult - (upg4 * 0.012);
-    const safeCount = Math.min(Math.max(0, count), 500);
+    const safeCount = Math.min(Math.max(0, count), 300); // 制限を強化
     const safeMultiplier = Math.max(1.001, mitigatedMultiplier);
     
     const cost = new Decimal(safeMultiplier).pow(safeCount).mul(baseCost);
-    return cost;
+    return __sanitizeDecimal(cost, Number.MAX_VALUE);
   } catch (e) {
     return new Decimal(Number.MAX_VALUE);
   }
@@ -1536,7 +1532,7 @@ function getUpgradeCost(id) {
     
     const safeLvl = Math.min(Math.max(0, lvl), maxLvl);
     const cost = new Decimal(costMult).pow(safeLvl).mul(baseCost);  
-    return cost;
+    return __sanitizeDecimal(cost, Number.MAX_VALUE);
   } catch (e) {
     return new Decimal(Number.MAX_VALUE);
   }
@@ -1554,7 +1550,7 @@ function getAmUpgradeCost(id) {
     
     const safeLvl = Math.min(Math.max(0, lvl), maxLvl);
     const cost = new Decimal(costMult).pow(safeLvl).mul(baseCost);  
-    return cost;
+    return __sanitizeDecimal(cost, Number.MAX_VALUE);
   } catch (e) {
     return new Decimal(Number.MAX_VALUE);
   }
@@ -1572,7 +1568,7 @@ function getTlUpgradeCost(id) {
     
     const safeLvl = Math.min(Math.max(0, lvl), maxLvl);
     const cost = new Decimal(costMult).pow(safeLvl).mul(baseCost);  
-    return cost;
+    return __sanitizeDecimal(cost, Number.MAX_VALUE);
   } catch (e) {
     return new Decimal(Number.MAX_VALUE);
   }
@@ -1588,7 +1584,8 @@ function getGameSpeedMultiplier() {
     const amUpg3Effect = 1 + (Math.max(0, amUpg3) * 0.5);
     const result = baseShardsEffect.mul(amUpg3Effect);
     
-    return result.toNumber();
+    const num = result.toNumber();
+    return (isFinite(num) && num > 0) ? Math.min(num, 1e10) : 1.0;
   } catch (e) {
     return 1.0;
   }
@@ -1607,12 +1604,17 @@ function getGlobalProductionMultiplier() {
     const amPerUnitValue = 1.0 + (amUpg0 * 0.5);
     let amMultiplier = antimatter.max(0).mul(amPerUnitValue).plus(1);
     let baseUpgradeMultiplier = 1.0 + (Math.max(0, upg1) * 0.3);
-    let exponentialMultiplier = new Decimal(1.6).pow(Math.min(Math.max(0, upg3), 50));
+    
+    // 【修正】指数が大きくなりすぎてInfinityになるのを防ぐため、上限を20に制限
+    let safeUpg3 = Math.min(Math.max(0, upg3), 20);
+    let exponentialMultiplier = new Decimal(1.6).pow(safeUpg3);
+    
     let timelineTimeMultiplier = 1.0 + (Math.max(0, tlUpg1) * (Math.max(0, totalTime) * 0.005));
     let galaxyMultiplier = galaxyNodes.max(0).mul(5.0).plus(1);
     
-    const result = amMultiplier.mul(baseUpgradeMultiplier).mul(exponentialMultiplier).mul(timelineTimeMultiplier).mul(galaxyMultiplier);
-    return result; 
+    let result = amMultiplier.mul(baseUpgradeMultiplier).mul(exponentialMultiplier).mul(timelineTimeMultiplier).mul(galaxyMultiplier);
+    
+    return __sanitizeDecimal(result, 1.0);
   } catch (e) {
     return new Decimal(1.0);
   }
@@ -1626,7 +1628,7 @@ function getFactoryCps(id) {
     const globalMult = getGlobalProductionMultiplier();
     
     const cps = new Decimal(baseCps).mul(Math.max(0, count)).mul(globalMult);
-    return cps;
+    return __sanitizeDecimal(cps, 0);
   } catch (e) {
     return new Decimal(0);
   }
@@ -1639,7 +1641,7 @@ function getTotalCps() {
     for (let i = 0; i < DB_FACTORIES.length; i++) {
       total = total.plus(getFactoryCps(i));
     }
-    return total;
+    return __sanitizeDecimal(total, 0);
   } catch (e) {
     return new Decimal(0);
   }
@@ -1652,12 +1654,14 @@ function getClickPower() {
     const antimatter = __sanitizeDecimal(game?.antimatter, 0);
     const upg5 = __sanitizeNumber(game?.upgLevels?.[5], 0);
 
-    let baseClick = new Decimal(2).pow(Math.min(Math.max(0, upg0), 50));
+    // 【修正】ベースクリックのべき乗上限を20に制限してオーバーフローを防止
+    let safeUpg0 = Math.min(Math.max(0, upg0), 20);
+    let baseClick = new Decimal(2).pow(safeUpg0);
     let amClickBonus = antimatter.max(0).mul(0.2).mul(amUpg1).plus(1);
     let cpHitsBonus = getTotalCps().mul(Math.max(0, upg5) * 0.012);
     
     let power = baseClick.mul(amClickBonus).plus(cpHitsBonus);
-    return power;
+    return __sanitizeDecimal(power, 1);
   } catch (e) {
     return new Decimal(1);
   }
@@ -1673,7 +1677,7 @@ function getGainAntimatter() {
     let baseGain = energy.div(1e6).sqrt().floor();
     baseGain = baseGain.mul(1.0 + Math.max(0, upg6) * 0.5).floor();
     if (tlUpg2 >= 1) baseGain = baseGain.mul(2);
-    return baseGain;
+    return __sanitizeDecimal(baseGain, 0);
   } catch (e) {
     return new Decimal(0);
   }
@@ -1691,7 +1695,7 @@ function getGainTimeShards() {
     if (val.lte(0) || !isValFinite) return new Decimal(0);
 
     let gain = new Decimal(Math.floor(val.log10())).mul(1 + Math.floor(antimatter.div(400).toNumber())).floor();
-    return gain.max(0);
+    return __sanitizeDecimal(gain.max(0), 0);
   } catch (e) {
     return new Decimal(0);
   }
