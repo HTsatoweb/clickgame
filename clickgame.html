@@ -2910,14 +2910,11 @@ const STORAGE_KEY = "INFINITY_MATRIX_OMEGA_SAVE_DATA";
  */
 function __safeDecimalParse(val, fallback = 0) {
   if (val === null || val === undefined) return new Decimal(fallback);
-  // Infinityを0に落とさず、そのまま扱う（または大きな値にする）
-  if (val === Infinity || val === "Infinity") return new Decimal("1e308"); // または new Decimal(1e308)
+  if (val === Infinity || val === "Infinity") return new Decimal("1e308"); // 0にしない
   if (val === -Infinity || val === "-Infinity") return new Decimal(0);
   try {
     const d = new Decimal(val);
-    // magがInfinityでも強制的に0にしない
-    // if (typeof d.mag === 'number' && (!Number.isFinite(d.mag) || d.mag === Infinity)) return new Decimal(fallback);
-    return d;
+    return d; // isFiniteチェックで0に落とさない
   } catch (e) {
     return new Decimal(fallback);
   }
@@ -2994,12 +2991,7 @@ function loadGameOnLaunch() {
 // 最終防壁：オブジェクトの型を問わず安全に Infinity/NaN を判定して 0 にリセットする
  
 
-    if (typeof game.antimatter.isFinite === 'function') {
-      if (!game.antimatter.isFinite() || game.antimatter.isNaN()) game.antimatter = new Decimal(0);
-    } else {
-      if (!Number.isFinite(Number(game.antimatter)) || Number.isNaN(Number(game.antimatter))) game.antimatter = new Decimal(0);
-      else game.antimatter = new Decimal(game.antimatter); // Decimal型に強制変換
-    }
+   
 
     const upg7 = game.upgLevels && Array.isArray(game.upgLevels) ? (game.upgLevels[7] || 0) : 0;
     if (upg7 >= 1) {
@@ -3024,9 +3016,12 @@ window.addEventListener("DOMContentLoaded", () => {
     if (typeof buildGameDOM === "function") buildGameDOM();
     if (typeof loadGameOnLaunch === "function") loadGameOnLaunch();
     if (typeof refreshUI === "function") refreshUI();
-    // セーブデータにInfinityが混ざっていたら強制リセットする
-    const raw = localStorage.getItem("INFINITY_MATRIX_OMEGA_SAVE_DATA");
-  } catch(e) {}
+
+    // ★ これを追加（ゲームループ開始）
+    requestAnimationFrame(executeCoreGameTick);
+  } catch(e) {
+    console.error("初期化エラー:", e);
+  }
 });
 /**
  * =========================================================================
