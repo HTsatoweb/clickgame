@@ -3017,8 +3017,9 @@ window.addEventListener("DOMContentLoaded", () => {
     if (typeof loadGameOnLaunch === "function") loadGameOnLaunch();
     if (typeof refreshUI === "function") refreshUI();
 
-    // ★ これを追加（ゲームループ開始）
+    // ★ これを必ず追加する（ゲームループの最初の起動）
     requestAnimationFrame(executeCoreGameTick);
+
   } catch(e) {
     console.error("初期化エラー:", e);
   }
