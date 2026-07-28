@@ -1227,29 +1227,37 @@ if (typeof window.ModAPI === "undefined") {
  * =========================================================================
  */
 let game = {
-  energy: 0,
-  totalClicks: 0,
-  antimatter: 0,
+  energy: new Decimal(0),
+  totalClicks: new Decimal(0),
+  antimatter: new Decimal(0),
   prestigeAmCount: 0,
-  timeShards: 0,
+  timeShards: new Decimal(0),
   prestigeTlCount: 0,
   galaxyNodes: 0,
   prestigeGxCount: 0,
   sessionTime: 0,
   totalTime: 0,
-  facCounts: new Array(DB_FACTORIES.length).fill(0),     // 30個に正確に一致
-  upgLevels: new Array(DB_UPGRADES.length).fill(0),     // 33個に正確に一致
-  amUpgLevels: new Array(DB_AM_UPGRADES.length).fill(0), // 26個に正確に一致
-  tlUpgLevels: new Array(DB_TL_UPGRADES.length).fill(0), // 26個に正確に一致
+  facCounts: new Array(DB_FACTORIES.length).fill(0),
+  upgLevels: new Array(DB_UPGRADES.length).fill(0),
+  amUpgLevels: new Array(DB_AM_UPGRADES.length).fill(0),
+  tlUpgLevels: new Array(DB_TL_UPGRADES.length).fill(0),
   autoFacEnabled: false,
   autoUpgEnabled: false,
   autoAmEnabled: false,
   autoPrestigeAmEnabled: false,
-  achievements: []
+  achievements: [],
+  unlockedAchievements: {}
 };
 
 const DEFAULT_GAME_STATE = JSON.stringify(game);
-
+function deserializeGameData(rawData) {
+     const parsed = JSON.parse(rawData);
+     game.energy = new Decimal(parsed.energy ?? 0);
+     game.totalClicks = new Decimal(parsed.totalClicks ?? 0);
+     game.antimatter = new Decimal(parsed.antimatter ?? 0);
+     game.timeShards = new Decimal(parsed.timeShards ?? 0);
+     // ...他のプロパティの復元（必要に応じて追加）
+   }
 /**
  * ==========================================================================================
  * VERIFIED 65+ COMPLETELY SEPARATED API ENDPOINTS ARCHITECTURE (NO ALTERATION ALLOWED)
@@ -2638,6 +2646,7 @@ function loadGameOnLaunch() {
   try {
     const rawData = localStorage.getItem(STORAGE_KEY);
     if (rawData) {
+      deserializeGameData(rawData);
       game = Object.assign({}, game, JSON.parse(rawData));
       if (game.upgLevels[7] >= 1) {
         document.getElementById("chk-auto-fac").checked = game.autoFacEnabled;
@@ -2674,7 +2683,9 @@ function executeCoreGameTick(currentTimestamp) {
 
   game.sessionTime += dimensionalDeltaTime;
   game.totalTime += dimensionalDeltaTime;
-  game.energy += getTotalCps() * dimensionalDeltaTime;
+  const totalCpsVal = (typeof getTotalCps === "function") ? getTotalCps() : new Decimal(0);
+const cpsDecimal = (totalCpsVal instanceof Decimal) ? totalCpsVal : new Decimal(totalCpsVal);
+game.energy = game.energy.add(cpsDecimal.mul(dimensionalDeltaTime));
 
   runInternalAutomation();
 
@@ -2684,7 +2695,7 @@ function executeCoreGameTick(currentTimestamp) {
   }
 
   // エネルギー量・進行度に応じた動的ビジュアル演出の更新
-  updateDynamicCoreAndResourceVisuals(game.energy);
+  updateDynamicCoreAndResourceVisuals(game.energy.toNumber());
 
   if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onTick) {
     window.ModAPI.hooks.onTick.forEach(cb => { try { cb(dimensionalDeltaTime); } catch(e){} });
