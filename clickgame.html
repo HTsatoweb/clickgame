@@ -1457,7 +1457,7 @@ function safeAdd(a, b) {
     const da = __safeDecimalParse(a);
     const db = __safeDecimalParse(b);
     const res = da.plus(db);
-    if (!res.isFinite() || res.isNaN()) return new Decimal(0);
+    // Infinityになっても0にしない
     return res;
   } catch (e) {
     return new Decimal(0);
@@ -1469,7 +1469,7 @@ function safeMul(a, b) {
     const da = __safeDecimalParse(a);
     const db = __safeDecimalParse(b);
     const res = da.mul(db);
-    if (!res.isFinite() || res.isNaN()) return new Decimal(0);
+    // Infinityになっても0にしない
     return res;
   } catch (e) {
     return new Decimal(0);
@@ -3020,29 +3020,7 @@ function loadGameOnLaunch() {
     localStorage.removeItem(STORAGE_KEY);
   }
 }
-// ==========================================
-// 🛡️ 正しい数値崩壊防壁パッチ（修正版）
-// ==========================================
-if (typeof Decimal !== 'undefined') {
-  // 無理な強制置換（1e308を返す処理）を廃止し、NaNや無限大になった場合のみ0または安全値に落とす
-  const originalPlus = Decimal.prototype.plus;
-  Decimal.prototype.plus = function(v) {
-    try {
-      const res = originalPlus.call(this, v);
-      if (res && typeof res.isFinite === 'function' && !res.isFinite()) return new Decimal(0);
-      return res;
-    } catch(e) { return this; }
-  };
 
-  const originalMul = Decimal.prototype.mul;
-  Decimal.prototype.mul = function(v) {
-    try {
-      const res = originalMul.call(this, v);
-      if (res && typeof res.isFinite === 'function' && !res.isFinite()) return new Decimal(0);
-      return res;
-    } catch(e) { return this; }
-  };
-}
 
 // 起動時の強制クリーンアップ
 window.addEventListener("DOMContentLoaded", () => {
