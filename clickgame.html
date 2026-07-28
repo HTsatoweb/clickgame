@@ -2754,20 +2754,24 @@ function refreshUI() {
 
   DB_UPGRADES.forEach(u => {
     const lv = game.upgLevels[u.id] || 0;
-    const cost = getUpgradeCost(u.id); // Decimal型
+    // コスト計算を正しいロジックに修正
+    const cost = new Decimal(u.baseCost).times(Decimal.pow(u.costScale, lv));
     const card = document.getElementById(`dom-upg-${u.id}`);
     const labelCost = document.getElementById(`dom-upg-cost-${u.id}`);
     const labelLv = document.getElementById(`dom-upg-lv-${u.id}`);
 
-    labelLv.textContent = `${lv} / ${u.max}`;
-    if (lv >= u.max) {
-      card.className = "card-upgrade-node state-maxed";
-      labelCost.textContent = "MAX定着";
-    } else {
-      card.className = "card-upgrade-node";
-      labelCost.textContent = `${formatValue(cost)} E`;
-      if (energy.gte(cost)) card.classList.remove("state-disabled");
-      else card.classList.add("state-disabled");
+    if (labelLv) labelLv.textContent = `${lv} / ${u.max}`;
+    if (card) {
+      if (lv >= u.max) {
+        card.className = "card-upgrade-node state-maxed";
+        if (labelCost) labelCost.textContent = "MAX定着";
+      } else {
+        card.className = "card-upgrade-node";
+        if (labelCost) labelCost.textContent = `${formatValue(cost)} E`;
+        // energy を game.energy に修正
+        if (game.energy.gte(cost)) card.classList.remove("state-disabled");
+        else card.classList.add("state-disabled");
+      }
     }
   });
 
