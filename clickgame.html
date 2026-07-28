@@ -1694,6 +1694,8 @@ function getGameSpeedMultiplier() {
 
 function getGlobalProductionMultiplier() {
   try {
+    if (typeof game === 'undefined' || !game) return new Decimal(1.0);
+
     const amUpg0 = __sanitizeNumber(game?.amUpgLevels?.[0], 0);
     const antimatter = __sanitizeDecimal(game?.antimatter, 0);
     const upg1 = __sanitizeNumber(game?.upgLevels?.[1], 0);
@@ -1702,33 +1704,73 @@ function getGlobalProductionMultiplier() {
     const totalTime = __sanitizeNumber(game?.totalTime, 0);
     const galaxyNodes = __sanitizeDecimal(game?.galaxyNodes, 0);
 
+    // 1. 反物質倍率
     const amPerUnitValue = 1.0 + (amUpg0 * 0.5);
     let amMultiplier = antimatter.max(0).mul(amPerUnitValue).plus(1);
+
+    // 2. 基本アップグレード倍率
     let baseUpgradeMultiplier = 1.0 + (Math.max(0, upg1) * 0.3);
-    
-    let safeUpg3 = Math.min(Math.max(0, upg3), 20);
+
+    // 3. 指数倍率（ここが一番危険なので強めにキャップ）
+    const safeUpg3 = Math.min(Math.max(0, upg3), 25); // 上限を少し緩和しつつ制限
     let exponentialMultiplier = new Decimal(1.6).pow(safeUpg3);
-    
+
+    // 4. 時間倍率
     let timelineTimeMultiplier = 1.0 + (Math.max(0, tlUpg1) * (Math.max(0, totalTime) * 0.005));
+
+    // 5. 銀河倍率
     let galaxyMultiplier = galaxyNodes.max(0).mul(5.0).plus(1);
-    
-    let result = amMultiplier.mul(baseUpgradeMultiplier).mul(exponentialMultiplier).mul(timelineTimeMultiplier).mul(galaxyMultiplier);
-    return __sanitizeDecimal(result, 1.0);
+
+    // 掛け合わせ
+    let result = amMultiplier
+      .mul(baseUpgradeMultiplier)
+      .mul(exponentialMultiplier)
+      .mul(timelineTimeMultiplier)
+      .mul(galaxyMultiplier);
+
+    // ★ 重要：非有限になったら巨大な有限数に強制キャップ
+    if (typeof result.isFinite === 'function' && !result.isFinite()) {
+      return new Decimal("1e300");
+    }
+
+    // さらに安全のため上限を設ける（任意）
+    if (result.gte(new Decimal("1e300"))) {
+      return new Decimal("1e300");
+    }
+
+    return result;
   } catch (e) {
+    console.warn("getGlobalProductionMultiplier error:", e);
     return new Decimal(1.0);
   }
 }
 
-function getFactoryCps(id) {  
+function getFactoryCps(id) {
   try {
     if (!DB_FACTORIES || !DB_FACTORIES[id]) return new Decimal(0);
+
     const count = __sanitizeNumber(game?.facCounts?.[id], 0);
     const baseCps = __sanitizeNumber(DB_FACTORIES[id].baseCps, 0);
     const globalMult = getGlobalProductionMultiplier();
-    
-    const cps = new Decimal(baseCps).mul(Math.max(0, count)).mul(globalMult);
-    return __sanitizeDecimal(cps, 0);
+
+    // 計算
+    let cps = new Decimal(baseCps)
+      .mul(Math.max(0, count))
+      .mul(globalMult);
+
+    // ★ 重要：非有限ならキャップ
+    if (typeof cps.isFinite === 'function' && !cps.isFinite()) {
+      return new Decimal("1e300");
+    }
+
+    // さらに安全な上限
+    if (cps.gte(new Decimal("1e300"))) {
+      return new Decimal("1e300");
+    }
+
+    return cps;
   } catch (e) {
+    console.warn("getFactoryCps error:", e);
     return new Decimal(0);
   }
 }
