@@ -643,15 +643,6 @@ button, .btn-action-prestige, .click-core-btn, .card-upgrade-node, .factory-line
       </button>
       <div class="prestige-req">要求: 1.00e24 E かつ 50 TS</div>
     </div>
-
-    <div class="prestige-node">
-  <button class="btn-action-prestige" id="btnResetOp" disabled>
-    Ω転生：特異点統合
-  </button>
-  <div class="prestige-req">要求: 1e50 E かつ 10 GN</div>
-  <div id="v-gain-op">+0 OP</div>
-</div>
-    
   </div>
 </div>
 
@@ -748,95 +739,6 @@ button, .btn-action-prestige, .click-core-btn, .card-upgrade-node, .factory-line
 </div>
 
 <script>
-  // ==========================================
-// break_infinity.js が無い環境用のフォールバック
-// ==========================================
-if (typeof Decimal === 'undefined') {
-  console.warn("break_infinity.js が読み込めませんでした。簡易Decimalで動作します（1e308まで）");
-
-  class SimpleDecimal {
-    constructor(value = 0) {
-      this.value = Number(value) || 0;
-      if (!isFinite(this.value)) this.value = 0;
-    }
-
-    plus(v) {
-      const n = (v instanceof SimpleDecimal) ? v.value : Number(v) || 0;
-      return new SimpleDecimal(this.value + n);
-    }
-    sub(v) {
-      const n = (v instanceof SimpleDecimal) ? v.value : Number(v) || 0;
-      return new SimpleDecimal(Math.max(0, this.value - n));
-    }
-    mul(v) {
-      const n = (v instanceof SimpleDecimal) ? v.value : Number(v) || 0;
-      return new SimpleDecimal(this.value * n);
-    }
-    div(v) {
-      const n = (v instanceof SimpleDecimal) ? v.value : Number(v) || 0;
-      return new SimpleDecimal(n === 0 ? 0 : this.value / n);
-    }
-    pow(v) {
-      const n = (v instanceof SimpleDecimal) ? v.value : Number(v) || 0;
-      return new SimpleDecimal(Math.pow(this.value, n));
-    }
-    log10() {
-      return new SimpleDecimal(this.value <= 0 ? 0 : Math.log10(this.value));
-    }
-    floor() {
-      return new SimpleDecimal(Math.floor(this.value));
-    }
-    max(v) {
-      const n = (v instanceof SimpleDecimal) ? v.value : Number(v) || 0;
-      return new SimpleDecimal(Math.max(this.value, n));
-    }
-    min(v) {
-      const n = (v instanceof SimpleDecimal) ? v.value : Number(v) || 0;
-      return new SimpleDecimal(Math.min(this.value, n));
-    }
-    gte(v) {
-      const n = (v instanceof SimpleDecimal) ? v.value : Number(v) || 0;
-      return this.value >= n;
-    }
-    gt(v) {
-      const n = (v instanceof SimpleDecimal) ? v.value : Number(v) || 0;
-      return this.value > n;
-    }
-    lte(v) {
-      const n = (v instanceof SimpleDecimal) ? v.value : Number(v) || 0;
-      return this.value <= n;
-    }
-    lt(v) {
-      const n = (v instanceof SimpleDecimal) ? v.value : Number(v) || 0;
-      return this.value < n;
-    }
-    eq(v) {
-      const n = (v instanceof SimpleDecimal) ? v.value : Number(v) || 0;
-      return this.value === n;
-    }
-    toNumber() {
-      return this.value;
-    }
-    toString() {
-      return String(this.value);
-    }
-    isFinite() {
-      return Number.isFinite(this.value);
-    }
-    isNaN() {
-      return Number.isNaN(this.value);
-    }
-  }
-
-  // 静的メソッドも最低限用意
-  SimpleDecimal.max = function(a, b) {
-    const na = (a instanceof SimpleDecimal) ? a.value : Number(a) || 0;
-    const nb = (b instanceof SimpleDecimal) ? b.value : Number(b) || 0;
-    return new SimpleDecimal(Math.max(na, nb));
-  };
-
-  window.Decimal = SimpleDecimal;
-}
 /**
  * =========================================================================
  * Extended Configuration Database Ecosystem (DEEP MASSIVE ARRAY ENHANCEMENT)
@@ -1130,6 +1032,7 @@ const DB_ACHIEVEMENTS = [
   { id: 'ach_89', text: '「全プレステージの主」', req: () => (game.prestigeAmCount ?? 0) >= 10 && (game.prestigeTlCount ?? 0) >= 5 && (game.prestigeGxCount ?? 0) >= 3, desc: 'すべての下位プレステージを複数回達成。' },
   { id: 'ach_90', text: '「オメガ・アブソリュート」', req: () => (game.omegaPoints ?? 0) >= 100, desc: 'Ωポイントが100に到達し、真の上位存在となった。' }
 ];
+
 /**
  * セーブを実行したのちにページを再読み込みする
  */
@@ -1211,12 +1114,10 @@ let game = {
   prestigeGxCount: 0,
   sessionTime: 0,
   totalTime: 0,
-  prestigeOpCount: 0,
   facCounts: new Array(DB_FACTORIES.length).fill(0),     // 30個に正確に一致
   upgLevels: new Array(DB_UPGRADES.length).fill(0),     // 33個に正確に一致
   amUpgLevels: new Array(DB_AM_UPGRADES.length).fill(0), // 26個に正確に一致
   tlUpgLevels: new Array(DB_TL_UPGRADES.length).fill(0), // 26個に正確に一致
-  omegaPoints: new Decimal(0),
   autoFacEnabled: false,
   autoUpgEnabled: false,
   autoAmEnabled: false,
@@ -1226,38 +1127,6 @@ let game = {
 
 const DEFAULT_GAME_STATE = JSON.stringify(game);
 
-
-  function getGainOmegaPoints() {
-  try {
-    const energy = __sanitizeDecimal(game?.energy, 0);
-    const galaxyNodes = __sanitizeDecimal(game?.galaxyNodes, 0);
-
-    if (energy.lt("1e50") || galaxyNodes.lt(10)) return new Decimal(0);
-
-    // ポイント方式の例：logベースで獲得
-    let gain = energy.log10().div(50).floor();
-    gain = gain.mul(galaxyNodes.div(5).floor().plus(1));
-    return __sanitizeDecimal(gain.max(0), 0);
-  } catch (e) {
-    return new Decimal(0);
-  }
-}
-  function executePrestigeOmega(forcedGain) {
-  const safeGain = __sanitizeDecimal(forcedGain, 0);
-  game.omegaPoints = __sanitizeDecimal(game.omegaPoints, 0).plus(safeGain);
-  game.prestigeOpCount = (game.prestigeOpCount || 0) + 1;
-
-  // リセット内容（調整可能）
-  game.energy = new Decimal(0);
-  game.antimatter = new Decimal(0);
-  game.timeShards = new Decimal(0);
-  // game.galaxyNodes は残すか消すか選択
-  game.facCounts = game.facCounts.map(() => 0);
-  // アップグレードもリセット（一部残す場合は調整）
-
-  refreshUI();
-  pushLog(`Ω 転生完了：+${formatValue(safeGain)} OP を獲得`, "#ff00aa");
-}
 /**
  * ==========================================================================================
  * VERIFIED 65+ COMPLETELY SEPARATED API ENDPOINTS ARCHITECTURE (NO ALTERATION ALLOWED)
@@ -1595,9 +1464,7 @@ function getGlobalProductionMultiplier() {
     let exponentialMultiplier = Math.pow(1.6, Math.min(Math.max(0, upg3), 50));
     let timelineTimeMultiplier = 1.0 + (Math.max(0, tlUpg1) * (Math.max(0, totalTime) * 0.005));
     let galaxyMultiplier = 1.0 + (Math.max(0, galaxyNodes) * 5.0);
-    const omegaPoints = __sanitizeDecimal(game?.omegaPoints, 0);
-let omegaMultiplier = omegaPoints.max(0).mul(2).plus(1); // 1 OPごとに ×2
-// 最後に .mul(omegaMultiplier) を追加
+    
     const result = amMultiplier * baseUpgradeMultiplier * exponentialMultiplier * timelineTimeMultiplier * galaxyMultiplier;
     return __sanitizeNumber(result, 1.0);
   } catch (e) {
@@ -1899,76 +1766,125 @@ function buildGameDOM() {
 }
 /**
  * =========================================================================
- * Transaction Purchase Controllers
+ * 物質施設・アップグレードの安全な購入処理システム
  * =========================================================================
  */
+
+// 1. 物質施設の購入処理
 function executeBuyFactory(id) {
-  const cost = getFactoryCost(id);
-  if (game.energy >= cost) {
-    game.energy -= cost;
-    game.facCounts[id]++;
-    SoundManager.playBuy();
-    pushLog(`施設 [${DB_FACTORIES[id].name}] を製造しました。`, "var(--color-energy)");
-    window.ModAPI.hooks.onBuyFactory.forEach(cb => { try { cb({id: id, cost: cost}); } catch(e){} });
-    refreshUI();
-  }
-}
-function refreshUI() {
-  // 例: レベルやコストの更新部分
-  DB_UPGRADES.forEach(u => {
-    const labelCost = document.getElementById(`dom-upg-cost-${u.id}`);
-    const labelLv = document.getElementById(`dom-upg-lv-${u.id}`);
+  try {
+    sanitizeGameData(); // データの整合性を強制修復
     
-    // ★要素が存在する場合のみ値を代入する（nullエラーを防ぐ）
-    if (labelCost) labelCost.textContent = `${formatValue(getUpgradeCost(u.id))} E`;
-    if (labelLv) labelLv.textContent = `${game.upgLevels[u.id]} / ${u.max}`;
-  });
-
-  // 施設や他のUI更新部分も同様に、取得した要素が null でないか確認するコードに修正してください
+    if (!DB_FACTORIES || !DB_FACTORIES[id]) return;
+    const cost = getFactoryCost(id);
+    
+    if (game.energy >= cost) {
+      game.energy -= cost;
+      if (!Array.isArray(game.facCounts)) game.facCounts = [];
+      
+      // undefinedやNaNだった場合は0にしてから加算
+      let currentQty = __sanitizeNumber(game.facCounts[id], 0);
+      game.facCounts[id] = currentQty + 1;
+      
+      refreshUI();
+      pushLog(`🏭 施設購入：${DB_FACTORIES[id].name} を増設しました（所持数: ${game.facCounts[id]}）`, "var(--color-energy)");
+      
+      // モック用フックの実行
+      if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onBuyFactory) {
+        window.ModAPI.hooks.onBuyFactory.forEach(cb => { try { cb({id, count: game.facCounts[id]}); } catch(e){} });
+      }
+    } else {
+      createToast("エネルギー不足", "この施設を購入するためのエネルギーが足りません。");
+    }
+  } catch (err) {
+    console.error("Factory purchase error:", err);
+  }
 }
+
+// 2. 通常アップグレードの購入処理
 function executeBuyUpgrade(id) {
-  if (game.upgLevels[id] >= DB_UPGRADES[id].max) return;
-  const cost = getUpgradeCost(id);
-  if (game.energy >= cost) {
-    game.energy -= cost;
-    game.upgLevels[id]++;
-    SoundManager.playBuy();
-    pushLog(`概念改良 [${DB_UPGRADES[id].name}] Lv.${game.upgLevels[id]} 適用。`, "var(--color-upgrade)");
-    window.ModAPI.hooks.onBuyUpgrade.forEach(cb => { try { cb({id: id, type: 'normal', cost: cost}); } catch(e){} });
-    refreshUI();
+  try {
+    sanitizeGameData();
+    if (!DB_UPGRADES || !DB_UPGRADES[id]) return;
+    
+    const uData = DB_UPGRADES[id];
+    if (!Array.isArray(game.upgLevels)) game.upgLevels = [];
+    
+    let currentLvl = __sanitizeNumber(game.upgLevels[id], 0);
+    if (currentLvl >= uData.max) return;
+    
+    const cost = getUpgradeCost(id);
+    if (game.energy >= cost) {
+      game.energy -= cost;
+      game.upgLevels[id] = currentLvl + 1;
+      
+      refreshUI();
+      pushLog(`💡 改良成功：${uData.name} (Lv.${game.upgLevels[id]})`, "var(--color-upgrade)");
+      
+      if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onBuyUpgrade) {
+        window.ModAPI.hooks.onBuyUpgrade.forEach(cb => { try { cb({id, level: game.upgLevels[id]}); } catch(e){} });
+      }
+    } else {
+      createToast("エネルギー不足", "アップグレードに必要なエネルギーが足りません。");
+    }
+  } catch (err) {
+    console.error("Upgrade purchase error:", err);
   }
 }
 
+// 3. 反物質アップグレードの購入処理
 function executeBuyAmUpgrade(id) {
-  if (game.amUpgLevels[id] >= DB_AM_UPGRADES[id].max) return;
-  const cost = getAmUpgradeCost(id);
-  if (game.antimatter >= cost) {
-    game.antimatter -= cost;
-    game.amUpgLevels[id]++;
-    SoundManager.playBuy(); // ★ 反物質アップグレード購入音を追加
-    pushLog(`反物質改良 [${DB_AM_UPGRADES[id].name}] を適用。`, "var(--color-antimatter)");
-    refreshUI();
+  try {
+    sanitizeGameData();
+    if (!DB_AM_UPGRADES || !DB_AM_UPGRADES[id]) return;
+    
+    const auData = DB_AM_UPGRADES[id];
+    if (!Array.isArray(game.amUpgLevels)) game.amUpgLevels = [];
+    
+    let currentLvl = __sanitizeNumber(game.amUpgLevels[id], 0);
+    if (currentLvl >= auData.max) return;
+    
+    const cost = getAmUpgradeCost(id);
+    if (game.antimatter >= cost) {
+      game.antimatter -= cost;
+      game.amUpgLevels[id] = currentLvl + 1;
+      
+      refreshUI();
+      pushLog(`⚛️ 反物質改良：${auData.name} (Lv.${game.amUpgLevels[id]})`, "var(--color-antimatter)");
+    } else {
+      createToast("反物質不足", "反物質アップグレードに必要なAMが足りません。");
+    }
+  } catch (err) {
+    console.error("AM Upgrade error:", err);
   }
 }
 
+// 4. タイムラインアップグレードの購入処理
 function executeBuyTlUpgrade(id) {
-  if (game.tlUpgLevels[id] >= DB_TL_UPGRADES[id].max) return;
-  const cost = getTlUpgradeCost(id);
-  if (game.timeShards >= cost) {
-    game.timeShards -= cost;
-    game.tlUpgLevels[id]++;
-    SoundManager.playBuy(); // ★ 時間律アップグレード購入音を追加
-    pushLog(`時間律改良 [${DB_TL_UPGRADES[id].name}] を定着。`, "var(--color-timeline)");
-    refreshUI();
+  try {
+    sanitizeGameData();
+    if (!DB_TL_UPGRADES || !DB_TL_UPGRADES[id]) return;
+    
+    const tuData = DB_TL_UPGRADES[id];
+    if (!Array.isArray(game.tlUpgLevels)) game.tlUpgLevels = [];
+    
+    let currentLvl = __sanitizeNumber(game.tlUpgLevels[id], 0);
+    if (currentLvl >= tuData.max) return;
+    
+    const cost = getTlUpgradeCost(id);
+    if (game.timeShards >= cost) {
+      game.timeShards -= cost;
+      game.tlUpgLevels[id] = currentLvl + 1;
+      
+      refreshUI();
+      pushLog(`⏳ 時間律改良：${tuData.name} (Lv.${game.tlUpgLevels[id]})`, "var(--color-timeline)");
+    } else {
+      createToast("時間律の破片不足", "タイムラインアップグレードに必要なTSが足りません。");
+    }
+  } catch (err) {
+    console.error("TL Upgrade error:", err);
   }
 }
-function toggleAuto(type) {
-  if (type === 'fac') game.autoFacEnabled = document.getElementById("chk-auto-fac").checked;
-  if (type === 'upg') game.autoUpgEnabled = document.getElementById("chk-auto-upg").checked;
-  if (type === 'am') game.autoAmEnabled = document.getElementById("chk-auto-am").checked;
-  if (type === 'pam') game.autoPrestigeAmEnabled = document.getElementById("chk-auto-pam").checked;
-}
-
 /**
  * =========================================================================
  * Multi-Tier Layer Prestige Subroutines
@@ -2050,13 +1966,7 @@ document.getElementById("btnResetGx").addEventListener("click", () => {
     refreshUI();
   }
 });
-document.getElementById("btnResetOp").addEventListener("click", () => {
-  const gain = getGainOmegaPoints();
-  if (gain.lte(0)) return;   // Decimal対応
-  if (confirm(`Ω転生を実行しますか？\n+${formatValue(gain)} OP を獲得し、下位リソースをリセットします。`)) {
-    executePrestigeOmega(gain);
-  }
-});
+
 /**
  * =========================================================================
  * Core Impulse Click Procedures
@@ -2409,43 +2319,6 @@ const SoundManager = {
 function toggleBGM() {
   SoundManager.toggleBGM();
 }
-  function executePrestigeOmega(forcedGain) {
-  try {
-    const safeGain = (forcedGain instanceof Decimal) ? forcedGain : new Decimal(forcedGain || 0);
-    if (safeGain.lte(0)) return;
-
-    // OPを加算
-    if (!(game.omegaPoints instanceof Decimal)) {
-      game.omegaPoints = new Decimal(game.omegaPoints || 0);
-    }
-    game.omegaPoints = game.omegaPoints.plus(safeGain);
-    game.prestigeOpCount = (game.prestigeOpCount || 0) + 1;
-
-    // リセット
-    game.energy = new Decimal(0);
-    game.antimatter = new Decimal(0);
-    game.timeShards = new Decimal(0);
-    // galaxyNodes は残す
-    game.facCounts = [0, 0, 0, 0, 0];
-    game.upgLevels = [0, 0, 0, 0, 0, 0, 0, 0];
-    game.amUpgLevels = [0, 0, 0, 0];
-    game.tlUpgLevels = [0, 0, 0, 0];
-    game.sessionTime = 0;
-
-    pushLog(`Ω転生完了：+${formatValue(safeGain)} OP を獲得`, "#ff00aa");
-    createToast("Ω転生", `特異点を統合し ${formatValue(safeGain)} OP を回収しました`);
-
-    if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onPrestigeOp) {
-      window.ModAPI.hooks.onPrestigeOp.forEach(cb => {
-        try { cb({gain: safeGain}); } catch(e){}
-      });
-    }
-
-    refreshUI();
-  } catch (e) {
-    console.error("executePrestigeOmega error:", e);
-  }
-}
 /**
  * =========================================================================
  * Viewport Refresher & State Synchronization Interface
@@ -2487,22 +2360,7 @@ function refreshUI() {
     if (game.energy >= cost) card.classList.remove("state-disabled");
     else card.classList.add("state-disabled");
   });
-// Ωポイント関連
-const gainOp = getGainOmegaPoints();
-const gainOpElem = document.getElementById("v-gain-op");
-if (gainOpElem) {
-  gainOpElem.textContent = `+${formatValue(gainOp)} OP`;
-}
-const btnOp = document.getElementById("btnResetOp");
-if (btnOp) {
-  btnOp.disabled = gainOp.lte(0);
-}
 
-// 現在のOP表示（どこかに表示したい場合）
-const opDisplay = document.getElementById("v-omega-points");
-if (opDisplay) {
-  opDisplay.textContent = formatValue(game.omegaPoints || 0);
-}
   DB_UPGRADES.forEach(u => {
     const lv = game.upgLevels[u.id];
     const cost = getUpgradeCost(u.id);
@@ -2650,10 +2508,8 @@ function loadGameOnLaunch() {
         document.getElementById("chk-auto-fac").checked = game.autoFacEnabled;
         document.getElementById("chk-auto-upg").checked = game.autoUpgEnabled;
         document.getElementById("chk-auto-am").checked = game.autoAmEnabled;
-     game.omegaPoints = __safeDecimalParse(parsed.omegaPoints, 0);
-game.prestigeOpCount = Number(parsed.prestigeOpCount) || 0;
-        if (document.getElementById("chk-auto-pam")) document.getElementById("chk-auto-pam").checked = game.autoPrestigeAmEnabled;  
-    }
+        if (document.getElementById("chk-auto-pam")) document.getElementById("chk-auto-pam").checked = game.autoPrestigeAmEnabled;
+      }
       pushLog("📂 復元完了：前回の世界線データが完全に同期されました。", "var(--color-upgrade)");
     }
   } catch (e) { console.error(e); }
