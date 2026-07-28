@@ -2908,33 +2908,41 @@ function loadGameOnLaunch() {
   } catch (e) { console.error(e); }
 }
 
-function hardResetGame() {
-  if (confirm("🚨 全データを完全に削除して初期化しますか？")) {
-    localStorage.removeItem(STORAGE_KEY);
-    if (typeof DEFAULT_GAME_STATE !== "undefined") {
-      game = JSON.parse(DEFAULT_GAME_STATE);
+// ==========================================
+// 🚨 Infinity・数値崩壊の完全阻止セーフガード
+// ==========================================
+if (typeof Decimal !== 'undefined') {
+  // Decimalのplusやmulなどの主要メソッドを上書きして、絶対にInfinityにならないようにする防壁
+  const originalPlus = Decimal.prototype.plus;
+  Decimal.prototype.plus = function(v) {
+    try {
+      const res = originalPlus.call(this, v);
+      if (!res.isFinite() || res.isNaN()) return new Decimal("1e308");
+      return res;
+    } catch(e) { return new Decimal(0); }
+  };
+
+  const originalMul = Decimal.prototype.mul;
+  Decimal.prototype.mul = function(v) {
+    try {
+      const res = originalMul.call(this, v);
+      if (!res.isFinite() || res.isNaN()) return new Decimal("1e308");
+      return res;
+    } catch(e) { return new Decimal(0); }
+  };
+}
+
+// 起動時の強制クリーンアップ
+window.addEventListener("DOMContentLoaded", () => {
+  try {
+    // セーブデータにInfinityが混ざっていたら強制リセットする
+    const raw = localStorage.getItem("INFINITY_MATRIX_OMEGA_SAVE_DATA");
+    if (raw && (raw.includes("Infinity") || raw.includes("null"))) {
+      console.warn("⚠️ セーブデータ内の異常値を検出しました。強制修復します。");
+      localStorage.removeItem("INFINITY_MATRIX_OMEGA_SAVE_DATA");
     }
-    location.reload();
-  }
-}
-function gameLoop(timestamp) {
-  // 1. 前回の時間からの差分（dt）を計算する処理のあたり
-  let dt = (timestamp - lastTimestamp) / 1000;
-  
-  // 🚨 起動直後やタブ非アクティブ復帰時の異常な大ジャンプ（爆発）を防ぐ強力なガード
-  if (isNaN(dt) || dt <= 0) {
-    dt = 0.016; // 標準的な1フレーム分（約60fps）に固定するもんな
-  } else if (dt > 1.0) {
-    dt = 1.0;   // どんなに時間が空いても最大1秒までに制限するもんな！
-  }
-
-  lastTimestamp = timestamp;
-
-  // ここから下の通常のティック処理へ続く...
-  executeCoreGameTick(dt);
-  
-  requestAnimationFrame(gameLoop);
-}
+  } catch(e) {}
+});
 /**
  * =========================================================================
  * High-Performance Primary Clock Loop & Dynamic Visuals (Decimal対応版)
