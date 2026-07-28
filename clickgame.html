@@ -1410,37 +1410,41 @@ function loadModFromFile(event) {
 
 /**
  =========================================================================
- * 修正済み高精度科学表記フォーマッター (Decimal完全対応版)
+ * 🛡️ 完全堅牢版・高精度科学表記フォーマッター (Decimal完全対応)
  =========================================================================
  */
 function formatValue(n) {
-  if (n === null || n === undefined) return "0.0";
-  
-  let dec = (n instanceof Decimal) ? n : new Decimal(n);
-  
-  const isDecFinite = typeof dec.isFinite === 'function' ? dec.isFinite() : (dec.mag !== Infinity && !isNaN(dec.mag));
-  if (!isDecFinite) return "無限宇宙 (Infinity)";
-  if (typeof dec.eq === 'function' && dec.eq(0)) return "0.0";
-  
-  if (typeof dec.lt === 'function' && dec.lt(1e6)) {
-    const num = dec.toNumber();
-    if (!isFinite(num)) return "無限宇宙 (Infinity)";
-    return num.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  try {
+    if (n === null || n === undefined) return "0.0";
+    let dec = (n instanceof Decimal) ? n : new Decimal(n);
+    
+    const isDecFinite = typeof dec.isFinite === 'function' ? dec.isFinite() : (dec.mag !== Infinity && !isNaN(dec.mag));
+    const isDecNaN = typeof dec.isNaN === 'function' ? dec.isNaN() : isNaN(dec.mag);
+    
+    if (!isDecFinite || isDecNaN) return "無限宇宙 (Infinity)";
+    if (typeof dec.eq === 'function' && dec.eq(0)) return "0.0";
+    
+    if (typeof dec.lt === 'function' && dec.lt(1e6)) {
+      const num = dec.toNumber();
+      if (!isFinite(num)) return "無限宇宙 (Infinity)";
+      return num.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    }
+    
+    const exponent = dec.exponent || dec.e || 0;
+    if (!isFinite(exponent) || exponent > 308) return "無限宇宙 (Infinity)";
+    
+    const mantissa = dec.mantissa || (typeof dec.div === 'function' ? dec.div(new Decimal(10).pow(exponent)).toNumber() : 1);
+    return `${Number(mantissa).toFixed(2)}e${exponent}`;
+  } catch (e) {
+    return "0.0";
   }
-  
-  const exponent = dec.exponent || dec.e || 0;
-  if (!isFinite(exponent) || exponent > 308) return "無限宇宙 (Infinity)";
-  
-  const mantissa = dec.mantissa || (typeof dec.div === 'function' ? dec.div(new Decimal(10).pow(exponent)).toNumber() : 1);
-  return `${Number(mantissa).toFixed(2)}e${exponent}`;
 }
 
 /**
  =========================================================================
- * 統合ゲームエンジン拡張セーフティ・完全修復モジュール (Decimal完全対応版)
+ * 🛡️ 統合ゲームエンジン拡張セーフティ・完全修復モジュール
  =========================================================================
  */
-
 function sanitizeGameData() {
   if (typeof game === 'undefined' || !game) return;
 
@@ -1454,7 +1458,7 @@ function sanitizeGameData() {
   arraysToSanitize.forEach(item => {
     if (!Array.isArray(game[item.target])) game[item.target] = [];
     for (let i = 0; i < item.db.length; i++) {
-      if (game[item.target][i] === undefined || isNaN(game[item.target][i])) {
+      if (game[item.target][i] === undefined || isNaN(game[item.target][i]) || !isFinite(game[item.target][i])) {
         game[item.target][i] = 0;
       }
     }
@@ -1477,10 +1481,9 @@ function updateGameLoopSafetyWrapper() {
 
 /**
  =========================================================================
- * Internal Mathematical Calculation Engine (Decimal Complete Support)
+ * 🛡️ 堅牢な数値・Decimal サニタイザー
  =========================================================================
  */
-
 function __sanitizeNumber(val, fallback = 0) {
   if (val === null || val === undefined || typeof val !== 'number' || isNaN(val) || !isFinite(val)) {
     return fallback;
@@ -1493,7 +1496,8 @@ function __sanitizeDecimal(val, fallback = 0) {
   try {
     const d = (val instanceof Decimal) ? val : new Decimal(val);
     const checkFinite = typeof d.isFinite === 'function' ? d.isFinite() : (d.mag !== Infinity && !isNaN(d.mag) && d.mag < 1e308);
-    return checkFinite ? d : new Decimal(fallback);
+    const checkNaN = typeof d.isNaN === 'function' ? d.isNaN() : isNaN(d.mag);
+    return (checkFinite && !checkNaN) ? d : new Decimal(fallback);
   } catch (e) {
     return new Decimal(fallback);
   }
@@ -1510,7 +1514,7 @@ function getFactoryCost(id) {
     const costMult = __sanitizeNumber(fData.costMultiplier, 1.15);
     
     const mitigatedMultiplier = costMult - (upg4 * 0.012);
-    const safeCount = Math.min(Math.max(0, count), 300); // 制限を強化
+    const safeCount = Math.min(Math.max(0, count), 300);
     const safeMultiplier = Math.max(1.001, mitigatedMultiplier);
     
     const cost = new Decimal(safeMultiplier).pow(safeCount).mul(baseCost);
@@ -1605,7 +1609,6 @@ function getGlobalProductionMultiplier() {
     let amMultiplier = antimatter.max(0).mul(amPerUnitValue).plus(1);
     let baseUpgradeMultiplier = 1.0 + (Math.max(0, upg1) * 0.3);
     
-    // 【修正】指数が大きくなりすぎてInfinityになるのを防ぐため、上限を20に制限
     let safeUpg3 = Math.min(Math.max(0, upg3), 20);
     let exponentialMultiplier = new Decimal(1.6).pow(safeUpg3);
     
@@ -1613,7 +1616,6 @@ function getGlobalProductionMultiplier() {
     let galaxyMultiplier = galaxyNodes.max(0).mul(5.0).plus(1);
     
     let result = amMultiplier.mul(baseUpgradeMultiplier).mul(exponentialMultiplier).mul(timelineTimeMultiplier).mul(galaxyMultiplier);
-    
     return __sanitizeDecimal(result, 1.0);
   } catch (e) {
     return new Decimal(1.0);
@@ -1654,7 +1656,6 @@ function getClickPower() {
     const antimatter = __sanitizeDecimal(game?.antimatter, 0);
     const upg5 = __sanitizeNumber(game?.upgLevels?.[5], 0);
 
-    // 【修正】ベースクリックのべき乗上限を20に制限してオーバーフローを防止
     let safeUpg0 = Math.min(Math.max(0, upg0), 20);
     let baseClick = new Decimal(2).pow(safeUpg0);
     let amClickBonus = antimatter.max(0).mul(0.2).mul(amUpg1).plus(1);
@@ -1712,7 +1713,6 @@ function getGainGalaxyNodes() {
     return new Decimal(0);
   }
 }
-
 /**
  * =========================================================================
  * セーブデータのエクスポート（クリップボードへコピー）
