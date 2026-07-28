@@ -1880,7 +1880,13 @@ document.getElementById("btnResetGx").addEventListener("click", () => {
     refreshUI();
   }
 });
-
+document.getElementById("btnResetOp").addEventListener("click", () => {
+  const gain = getGainOmegaPoints();
+  if (gain.lte(0)) return;   // Decimal対応
+  if (confirm(`Ω転生を実行しますか？\n+${formatValue(gain)} OP を獲得し、下位リソースをリセットします。`)) {
+    executePrestigeOmega(gain);
+  }
+});
 /**
  * =========================================================================
  * Core Impulse Click Procedures
@@ -2122,16 +2128,7 @@ const SoundManager = {
       osc.stop(now + 0.08);
     }
   },
-const btnResetOp = document.getElementById("btnResetOp");
-if (btnResetOp) {
-  btnResetOp.addEventListener("click", () => {
-    const gain = getGainOmegaPoints();
-    if (gain.lte(0)) return;
-    if (confirm(`Ω転生を実行しますか？\n+${formatValue(gain)} OP を獲得し、下位リソースをリセットします。`)) {
-      executePrestigeOmega(gain);
-    }
-  });
-}
+
   playPart5_LeadMelody(now, t, section, track) {
     const scalesByTrack = [
       [110.00, 146.83, 164.81, 220.00, 293.66, 329.63, 440.00, 587.33],
@@ -2241,6 +2238,43 @@ if (btnResetOp) {
 // グローバル関数として登録
 function toggleBGM() {
   SoundManager.toggleBGM();
+}
+  function executePrestigeOmega(forcedGain) {
+  try {
+    const safeGain = (forcedGain instanceof Decimal) ? forcedGain : new Decimal(forcedGain || 0);
+    if (safeGain.lte(0)) return;
+
+    // OPを加算
+    if (!(game.omegaPoints instanceof Decimal)) {
+      game.omegaPoints = new Decimal(game.omegaPoints || 0);
+    }
+    game.omegaPoints = game.omegaPoints.plus(safeGain);
+    game.prestigeOpCount = (game.prestigeOpCount || 0) + 1;
+
+    // リセット
+    game.energy = new Decimal(0);
+    game.antimatter = new Decimal(0);
+    game.timeShards = new Decimal(0);
+    // galaxyNodes は残す
+    game.facCounts = [0, 0, 0, 0, 0];
+    game.upgLevels = [0, 0, 0, 0, 0, 0, 0, 0];
+    game.amUpgLevels = [0, 0, 0, 0];
+    game.tlUpgLevels = [0, 0, 0, 0];
+    game.sessionTime = 0;
+
+    pushLog(`Ω転生完了：+${formatValue(safeGain)} OP を獲得`, "#ff00aa");
+    createToast("Ω転生", `特異点を統合し ${formatValue(safeGain)} OP を回収しました`);
+
+    if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onPrestigeOp) {
+      window.ModAPI.hooks.onPrestigeOp.forEach(cb => {
+        try { cb({gain: safeGain}); } catch(e){}
+      });
+    }
+
+    refreshUI();
+  } catch (e) {
+    console.error("executePrestigeOmega error:", e);
+  }
 }
 /**
  * =========================================================================
