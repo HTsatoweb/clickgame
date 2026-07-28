@@ -1260,79 +1260,70 @@ function deserializeGameData(rawData) {
    }
 /**
  * ==========================================================================================
- * VERIFIED 65+ COMPLETELY SEPARATED API ENDPOINTS ARCHITECTURE (NO ALTERATION ALLOWED)
+ * VERIFIED 65+ COMPLETELY SEPARATED API ENDPOINTS ARCHITECTURE (Decimal Complete Support)
  * ==========================================================================================
  */
 window.ModAPI = {
   // === [1-5] Energy Accessors ===
   getEnergy: () => game.energy,
-  setEnergy: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.energy = v; refreshUI(); } },
-  addEnergy: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.energy += v; refreshUI(); } },
-  subEnergy: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.energy = Math.max(0, game.energy - v); refreshUI(); } },
-  clearEnergy: () => { game.energy = 0; refreshUI(); },
+  setEnergy: (v) => { game.energy = new Decimal(v); refreshUI(); },
+  addEnergy: (v) => { game.energy = game.energy.plus(v); refreshUI(); },
+  subEnergy: (v) => { game.energy = Decimal.max(0, game.energy.sub(v)); refreshUI(); },
+  clearEnergy: () => { game.energy = new Decimal(0); refreshUI(); },
 
   // === [6-10] Antimatter Accessors ===
   getAntimatter: () => game.antimatter,
-  setAntimatter: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.antimatter = v; refreshUI(); } },
-  addAntimatter: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.antimatter += v; refreshUI(); } },
-  subAntimatter: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.antimatter = Math.max(0, game.antimatter - v); refreshUI(); } },
-  clearAntimatter: () => { game.antimatter = 0; refreshUI(); },
+  setAntimatter: (v) => { game.antimatter = new Decimal(v); refreshUI(); },
+  addAntimatter: (v) => { game.antimatter = game.antimatter.plus(v); refreshUI(); },
+  subAntimatter: (v) => { game.antimatter = Decimal.max(0, game.antimatter.sub(v)); refreshUI(); },
+  clearAntimatter: () => { game.antimatter = new Decimal(0); refreshUI(); },
 
   // === [11-15] Time Shards Accessors ===
   getTimeShards: () => game.timeShards,
-  setTimeShards: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.timeShards = v; refreshUI(); } },
-  addTimeShards: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.timeShards += v; refreshUI(); } },
-  subTimeShards: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.timeShards = Math.max(0, game.timeShards - v); refreshUI(); } },
-  clearTimeShards: () => { game.timeShards = 0; refreshUI(); },
+  setTimeShards: (v) => { game.timeShards = new Decimal(v); refreshUI(); },
+  addTimeShards: (v) => { game.timeShards = game.timeShards.plus(v); refreshUI(); },
+  subTimeShards: (v) => { game.timeShards = Decimal.max(0, game.timeShards.sub(v)); refreshUI(); },
+  clearTimeShards: () => { game.timeShards = new Decimal(0); refreshUI(); },
 
   // === [16-20] Galaxy Nodes Accessors ===
   getGalaxyNodes: () => game.galaxyNodes,
-  setGalaxyNodes: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.galaxyNodes = v; refreshUI(); } },
-  addGalaxyNodes: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.galaxyNodes += v; refreshUI(); } },
-  subGalaxyNodes: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.galaxyNodes = Math.max(0, game.galaxyNodes - v); refreshUI(); } },
+  setGalaxyNodes: (v) => { game.galaxyNodes = Number(v) || 0; refreshUI(); },
+  addGalaxyNodes: (v) => { game.galaxyNodes = (game.galaxyNodes || 0) + (Number(v) || 0); refreshUI(); },
+  subGalaxyNodes: (v) => { game.galaxyNodes = Math.max(0, game.galaxyNodes - (Number(v) || 0)); refreshUI(); },
   clearGalaxyNodes: () => { game.galaxyNodes = 0; refreshUI(); },
 
-// === Industrial Factory Controllers 部分の修正例 ===
-getFactoryCount: (id) => game.facCounts[id] ?? 0,
-setFactoryCount: (id, v) => { 
-  if(id >= 0 && id < game.facCounts.length && typeof v === 'number' && !isNaN(v)) { 
-    game.facCounts[id] = v; 
-    refreshUI(); 
-  } 
-},
-addFactoryCount: (id, v) => { 
-  if(id >= 0 && id < game.facCounts.length && typeof v === 'number' && !isNaN(v)) { 
-    game.facCounts[id] = (game.facCounts[id] ?? 0) + v; 
-    refreshUI(); 
-  } 
-},
-
-// === Normal Upgrades Core Manipulation 部分の修正例 ===
-getUpgradeLevel: (id) => game.upgLevels[id] ?? 0,
-setUpgradeLevel: (id, v) => { 
-  if(id >= 0 && id < game.upgLevels.length && typeof v === 'number' && !isNaN(v)) { 
-    game.upgLevels[id] = v; 
-    refreshUI(); 
-  } 
-},
+  // === [21-25] Industrial Factory Controllers ===
+  getFactoryCount: (id) => game.facCounts[id] ?? 0,
+  setFactoryCount: (id, v) => { 
+    if(id >= 0 && id < game.facCounts.length) { 
+      game.facCounts[id] = Number(v) || 0; 
+      refreshUI(); 
+    } 
+  },
+  addFactoryCount: (id, v) => { 
+    if(id >= 0 && id < game.facCounts.length) { 
+      game.facCounts[id] = (game.facCounts[id] ?? 0) + (Number(v) || 0); 
+      refreshUI(); 
+    } 
+  },
 
   // === [26-28] Normal Upgrades Core Manipulation ===
-  getUpgradeLevel: (id) => game.upgLevels[id],
-  setUpgradeLevel: (id, v) => { if(id >= 0 && id < game.upgLevels.length) { game.upgLevels[id] = v; refreshUI(); } },
+  getUpgradeLevel: (id) => game.upgLevels[id] ?? 0,
+  setUpgradeLevel: (id, v) => { if(id >= 0 && id < game.upgLevels.length) { game.upgLevels[id] = Number(v) || 0; refreshUI(); } },
   setAllUpgradesToMax: () => { for(let i=0; i<game.upgLevels.length; i++) game.upgLevels[i] = DB_UPGRADES[i].max; refreshUI(); },
 
   // === [29-31] Antimatter Upgrades Manipulation ===
-  getAmUpgradeLevel: (id) => game.amUpgLevels[id],
-  setAmUpgradeLevel: (id, v) => { if(id >= 0 && id < game.amUpgLevels.length) { game.amUpgLevels[id] = v; refreshUI(); } },
+  getAmUpgradeLevel: (id) => game.amUpgLevels[id] ?? 0,
+  setAmUpgradeLevel: (id, v) => { if(id >= 0 && id < game.amUpgLevels.length) { game.amUpgLevels[id] = Number(v) || 0; refreshUI(); } },
   setAllAmUpgradesToMax: () => { for(let i=0; i<game.amUpgLevels.length; i++) game.amUpgLevels[i] = DB_AM_UPGRADES[i].max; refreshUI(); },
 
   // === [32-34] Timeline Upgrades Manipulation ===
-  getTlUpgradeLevel: (id) => game.tlUpgLevels[id],
-  setTlUpgradeLevel: (id, v) => { if(id >= 0 && id < game.tlUpgLevels.length) { game.tlUpgLevels[id] = v; refreshUI(); } },
+  getTlUpgradeLevel: (id) => game.tlUpgLevels[id] ?? 0,
+  setTlUpgradeLevel: (id, v) => { if(id >= 0 && id < game.tlUpgLevels.length) { game.tlUpgLevels[id] = Number(v) || 0; refreshUI(); } },
   setAllTlUpgradesToMax: () => { for(let i=0; i<game.tlUpgLevels.length; i++) game.tlUpgLevels[i] = DB_TL_UPGRADES[i].max; refreshUI(); },
 
-  // === [35-35] Global Telemetry Statistics Reset ===
-  resetSessionStatistics: () => { game.totalClicks = 0; game.sessionTime = 0; game.totalTime = 0; refreshUI(); },
+  // === [35] Global Telemetry Statistics Reset ===
+  resetSessionStatistics: () => { game.totalClicks = new Decimal(0); game.sessionTime = 0; game.totalTime = 0; refreshUI(); },
 
   // === [36-40] Advanced Mathematical Core Inquirers ===
   getCalculatedCps: () => getTotalCps(),
@@ -1346,13 +1337,17 @@ setUpgradeLevel: (id, v) => {
   getPredictedGainAm: () => getGainAntimatter(),
   getPredictedGainTl: () => getGainTimeShards(),
   getPredictedGainGx: () => getGainGalaxyNodes(),
-  getFutureEnergyEstimate: (seconds) => game.energy + (getTotalCps() * getGameSpeedMultiplier() * seconds),
+  getFutureEnergyEstimate: (seconds) => {
+    const cps = getTotalCps();
+    const speed = getGameSpeedMultiplier();
+    return game.energy.plus(cps.mul(speed).mul(seconds));
+  },
   getFactoryCpsContribution: (id) => getFactoryCps(id),
 
   // === [47-51] System IO Architecture Commands ===
   triggerCoreClickEvent: (e) => handleCoreClick(e),
   executePrestigeAmShift: (forcedGain) => executePrestigeAm(forcedGain),
-  executePrestigeTlShift: () => { game.timeShards += getGainTimeShards(); refreshUI(); },
+  executePrestigeTlShift: () => { game.timeShards = game.timeShards.plus(getGainTimeShards()); refreshUI(); },
   executePrestigeGxShift: () => { game.galaxyNodes += getGainGalaxyNodes(); refreshUI(); },
   executeSaveSerialization: () => saveGameManual(),
 
@@ -1415,31 +1410,38 @@ function loadModFromFile(event) {
 
 /**
  * =========================================================================
- * 修正済み高精度科学表記フォーマッター (行末の全角スペース・制御文字を排除)
+ * 修正済み高精度科学表記フォーマッター (Decimal完全対応版)
  * =========================================================================
  */
 function formatValue(n) {
-  if (n === null || n === undefined || isNaN(n)) return "0.0";
-  if (n === Infinity) return "無限宇宙 (Infinity)";
-  if (n === 0) return "0.0";
-  if (n < 1e6) {
-    return n.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  if (n === null || n === undefined) return "0.0";
+  
+  // Decimal オブジェクトの場合の処理
+  let dec = (n instanceof Decimal) ? n : new Decimal(n);
+  
+  if (!dec.isFinite()) return "無限宇宙 (Infinity)";
+  if (dec.eq(0)) return "0.0";
+  
+  // 1e6未満の場合
+  if (dec.lt(1e6)) {
+    return dec.toNumber().toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   }
-  const exponent = Math.floor(Math.log10(n));
-  const mantissa = n / Math.pow(10, exponent);
+  
+  // 巨大数の場合の科学表記
+  const exponent = dec.e;
+  const mantissa = dec.mantissa;
   return `${mantissa.toFixed(2)}e${exponent}`;
 }
 /**
  * =========================================================================
- * 統合ゲームエンジン拡張セーフティ・完全修復モジュール
+ * 統合ゲームエンジン拡張セーフティ・完全修復モジュール (Decimal完全対応版)
  * =========================================================================
  */
 
-// 1. セーブデータの自動初期化・整合性修復（配列長・未定義プロパティの安全化）
+// 1. セーブデータの自動初期化・整合性修復
 function sanitizeGameData() {
   if (typeof game === 'undefined' || !game) return;
 
-  // 各種インデックス配列の自動拡張と非数（NaN）修復
   const arraysToSanitize = [
     { target: 'facCounts', db: typeof DB_FACTORIES !== 'undefined' ? DB_FACTORIES : [] },
     { target: 'upgLevels', db: typeof DB_UPGRADES !== 'undefined' ? DB_UPGRADES : [] },
@@ -1456,11 +1458,11 @@ function sanitizeGameData() {
     }
   });
 
-  // 主要リソース・数値ステータスの厳格なサニタイジング
-  game.energy = __sanitizeNumber(game.energy, 0);
-  game.antimatter = __sanitizeNumber(game.antimatter, 0);
-  game.timeShards = __sanitizeNumber(game.timeShards, 0);
-  game.galaxyNodes = __sanitizeNumber(game.galaxyNodes, 0);
+  // 主要リソースの Decimal サニタイジング
+  game.energy = __sanitizeDecimal(game.energy, 0);
+  game.antimatter = __sanitizeDecimal(game.antimatter, 0);
+  game.timeShards = __sanitizeDecimal(game.timeShards, 0);
+  game.galaxyNodes = __sanitizeDecimal(game.galaxyNodes, 0);
   game.totalTime = __sanitizeNumber(game.totalTime, 0);
 }
 
@@ -1469,17 +1471,17 @@ function updateGameLoopSafetyWrapper() {
   try {
     sanitizeGameData();
   } catch (e) {
-    // 予期せぬ例外発生時もゲームループのクラッシュを完全にブロック
     console.warn("Safety wrapper caught an exception in game loop:", e);
   }
 }
+
 /**
  * =========================================================================
- * Internal Mathematical Calculation Engine (B-2 Bomber Grade Robustness)
+ * Internal Mathematical Calculation Engine (Decimal Complete Support)
  * =========================================================================
  */
 
-// 汎用数値サニタイザー（不正値・非数・無限大を安全なデフォルト値へ矯正）
+// 汎用数値サニタイザー（通常の数値用）
 function __sanitizeNumber(val, fallback = 0) {
   if (val === null || val === undefined || typeof val !== 'number' || isNaN(val) || !isFinite(val)) {
     return fallback;
@@ -1487,9 +1489,21 @@ function __sanitizeNumber(val, fallback = 0) {
   return val;
 }
 
+// Decimal 用サニタイザー
+function __sanitizeDecimal(val, fallback = 0) {
+  if (val === null || val === undefined) return new Decimal(fallback);
+  if (val instanceof Decimal) return val.isFinite() ? val : new Decimal(fallback);
+  try {
+    const d = new Decimal(val);
+    return d.isFinite() ? d : new Decimal(fallback);
+  } catch (e) {
+    return new Decimal(fallback);
+  }
+}
+
 function getFactoryCost(id) {
   try {
-    if (!DB_FACTORIES || !DB_FACTORIES[id]) return Number.MAX_VALUE;
+    if (!DB_FACTORIES || !DB_FACTORIES[id]) return new Decimal(Number.MAX_VALUE);
     const fData = DB_FACTORIES[id];
     
     const count = __sanitizeNumber(game?.facCounts?.[id], 0);
@@ -1498,20 +1512,19 @@ function getFactoryCost(id) {
     const costMult = __sanitizeNumber(fData.costMultiplier, 1.15);
     
     const mitigatedMultiplier = costMult - (upg4 * 0.012);
-    // 数量および倍率に厳格な物理上限を適用して爆発を完全阻止
     const safeCount = Math.min(Math.max(0, count), 500);
     const safeMultiplier = Math.max(1.001, mitigatedMultiplier);
     
-    const cost = baseCost * Math.pow(safeMultiplier, safeCount);
-    return __sanitizeNumber(cost, Number.MAX_VALUE);
+    const cost = new Decimal(safeMultiplier).pow(safeCount).mul(baseCost);
+    return cost;
   } catch (e) {
-    return Number.MAX_VALUE;
+    return new Decimal(Number.MAX_VALUE);
   }
 }
 
 function getUpgradeCost(id) {  
   try {
-    if (!DB_UPGRADES || !DB_UPGRADES[id]) return Number.MAX_VALUE;
+    if (!DB_UPGRADES || !DB_UPGRADES[id]) return new Decimal(Number.MAX_VALUE);
     const uData = DB_UPGRADES[id];
     
     const lvl = __sanitizeNumber(game?.upgLevels?.[id], 0);
@@ -1520,16 +1533,16 @@ function getUpgradeCost(id) {
     const costMult = __sanitizeNumber(uData.costMult, 2.0);
     
     const safeLvl = Math.min(Math.max(0, lvl), maxLvl);
-    const cost = baseCost * Math.pow(costMult, safeLvl);  
-    return __sanitizeNumber(cost, Number.MAX_VALUE);
+    const cost = new Decimal(costMult).pow(safeLvl).mul(baseCost);  
+    return cost;
   } catch (e) {
-    return Number.MAX_VALUE;
+    return new Decimal(Number.MAX_VALUE);
   }
 }
 
 function getAmUpgradeCost(id) {  
   try {
-    if (!DB_AM_UPGRADES || !DB_AM_UPGRADES[id]) return Number.MAX_VALUE;
+    if (!DB_AM_UPGRADES || !DB_AM_UPGRADES[id]) return new Decimal(Number.MAX_VALUE);
     const auData = DB_AM_UPGRADES[id];
     
     const lvl = __sanitizeNumber(game?.amUpgLevels?.[id], 0);
@@ -1538,16 +1551,16 @@ function getAmUpgradeCost(id) {
     const costMult = __sanitizeNumber(auData.costMult, 2.0);
     
     const safeLvl = Math.min(Math.max(0, lvl), maxLvl);
-    const cost = baseCost * Math.pow(costMult, safeLvl);  
-    return __sanitizeNumber(cost, Number.MAX_VALUE);
+    const cost = new Decimal(costMult).pow(safeLvl).mul(baseCost);  
+    return cost;
   } catch (e) {
-    return Number.MAX_VALUE;
+    return new Decimal(Number.MAX_VALUE);
   }
 }
 
 function getTlUpgradeCost(id) {  
   try {
-    if (!DB_TL_UPGRADES || !DB_TL_UPGRADES[id]) return Number.MAX_VALUE;
+    if (!DB_TL_UPGRADES || !DB_TL_UPGRADES[id]) return new Decimal(Number.MAX_VALUE);
     const tuData = DB_TL_UPGRADES[id];
     
     const lvl = __sanitizeNumber(game?.tlUpgLevels?.[id], 0);
@@ -1556,24 +1569,24 @@ function getTlUpgradeCost(id) {
     const costMult = __sanitizeNumber(tuData.costMult, 2.0);
     
     const safeLvl = Math.min(Math.max(0, lvl), maxLvl);
-    const cost = baseCost * Math.pow(costMult, safeLvl);  
-    return __sanitizeNumber(cost, Number.MAX_VALUE);
+    const cost = new Decimal(costMult).pow(safeLvl).mul(baseCost);  
+    return cost;
   } catch (e) {
-    return Number.MAX_VALUE;
+    return new Decimal(Number.MAX_VALUE);
   }
 }
 
 function getGameSpeedMultiplier() {
   try {
-    const timeShards = __sanitizeNumber(game?.timeShards, 0);
+    const timeShards = __sanitizeDecimal(game?.timeShards, 0);
     const tlUpg0 = __sanitizeNumber(game?.tlUpgLevels?.[0], 0);
     const amUpg3 = __sanitizeNumber(game?.amUpgLevels?.[3], 0);
 
-    const baseShardsEffect = 1 + Math.max(0, timeShards) * (0.02 + (tlUpg0 * 0.02));
+    const baseShardsEffect = timeShards.max(0).mul(0.02 + (tlUpg0 * 0.02)).plus(1);
     const amUpg3Effect = 1 + (Math.max(0, amUpg3) * 0.5);
-    const result = baseShardsEffect * amUpg3Effect;
+    const result = baseShardsEffect.mul(amUpg3Effect);
     
-    return __sanitizeNumber(result, 1.0);
+    return result.toNumber();
   } catch (e) {
     return 1.0;
   }
@@ -1582,51 +1595,51 @@ function getGameSpeedMultiplier() {
 function getGlobalProductionMultiplier() {
   try {
     const amUpg0 = __sanitizeNumber(game?.amUpgLevels?.[0], 0);
-    const antimatter = __sanitizeNumber(game?.antimatter, 0);
+    const antimatter = __sanitizeDecimal(game?.antimatter, 0);
     const upg1 = __sanitizeNumber(game?.upgLevels?.[1], 0);
     const upg3 = __sanitizeNumber(game?.upgLevels?.[3], 0);
     const tlUpg1 = __sanitizeNumber(game?.tlUpgLevels?.[1], 0);
     const totalTime = __sanitizeNumber(game?.totalTime, 0);
-    const galaxyNodes = __sanitizeNumber(game?.galaxyNodes, 0);
+    const galaxyNodes = __sanitizeDecimal(game?.galaxyNodes, 0);
 
     const amPerUnitValue = 1.0 + (amUpg0 * 0.5);
-    let amMultiplier = 1.0 + (Math.max(0, antimatter) * amPerUnitValue);
+    let amMultiplier = antimatter.max(0).mul(amPerUnitValue).plus(1);
     let baseUpgradeMultiplier = 1.0 + (Math.max(0, upg1) * 0.3);
-    let exponentialMultiplier = Math.pow(1.6, Math.min(Math.max(0, upg3), 50));
+    let exponentialMultiplier = new Decimal(1.6).pow(Math.min(Math.max(0, upg3), 50));
     let timelineTimeMultiplier = 1.0 + (Math.max(0, tlUpg1) * (Math.max(0, totalTime) * 0.005));
-    let galaxyMultiplier = 1.0 + (Math.max(0, galaxyNodes) * 5.0);
+    let galaxyMultiplier = galaxyNodes.max(0).mul(5.0).plus(1);
     
-    const result = amMultiplier * baseUpgradeMultiplier * exponentialMultiplier * timelineTimeMultiplier * galaxyMultiplier;
-    return __sanitizeNumber(result, 1.0);
+    const result = amMultiplier.mul(baseUpgradeMultiplier).mul(exponentialMultiplier).mul(timelineTimeMultiplier).mul(galaxyMultiplier);
+    return result; // Decimalのまま返すことでインフレに対応
   } catch (e) {
-    return 1.0;
+    return new Decimal(1.0);
   }
 }
 
 function getFactoryCps(id) {  
   try {
-    if (!DB_FACTORIES || !DB_FACTORIES[id]) return 0;
+    if (!DB_FACTORIES || !DB_FACTORIES[id]) return new Decimal(0);
     const count = __sanitizeNumber(game?.facCounts?.[id], 0);
     const baseCps = __sanitizeNumber(DB_FACTORIES[id].baseCps, 0);
     const globalMult = getGlobalProductionMultiplier();
     
-    const cps = baseCps * Math.max(0, count) * globalMult;
-    return __sanitizeNumber(cps, 0);
+    const cps = new Decimal(baseCps).mul(Math.max(0, count)).mul(globalMult);
+    return cps;
   } catch (e) {
-    return 0;
+    return new Decimal(0);
   }
 }
 
 function getTotalCps() {
   try {
-    let total = 0;
-    if (!DB_FACTORIES) return 0;
+    let total = new Decimal(0);
+    if (!DB_FACTORIES) return total;
     for (let i = 0; i < DB_FACTORIES.length; i++) {
-      total += getFactoryCps(i);
+      total = total.plus(getFactoryCps(i));
     }
-    return __sanitizeNumber(total, 0);
+    return total;
   } catch (e) {
-    return 0;
+    return new Decimal(0);
   }
 }
 
@@ -1634,62 +1647,62 @@ function getClickPower() {
   try {
     const upg0 = __sanitizeNumber(game?.upgLevels?.[0], 0);
     const amUpg1 = __sanitizeNumber(game?.amUpgLevels?.[1], 0);
-    const antimatter = __sanitizeNumber(game?.antimatter, 0);
+    const antimatter = __sanitizeDecimal(game?.antimatter, 0);
     const upg5 = __sanitizeNumber(game?.upgLevels?.[5], 0);
 
-    let baseClick = Math.pow(2, Math.min(Math.max(0, upg0), 50));
-    let amClickBonus = 1.0 + (amUpg1 * (Math.max(0, antimatter) * 0.2));
-    let cpHitsBonus = getTotalCps() * (Math.max(0, upg5) * 0.012);
+    let baseClick = new Decimal(2).pow(Math.min(Math.max(0, upg0), 50));
+    let amClickBonus = antimatter.max(0).mul(0.2).mul(amUpg1).plus(1);
+    let cpHitsBonus = getTotalCps().mul(Math.max(0, upg5) * 0.012);
     
-    let power = (baseClick * amClickBonus) + cpHitsBonus;
-    return __sanitizeNumber(power, 1);
+    let power = baseClick.mul(amClickBonus).plus(cpHitsBonus);
+    return power;
   } catch (e) {
-    return 1;
+    return new Decimal(1);
   }
 }
 
 function getGainAntimatter() {
   try {
-    const energy = __sanitizeNumber(game?.energy, 0);
+    const energy = __sanitizeDecimal(game?.energy, 0);
     const upg6 = __sanitizeNumber(game?.upgLevels?.[6], 0);
     const tlUpg2 = __sanitizeNumber(game?.tlUpgLevels?.[2], 0);
 
-    if (energy < 1e6) return 0;
-    let baseGain = Math.floor(Math.sqrt(energy / 1e6));
-    baseGain = Math.floor(baseGain * (1.0 + Math.max(0, upg6) * 0.5));
-    if (tlUpg2 >= 1) baseGain *= 2;
-    return __sanitizeNumber(baseGain, 0);
+    if (energy.lt(1e6)) return new Decimal(0);
+    let baseGain = energy.div(1e6).sqrt().floor();
+    baseGain = baseGain.mul(1.0 + Math.max(0, upg6) * 0.5).floor();
+    if (tlUpg2 >= 1) baseGain = baseGain.mul(2);
+    return baseGain;
   } catch (e) {
-    return 0;
+    return new Decimal(0);
   }
 }
 
 function getGainTimeShards() {
   try {
-    const energy = __sanitizeNumber(game?.energy, 0);
-    const antimatter = __sanitizeNumber(game?.antimatter, 0);
+    const energy = __sanitizeDecimal(game?.energy, 0);
+    const antimatter = __sanitizeDecimal(game?.antimatter, 0);
 
-    if (energy < 1e12 || antimatter < 100) return 0;
+    if (energy.lt(1e12) || antimatter.lt(100)) return new Decimal(0);
     
-    const val = energy / 1e11;
-    if (val <= 0 || isNaN(val) || !isFinite(val)) return 0;
+    const val = energy.div(1e11);
+    if (val.lte(0) || !val.isFinite()) return new Decimal(0);
 
-    let gain = Math.floor(Math.log10(val) * (1 + Math.floor(antimatter / 400)));
-    return __sanitizeNumber(gain, 0);
+    let gain = new Decimal(Math.floor(val.log10())).mul(1 + Math.floor(antimatter.div(400).toNumber())).floor();
+    return gain.max(0);
   } catch (e) {
-    return 0;
+    return new Decimal(0);
   }
 }
 
 function getGainGalaxyNodes() {
   try {
-    const energy = __sanitizeNumber(game?.energy, 0);
-    const timeShards = __sanitizeNumber(game?.timeShards, 0);
+    const energy = __sanitizeDecimal(game?.energy, 0);
+    const timeShards = __sanitizeDecimal(game?.timeShards, 0);
 
-    if (energy < 1e24 || timeShards < 50) return 0;
-    return 1;
+    if (energy.lt(1e24) || timeShards.lt(50)) return new Decimal(0);
+    return new Decimal(1);
   } catch (e) {
-    return 0;
+    return new Decimal(0);
   }
 }
 /**
@@ -1897,33 +1910,30 @@ function buildGameDOM() {
 }
 /**
  * =========================================================================
- * 物質施設・アップグレードの安全な購入処理システム（サウンド対応版）
+ * 物質施設・アップグレードの安全な購入処理システム（Decimal対応・完全修復版）
  * =========================================================================
  */
 
 // 1. 物質施設の購入処理
 function executeBuyFactory(id) {
   try {
-    sanitizeGameData(); // データの整合性を強制修復
+    sanitizeGameData();
     
     if (!DB_FACTORIES || !DB_FACTORIES[id]) return;
-    const cost = getFactoryCost(id);
+    const cost = getFactoryCost(id); // Decimal型
     
-    if (game.energy >= cost) {
-      game.energy -= cost;
+    if (game.energy.gte(cost)) {
+      game.energy = game.energy.sub(cost);
       if (!Array.isArray(game.facCounts)) game.facCounts = [];
       
-      // undefinedやNaNだった場合は0にしてから加算
       let currentQty = __sanitizeNumber(game.facCounts[id], 0);
       game.facCounts[id] = currentQty + 1;
       
-      // 購入成功時に効果音を再生
       SoundManager.playBuy();
       
       refreshUI();
       pushLog(`🏭 施設購入：${DB_FACTORIES[id].name} を増設しました（所持数: ${game.facCounts[id]}）`, "var(--color-energy)");
       
-      // モック用フックの実行
       if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onBuyFactory) {
         window.ModAPI.hooks.onBuyFactory.forEach(cb => { try { cb({id, count: game.facCounts[id]}); } catch(e){} });
       }
@@ -1947,12 +1957,11 @@ function executeBuyUpgrade(id) {
     let currentLvl = __sanitizeNumber(game.upgLevels[id], 0);
     if (currentLvl >= uData.max) return;
     
-    const cost = getUpgradeCost(id);
-    if (game.energy >= cost) {
-      game.energy -= cost;
+    const cost = getUpgradeCost(id); // Decimal型
+    if (game.energy.gte(cost)) {
+      game.energy = game.energy.sub(cost);
       game.upgLevels[id] = currentLvl + 1;
       
-      // 購入成功時に効果音を再生
       SoundManager.playBuy();
       
       refreshUI();
@@ -1981,12 +1990,11 @@ function executeBuyAmUpgrade(id) {
     let currentLvl = __sanitizeNumber(game.amUpgLevels[id], 0);
     if (currentLvl >= auData.max) return;
     
-    const cost = getAmUpgradeCost(id);
-    if (game.antimatter >= cost) {
-      game.antimatter -= cost;
+    const cost = getAmUpgradeCost(id); // Decimal型
+    if (game.antimatter.gte(cost)) {
+      game.antimatter = game.antimatter.sub(cost);
       game.amUpgLevels[id] = currentLvl + 1;
       
-      // 購入成功時に効果音を再生
       SoundManager.playBuy();
       
       refreshUI();
@@ -2011,12 +2019,11 @@ function executeBuyTlUpgrade(id) {
     let currentLvl = __sanitizeNumber(game.tlUpgLevels[id], 0);
     if (currentLvl >= tuData.max) return;
     
-    const cost = getTlUpgradeCost(id);
-    if (game.timeShards >= cost) {
-      game.timeShards -= cost;
+    const cost = getTlUpgradeCost(id); // Decimal型
+    if (game.timeShards.gte(cost)) {
+      game.timeShards = game.timeShards.sub(cost);
       game.tlUpgLevels[id] = currentLvl + 1;
       
-      // 購入成功時に効果音を再生
       SoundManager.playBuy();
       
       refreshUI();
@@ -2028,46 +2035,41 @@ function executeBuyTlUpgrade(id) {
     console.error("TL Upgrade error:", err);
   }
 }
+
 /**
  * =========================================================================
- * Multi-Tier Layer Prestige Subroutines
+ * Multi-Tier Layer Prestige Subroutines (Decimal対応版)
  * =========================================================================
  */
 document.getElementById("btnResetAm").addEventListener("click", () => {
-  const gain = getGainAntimatter();
-  if (gain <= 0) return;
-  if (confirm(`現在の世界線のエネルギーと全施設を破棄し、新たに ${gain} AM を引き継いで反物質空間へ転生しますか？`)) {
+  const gain = getGainAntimatter(); // Decimal型
+  if (gain.lte(0)) return;
+  if (confirm(`現在の世界線のエネルギーと全施設を破棄し、新たに ${formatValue(gain)} AM を引き継いで反物質空間へ転生しますか？`)) {
     executePrestigeAm(gain);
   }
 });
 
 function executePrestigeAm(forcedGain) {
-  // ゲイン値の安全化
-  const safeGain = Number(forcedGain);
-  game.antimatter = (isNaN(game.antimatter) ? 0 : game.antimatter) + (isNaN(safeGain) ? 0 : safeGain);
+  const safeGain = __sanitizeDecimal(forcedGain, 0);
+  game.antimatter = __sanitizeDecimal(game.antimatter, 0).plus(safeGain);
   game.prestigeAmCount = (isNaN(game.prestigeAmCount) ? 0 : game.prestigeAmCount) + 1;
 
-  let carryOverEnergy = 0;
+  let carryOverEnergy = new Decimal(0);
   const amUpg2 = game.amUpgLevels && !isNaN(game.amUpgLevels[2]) ? game.amUpgLevels[2] : 0;
-  const currentEnergy = !isNaN(game.energy) ? game.energy : 0;
+  const currentEnergy = __sanitizeDecimal(game.energy, 0);
 
   if (amUpg2 >= 1) {
-    carryOverEnergy = currentEnergy * (amUpg2 * 0.05);
+    carryOverEnergy = currentEnergy.mul(amUpg2 * 0.05);
   }
 
-  // 万が一 carryOverEnergy が NaN になったら 0 にする
-  game.energy = isNaN(carryOverEnergy) ? 0 : carryOverEnergy;
-  
-  // 各種リソースの初期化（NaNガード付き）
+  game.energy = carryOverEnergy;
   game.facCounts = [0, 0, 0, 0, 0];
   
-  // インデックス 7 のみが引き継がれる実装の確認
   const keepUpg7 = (game.upgLevels && !isNaN(game.upgLevels[7])) ? game.upgLevels[7] : 0;
   game.upgLevels = [0, 0, 0, 0, 0, 0, 0, keepUpg7];
-  
   game.sessionTime = 0;
   
-  pushLog(`★ 反物質転生が実行されました（+${safeGain} AM）`, "var(--color-antimatter)");
+  pushLog(`★ 反物質転生が実行されました（+${formatValue(safeGain)} AM）`, "var(--color-antimatter)");
   createToast("世界線反物質化", `粒子が対消滅し、${formatValue(safeGain)} AM を回収しました。`);
   
   if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onPrestigeAm) {
@@ -2076,50 +2078,65 @@ function executePrestigeAm(forcedGain) {
   
   refreshUI();
 }
+
 document.getElementById("btnResetTl").addEventListener("click", () => {
-  const gain = getGainTimeShards();
-  if (gain <= 0) return;
-  if (confirm(`下位の全構造をリセットし、時間律の破片 ${gain} TS を獲得しますか？`)) {
-    game.timeShards += gain;
+  const gain = getGainTimeShards(); // Decimal型
+  if (gain.lte(0)) return;
+  if (confirm(`下位の全構造をリセットし、時間律の破片 ${formatValue(gain)} TS を獲得しますか？`)) {
+    game.timeShards = __sanitizeDecimal(game.timeShards, 0).plus(gain);
     game.prestigeTlCount++;
-    game.energy = 0; game.antimatter = 0;
+    game.energy = new Decimal(0);
+    game.antimatter = new Decimal(0);
     game.facCounts = [0, 0, 0, 0, 0];
     game.upgLevels = [0, 0, 0, 0, 0, 0, 0, 0];
     game.amUpgLevels = [0, 0, 0, 0];
     game.sessionTime = 0;
-    pushLog(`⏳ 時空の切断に成功（+${gain} TS 獲得）`, "var(--color-timeline)");
-    window.ModAPI.hooks.onPrestigeTl.forEach(cb => { try { cb({gain: gain}); } catch(e){} });
+    pushLog(`⏳ 時空の切断に成功（+${formatValue(gain)} TS 獲得）`, "var(--color-timeline)");
+    if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onPrestigeTl) {
+      window.ModAPI.hooks.onPrestigeTl.forEach(cb => { try { cb({gain: gain}); } catch(e){} });
+    }
     refreshUI();
   }
 });
 
 document.getElementById("btnResetGx").addEventListener("click", () => {
-  const gain = getGainGalaxyNodes();
-  if (gain <= 0) return;
+  const gain = getGainGalaxyNodes(); // Decimal型
+  if (gain.lte(0)) return;
   if (confirm(`究極の統合：時間と物質のすべてを捧げ、銀河系統合ノードを1つ固定化します。全リソースがリセットされますが、全生産効率が永久に5倍になります。`)) {
-    game.galaxyNodes += gain;
+    game.galaxyNodes = __sanitizeDecimal(game.galaxyNodes, 0).plus(gain);
     game.prestigeGxCount++;
-    game.energy = 0; game.antimatter = 0; game.timeShards = 0;
+    game.energy = new Decimal(0);
+    game.antimatter = new Decimal(0);
+    game.timeShards = new Decimal(0);
     game.facCounts = [0, 0, 0, 0, 0];
     game.upgLevels = [0, 0, 0, 0, 0, 0, 0, 0];
-    game.amUpgLevels = [0, 0, 0, 0]; game.tlUpgLevels = [0, 0, 0, 0];
+    game.amUpgLevels = [0, 0, 0, 0];
+    game.tlUpgLevels = [0, 0, 0, 0];
     game.sessionTime = 0;
     pushLog(`🌌 銀河収束完了。大宇宙の定数が書き換わりました。`, "var(--color-galaxy)");
-    window.ModAPI.hooks.onPrestigeGx.forEach(cb => { try { cb({gain: gain}); } catch(e){} });
+    if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onPrestigeGx) {
+      window.ModAPI.hooks.onPrestigeGx.forEach(cb => { try { cb({gain: gain}); } catch(e){} });
+    }
     refreshUI();
   }
 });
-
 /**
  * =========================================================================
- * Core Impulse Click Procedures
+ * Core Impulse Click Procedures (Decimal完全対応版)
  * =========================================================================
  */
 function handleCoreClick(e) {
-  const power = getClickPower();
-  game.energy += power;
-  game.totalClicks++;
-  SoundManager.playClick()
+  const power = getClickPower(); // Decimal型
+  
+  // Decimalのメソッドを使って加算
+  game.energy = game.energy.plus(power);
+  
+  // totalClicksもDecimal化されているため、plus(1)を使用
+  if (game.totalClicks === undefined) game.totalClicks = new Decimal(0);
+  game.totalClicks = game.totalClicks.plus(1);
+  
+  SoundManager.playClick();
+  
   const clickX = e ? e.clientX : window.innerWidth / 4;
   const clickY = e ? e.clientY : window.innerHeight / 2;
   
@@ -2132,9 +2149,15 @@ function handleCoreClick(e) {
   document.body.appendChild(floater);
   
   setTimeout(() => floater.remove(), 400);
-  window.ModAPI.hooks.onCoreClick.forEach(cb => { try { cb({power: power}); } catch(e){} });
+  
+  // フックの安全性確保
+  if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onCoreClick) {
+    window.ModAPI.hooks.onCoreClick.forEach(cb => { try { cb({power: power}); } catch(e){} });
+  }
+  
   refreshUI();
 }
+
 document.getElementById("coreTrigger").addEventListener("click", handleCoreClick);
 
 // === 統合版 SoundManager (効果音 & 超壮大オーケストラBGMエンジン) ===
@@ -2464,49 +2487,54 @@ function toggleBGM() {
 }
 /**
  * =========================================================================
- * Viewport Refresher & State Synchronization Interface
+ * Viewport Refresher & State Synchronization Interface (Decimal対応版)
  * =========================================================================
  */
 function refreshUI() {
-  document.getElementById("v-energy").textContent = formatValue(game.energy);
+  const energy = __sanitizeDecimal(game.energy, 0);
+  const antimatter = __sanitizeDecimal(game.antimatter, 0);
+  const timeShards = __sanitizeDecimal(game.timeShards, 0);
+  const galaxyNodes = __sanitizeDecimal(game.galaxyNodes, 0);
+
+  document.getElementById("v-energy").textContent = formatValue(energy);
   document.getElementById("v-total-cps").textContent = formatValue(getTotalCps());
   document.getElementById("v-click-power").textContent = "+" + formatValue(getClickPower());
   
-  if (game.antimatter > 0 || game.prestigeAmCount > 0) {
+  if (antimatter.gt(0) || (game.prestigeAmCount || 0) > 0) {
     document.getElementById("group-am").style.display = "block";
-    document.getElementById("v-antimatter").textContent = game.antimatter.toLocaleString();
+    document.getElementById("v-antimatter").textContent = formatValue(antimatter);
   }
-  if (game.timeShards > 0 || game.prestigeTlCount > 0) {
+  if (timeShards.gt(0) || (game.prestigeTlCount || 0) > 0) {
     document.getElementById("group-tl").style.display = "block";
-    document.getElementById("v-timeshards").textContent = game.timeShards.toLocaleString();
+    document.getElementById("v-timeshards").textContent = formatValue(timeShards);
   }
 
-  const gainAm = getGainAntimatter();
-  document.getElementById("v-gain-am").textContent = `+${gainAm.toLocaleString()} AM`;
-  document.getElementById("btnResetAm").disabled = gainAm <= 0;
+  const gainAm = getGainAntimatter(); // Decimal型
+  document.getElementById("v-gain-am").textContent = `+${formatValue(gainAm)} AM`;
+  document.getElementById("btnResetAm").disabled = gainAm.lte(0);
 
-  const gainTl = getGainTimeShards();
-  document.getElementById("v-gain-tl").textContent = `+${gainTl.toLocaleString()} TS`;
-  document.getElementById("btnResetTl").disabled = gainTl <= 0;
+  const gainTl = getGainTimeShards(); // Decimal型
+  document.getElementById("v-gain-tl").textContent = `+${formatValue(gainTl)} TS`;
+  document.getElementById("btnResetTl").disabled = gainTl.lte(0);
 
-  const gainGx = getGainGalaxyNodes();
-  document.getElementById("v-gain-gx").textContent = `+${gainGx} GN`;
-  document.getElementById("btnResetGx").disabled = gainGx <= 0;
+  const gainGx = getGainGalaxyNodes(); // Decimal型
+  document.getElementById("v-gain-gx").textContent = `+${formatValue(gainGx)} GN`;
+  document.getElementById("btnResetGx").disabled = gainGx.lte(0);
 
   DB_FACTORIES.forEach(f => {
-    const cost = getFactoryCost(f.id);
+    const cost = getFactoryCost(f.id); // Decimal型
     document.getElementById(`dom-fac-cost-${f.id}`).textContent = formatValue(cost);
-    document.getElementById(`dom-fac-count-${f.id}`).textContent = game.facCounts[f.id];
+    document.getElementById(`dom-fac-count-${f.id}`).textContent = game.facCounts[f.id] || 0;
     document.getElementById(`dom-fac-cps-${f.id}`).textContent = formatValue(getFactoryCps(f.id));
     
     const card = document.getElementById(`dom-fac-${f.id}`);
-    if (game.energy >= cost) card.classList.remove("state-disabled");
+    if (energy.gte(cost)) card.classList.remove("state-disabled");
     else card.classList.add("state-disabled");
   });
 
   DB_UPGRADES.forEach(u => {
-    const lv = game.upgLevels[u.id];
-    const cost = getUpgradeCost(u.id);
+    const lv = game.upgLevels[u.id] || 0;
+    const cost = getUpgradeCost(u.id); // Decimal型
     const card = document.getElementById(`dom-upg-${u.id}`);
     const labelCost = document.getElementById(`dom-upg-cost-${u.id}`);
     const labelLv = document.getElementById(`dom-upg-lv-${u.id}`);
@@ -2518,14 +2546,14 @@ function refreshUI() {
     } else {
       card.className = "card-upgrade-node";
       labelCost.textContent = `${formatValue(cost)} E`;
-      if (game.energy >= cost) card.classList.remove("state-disabled");
+      if (energy.gte(cost)) card.classList.remove("state-disabled");
       else card.classList.add("state-disabled");
     }
   });
 
   DB_AM_UPGRADES.forEach(au => {
-    const lv = game.amUpgLevels[au.id];
-    const cost = getAmUpgradeCost(au.id);
+    const lv = game.amUpgLevels[au.id] || 0;
+    const cost = getAmUpgradeCost(au.id); // Decimal型
     const card = document.getElementById(`dom-amupg-${au.id}`);
     const labelCost = document.getElementById(`dom-amupg-cost-${au.id}`);
     const labelLv = document.getElementById(`dom-amupg-lv-${au.id}`);
@@ -2536,15 +2564,15 @@ function refreshUI() {
       labelCost.textContent = "結合最大";
     } else {
       card.className = "card-upgrade-node";
-      labelCost.textContent = `${cost} AM`;
-      if (game.antimatter >= cost) card.classList.remove("state-disabled");
+      labelCost.textContent = `${formatValue(cost)} AM`;
+      if (antimatter.gte(cost)) card.classList.remove("state-disabled");
       else card.classList.add("state-disabled");
     }
   });
 
   DB_TL_UPGRADES.forEach(tu => {
-    const lv = game.tlUpgLevels[tu.id];
-    const cost = getTlUpgradeCost(tu.id);
+    const lv = game.tlUpgLevels[tu.id] || 0;
+    const cost = getTlUpgradeCost(tu.id); // Decimal型
     const card = document.getElementById(`dom-tlupg-${tu.id}`);
     const labelCost = document.getElementById(`dom-tlupg-cost-${tu.id}`);
     const labelLv = document.getElementById(`dom-tlupg-lv-${tu.id}`);
@@ -2555,58 +2583,63 @@ function refreshUI() {
       labelCost.textContent = "超越完了";
     } else {
       card.className = "card-upgrade-node";
-      labelCost.textContent = `${cost} TS`;
-      if (game.timeShards >= cost) card.classList.remove("state-disabled");
+      labelCost.textContent = `${formatValue(cost)} TS`;
+      if (timeShards.gte(cost)) card.classList.remove("state-disabled");
       else card.classList.add("state-disabled");
     }
   });
 
-  if (game.upgLevels[7] >= 1) {
+  if ((game.upgLevels?.[7] || 0) >= 1) {
     document.getElementById("auto-locked-msg").style.display = "none";
     document.getElementById("auto-unlocked-grid").style.display = "block";
-    if (game.tlUpgLevels[3] >= 1) {
+    if ((game.tlUpgLevels?.[3] || 0) >= 1) {
       document.getElementById("row-auto-prestige-am").style.display = "flex";
     }
   }
 
-  document.getElementById("s-run-time").textContent = game.sessionTime.toFixed(1) + "s";
-  document.getElementById("s-total-time").textContent = game.totalTime.toFixed(1) + "s";
-  document.getElementById("s-clicks").textContent = game.totalClicks.toLocaleString();
-  document.getElementById("s-p-am").textContent = game.prestigeAmCount;
-  document.getElementById("s-p-tl").textContent = game.prestigeTlCount;
-  document.getElementById("s-galaxy-nodes").textContent = game.galaxyNodes;
+  document.getElementById("s-run-time").textContent = (game.sessionTime || 0).toFixed(1) + "s";
+  document.getElementById("s-total-time").textContent = (game.totalTime || 0).toFixed(1) + "s";
+  document.getElementById("s-clicks").textContent = formatValue(game.totalClicks || 0);
+  document.getElementById("s-p-am").textContent = game.prestigeAmCount || 0;
+  document.getElementById("s-p-tl").textContent = game.prestigeTlCount || 0;
+  document.getElementById("s-galaxy-nodes").textContent = formatValue(galaxyNodes);
   
-  const amPerUnit = 100 + (game.amUpgLevels[0] * 50);
-  document.getElementById("s-mult-am").textContent = `+${(game.antimatter * amPerUnit).toLocaleString()}%`;
+  const amPerUnit = 100 + ((game.amUpgLevels?.[0] || 0) * 50);
+  const amMultiplierBonus = antimatter.mul(amPerUnit);
+  document.getElementById("s-mult-am").textContent = `+${formatValue(amMultiplierBonus)}%`;
   
   const totalSpeedPercentage = (getGameSpeedMultiplier() * 100) - 100;
   document.getElementById("s-mult-time").textContent = `+${totalSpeedPercentage.toFixed(1)}%`;
-  document.getElementById("s-mult-galaxy").textContent = `${(1.0 + game.galaxyNodes * 5.0).toFixed(1)}x`;
+  
+  const galaxyMultiplier = new Decimal(1.0).plus(galaxyNodes.mul(5.0));
+  document.getElementById("s-mult-galaxy").textContent = `${formatValue(galaxyMultiplier)}x`;
 
   DB_ACHIEVEMENTS.forEach(ach => {
     if (!game.achievements.includes(ach.id) && ach.req()) {
       game.achievements.push(ach.id);
       createToast(`🏆 実績解除: ${ach.text}`, ach.desc);
       pushLog(`【実績獲得】 ${ach.text} - ${ach.desc}`, "var(--color-upgrade)");
-      window.ModAPI.hooks.onAchievement.forEach(cb => { try { cb({id: ach.id, text: ach.text}); } catch(e){} });
+      if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onAchievement) {
+        window.ModAPI.hooks.onAchievement.forEach(cb => { try { cb({id: ach.id, text: ach.text}); } catch(e){} });
+      }
     }
   });
 }
+
 function loadGame() {
-  const savedData = localStorage.getItem('your_game_save_key'); // プロジェクトのセーブキーに合わせて変更してください
+  const savedData = localStorage.getItem('your_game_save_key');
   if (!savedData) return;
   
   try {
     const parsed = JSON.parse(savedData);
     
-    // 基本パラメータのロード
-    game.energy = parsed.energy ?? 0;
-    game.totalClicks = parsed.totalClicks ?? 0;
-    game.antimatter = parsed.antimatter ?? 0;
+    game.energy = new Decimal(parsed.energy ?? 0);
+    game.totalClicks = new Decimal(parsed.totalClicks ?? 0);
+    game.antimatter = new Decimal(parsed.antimatter ?? 0);
     game.prestigeAmCount = parsed.prestigeAmCount ?? 0;
-    game.timeShards = parsed.timeShards ?? 0;
+    game.timeShards = new Decimal(parsed.timeShards ?? 0);
     game.prestigeTlCount = parsed.prestigeTlCount ?? 0;
-    game.galaxyNodes = parsed.galaxyNodes ?? 0;
+    game.galaxyNodes = new Decimal(parsed.galaxyNodes ?? 0);
     game.prestigeGxCount = parsed.prestigeGxCount ?? 0;
     game.sessionTime = parsed.sessionTime ?? 0;
     game.totalTime = parsed.totalTime ?? 0;
@@ -2616,7 +2649,6 @@ function loadGame() {
     game.autoPrestigeAmEnabled = parsed.autoPrestigeAmEnabled ?? false;
     game.achievements = parsed.achievements ?? [];
 
-    // 各配列のロード ＋ データベース数に満たない場合は 0 で自動パディング（NaN完全防止）
     game.facCounts = DB_FACTORIES.map((_, i) => parsed.facCounts?.[i] ?? 0);
     game.upgLevels = DB_UPGRADES.map((_, i) => parsed.upgLevels?.[i] ?? 0);
     game.amUpgLevels = DB_AM_UPGRADES.map((_, i) => parsed.amUpgLevels?.[i] ?? 0);
@@ -2638,7 +2670,9 @@ function saveGameManual() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(game));
     createToast("セーブ完了", "宇宙パラメータがLocalStoreへ永続保存されました。");
     pushLog("📁 システム：手動セーブが正常に書き込まれました。", "var(--color-energy)");
-    window.ModAPI.hooks.onSave.forEach(cb => { try { cb({success: true}); } catch(e){} });
+    if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onSave) {
+      window.ModAPI.hooks.onSave.forEach(cb => { try { cb({success: true}); } catch(e){} });
+    }
   } catch (e) { console.error(e); }
 }
 
@@ -2646,12 +2680,24 @@ function loadGameOnLaunch() {
   try {
     const rawData = localStorage.getItem(STORAGE_KEY);
     if (rawData) {
-      deserializeGameData(rawData);
-      game = Object.assign({}, game, JSON.parse(rawData));
-      if (game.upgLevels[7] >= 1) {
-        document.getElementById("chk-auto-fac").checked = game.autoFacEnabled;
-        document.getElementById("chk-auto-upg").checked = game.autoUpgEnabled;
-        document.getElementById("chk-auto-am").checked = game.autoAmEnabled;
+      if (typeof deserializeGameData === "function") {
+        deserializeGameData(rawData);
+      }
+      const parsed = JSON.parse(rawData);
+      game = Object.assign({}, game, parsed);
+      
+      // Decimal 型の復元保証
+      game.energy = new Decimal(parsed.energy ?? 0);
+      game.totalClicks = new Decimal(parsed.totalClicks ?? 0);
+      game.antimatter = new Decimal(parsed.antimatter ?? 0);
+      game.timeShards = new Decimal(parsed.timeShards ?? 0);
+      game.galaxyNodes = new Decimal(parsed.galaxyNodes ?? 0);
+
+      const upg7 = game.upgLevels && Array.isArray(game.upgLevels) ? (game.upgLevels[7] || 0) : 0;
+      if (upg7 >= 1) {
+        if (document.getElementById("chk-auto-fac")) document.getElementById("chk-auto-fac").checked = game.autoFacEnabled;
+        if (document.getElementById("chk-auto-upg")) document.getElementById("chk-auto-upg").checked = game.autoUpgEnabled;
+        if (document.getElementById("chk-auto-am")) document.getElementById("chk-auto-am").checked = game.autoAmEnabled;
         if (document.getElementById("chk-auto-pam")) document.getElementById("chk-auto-pam").checked = game.autoPrestigeAmEnabled;
       }
       pushLog("📂 復元完了：前回の世界線データが完全に同期されました。", "var(--color-upgrade)");
@@ -2662,40 +2708,52 @@ function loadGameOnLaunch() {
 function hardResetGame() {
   if (confirm("🚨 全データを完全に削除して初期化しますか？")) {
     localStorage.removeItem(STORAGE_KEY);
-    game = JSON.parse(DEFAULT_GAME_STATE);
+    if (typeof DEFAULT_GAME_STATE !== "undefined") {
+      game = JSON.parse(DEFAULT_GAME_STATE);
+    }
     location.reload();
   }
 }
 
 /**
  * =========================================================================
- * High-Performance Primary Clock Loop & Dynamic Visuals
+ * High-Performance Primary Clock Loop & Dynamic Visuals (Decimal対応版)
  * =========================================================================
  */
 let cronosPreviousTimestamp = performance.now();
 let lastAutosaveTime = 0;
-let achievementCheckTimer = 0;
 
 function executeCoreGameTick(currentTimestamp) {
   const baseDeltaTime = (currentTimestamp - cronosPreviousTimestamp) / 1000;
   const dimensionalDeltaTime = baseDeltaTime * getGameSpeedMultiplier();
   cronosPreviousTimestamp = currentTimestamp;
 
-  game.sessionTime += dimensionalDeltaTime;
-  game.totalTime += dimensionalDeltaTime;
+  game.sessionTime = (game.sessionTime || 0) + dimensionalDeltaTime;
+  game.totalTime = (game.totalTime || 0) + dimensionalDeltaTime;
+  
   const totalCpsVal = (typeof getTotalCps === "function") ? getTotalCps() : new Decimal(0);
-const cpsDecimal = (totalCpsVal instanceof Decimal) ? totalCpsVal : new Decimal(totalCpsVal);
-game.energy = game.energy.add(cpsDecimal.mul(dimensionalDeltaTime));
+  const cpsDecimal = __sanitizeDecimal(totalCpsVal, 0);
+  
+  // Decimal の加算処理
+  const energyAdd = cpsDecimal.mul(dimensionalDeltaTime);
+  game.energy = __sanitizeDecimal(game.energy, 0).plus(energyAdd);
 
-  runInternalAutomation();
+  if (typeof runInternalAutomation === "function") {
+    runInternalAutomation();
+  }
 
-  // 実績判定を毎フレームまたは適宜実行（負荷軽減のためタイマーまたは毎フレーム処理）
   if (typeof checkAchievements === "function") {
     checkAchievements();
   }
 
-  // エネルギー量・進行度に応じた動的ビジュアル演出の更新
-  updateDynamicCoreAndResourceVisuals(game.energy.toNumber());
+  // 動的ビジュアル演出の更新（Decimalの大きさを考慮した安全な数値変換）
+  let visualEnergyNum = 0;
+  try {
+    visualEnergyNum = game.energy.isFinite() ? game.energy.toNumber() : 1e308;
+  } catch(e) {
+    visualEnergyNum = 1e308;
+  }
+  updateDynamicCoreAndResourceVisuals(visualEnergyNum);
 
   if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onTick) {
     window.ModAPI.hooks.onTick.forEach(cb => { try { cb(dimensionalDeltaTime); } catch(e){} });
@@ -2717,8 +2775,6 @@ game.energy = game.energy.add(cpsDecimal.mul(dimensionalDeltaTime));
   requestAnimationFrame(executeCoreGameTick);
 }
 
-
-
 function switchMainTab(targetId) {
   const panes = document.getElementsByClassName("tab-pane");
   for (let i = 0; i < panes.length; i++) panes[i].classList.remove("active");
@@ -2734,7 +2790,10 @@ let stateSpaceKeyGuard = false;
 document.addEventListener("keydown", e => {
   if (e.code === "Space") {
     e.preventDefault();
-    if (!stateSpaceKeyGuard) { stateSpaceKeyGuard = true; if (typeof handleCoreClick === "function") handleCoreClick(null); }
+    if (!stateSpaceKeyGuard) { 
+      stateSpaceKeyGuard = true; 
+      if (typeof handleCoreClick === "function") handleCoreClick(null); 
+    }
   }
 });
 document.addEventListener("keyup", e => { if (e.code === "Space") stateSpaceKeyGuard = false; });
@@ -2745,18 +2804,13 @@ window.addEventListener("DOMContentLoaded", () => {
   cronosPreviousTimestamp = performance.now();
   requestAnimationFrame(executeCoreGameTick);
 });
+
 /**
  =========================================================================
  * 🌈 フルスペクトル・ダイナミック演出 & 粒子パーティクルシステム
- * （決定論的カラー割当・文字色とコア色を常に同じ・同一段階中は不変）
- * 使い方：既存の関連スクリプトをこのファイルで完全に置き換えてください
  =========================================================================
  */
-
 (function() {
-  /* -------------------------
-     基本CSS（1回だけ追加）
-     ------------------------- */
   if (!document.getElementById('deterministic-visuals-style')) {
     const s = document.createElement('style');
     s.id = 'deterministic-visuals-style';
@@ -2768,65 +2822,17 @@ window.addEventListener("DOMContentLoaded", () => {
     document.head.appendChild(s);
   }
 
-  /* -------------------------
-     ヘルパー
-     ------------------------- */
   function hsl(h, s, l) { return `hsl(${Math.round((h + 360) % 360)}, ${Math.round(s)}%, ${Math.round(l)}%)`; }
   function hslaFromHsl(hslStr, a = 0.08) { return hslStr.replace(/^hsl\(/, 'hsla(').replace(/\)$/, `, ${a})`); }
 
-  // 決定論的に stage -> hue を返す（ランダム無し）
-  // Golden angle を使って均等分布。stage が同じなら常に同じ hue。
   function hueForStage(stage) {
-    const GOLDEN_ANGLE = 137.508; // degrees
-    const startHue = 190; // 水色寄りの基準
+    const GOLDEN_ANGLE = 137.508;
+    const startHue = 190;
     return (startHue + stage * GOLDEN_ANGLE) % 360;
   }
 
-  // 要素に色を強制適用（通常要素 / SVG 対応）
-  function applyColorToElement(el, color, glow = '0 0 18px rgba(0,0,0,0.18)') {
-    if (!el) return;
-    try {
-      el.style.setProperty('border-color', color, 'important');
-      el.style.setProperty('border-style', 'solid', 'important');
-      el.style.setProperty('border-width', '3px', 'important');
-      el.style.setProperty('box-shadow', glow, 'important');
-      el.style.setProperty('outline', `2px solid ${color}`, 'important');
-      el.style.setProperty('outline-offset', '2px', 'important');
-      el.style.setProperty('background-color', hslaFromHsl(color, 0.06), 'important');
-      el.style.setProperty('color', color, 'important');
-    } catch (e) {}
-    try {
-      if (el instanceof SVGElement || (el.tagName && el.tagName.toLowerCase() === 'svg')) {
-        el.style.setProperty('stroke', color, 'important');
-        el.style.setProperty('fill', color, 'important');
-        el.setAttribute('stroke', color);
-        el.setAttribute('fill', color);
-        const children = el.querySelectorAll && el.querySelectorAll('path, circle, rect, polygon, g');
-        if (children && children.length) {
-          children.forEach(ch => {
-            try {
-              ch.style.setProperty('stroke', color, 'important');
-              ch.style.setProperty('fill', color, 'important');
-              ch.setAttribute('stroke', color);
-              ch.setAttribute('fill', color);
-            } catch (e) {}
-          });
-        }
-      }
-    } catch (e) {}
-  }
+  const lastState = new WeakMap();
 
-  /* -------------------------
-     状態保持（同一段階中は色を変えない）
-     ------------------------- */
-  const lastState = new WeakMap(); // key: coreBtn element -> { stage, hue }
-
-  /* -------------------------
-     メイン：updateDynamicCoreAndResourceVisuals
-     - stage は e1~e10 => 1, e11~e20 => 2, ... 最大1000
-     - 文字色とコア色は同じ（決定論的）
-     - 同一段階中は再適用しない（ちらつき防止）
-     ------------------------- */
   window.updateDynamicCoreAndResourceVisuals = function(currentEnergy) {
     const coreBtn = document.getElementById('coreTrigger');
     const energyValElem = document.getElementById('v-energy');
@@ -2834,36 +2840,25 @@ window.addEventListener("DOMContentLoaded", () => {
 
     const productButtons = document.querySelectorAll('.shop-item-btn, .product-btn, .upg-btn, button[id*=shop], button[id*=buy]');
 
-    // currentEnergy を数値化して対数を取る
     const energyNum = (typeof currentEnergy === 'number') ? currentEnergy : Number(currentEnergy);
     const exponent = (isFinite(energyNum) && energyNum > 0) ? Math.max(0, Math.min(10000, Math.log10(energyNum))) : 0;
 
-    // stage 計算（e1~e10 => stage=1, e11~e20 => stage=2, ...）
     let stage = 1;
     if (exponent >= 1) stage = Math.floor((exponent - 1) / 10) + 1;
     stage = Math.max(1, Math.min(1000, stage));
 
-    // 前回 state を取得
     const prev = lastState.get(coreBtn) || { stage: null, hue: null };
 
-    // 同一段階中は何もしない（虹域 e10000 以上は例外で常に適用）
     if (prev.stage === stage && exponent < 10000) return;
 
-    // 決定論的に hue を決定（stage のみで決まる）
     let hue = hueForStage(stage);
-
-    // 明度・彩度（stage に応じて変化）
     const t = (stage - 1) / 999;
-    const lightness = 75 - (t * 40); // 75 -> 35
-    const saturation = 70 + (t * 20); // 70 -> 90
-
-    // 文字色（単色）とコア色は同じ
+    const lightness = 75 - (t * 40);
+    const saturation = 70 + (t * 20);
     const textColor = hsl(hue, saturation, lightness);
 
-    // 保存（次回比較用）
     lastState.set(coreBtn, { stage: stage, hue: hue });
 
-    // e10000 以上（虹域）処理（例外）
     if (exponent >= 10000) {
       const rainbow = 'linear-gradient(90deg, #00f2fe, #4facfe, #00ffcc, #ffea00, #ff0055, #9d4edd, #00f2fe)';
       energyValElem.style.setProperty('background', rainbow, 'important');
@@ -2892,9 +2887,7 @@ window.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // stage < 250: 単色運用（文字とコアを同色に）
     if (stage < 250) {
-      // 文字（単色）
       energyValElem.style.setProperty('animation', 'none', 'important');
       energyValElem.style.setProperty('background', 'none', 'important');
       energyValElem.style.removeProperty('background-clip');
@@ -2903,14 +2896,12 @@ window.addEventListener("DOMContentLoaded", () => {
       energyValElem.style.setProperty('-webkit-text-fill-color', 'initial', 'important');
       energyValElem.style.setProperty('text-shadow', `0 0 18px ${hslaFromHsl(textColor, 0.45)}`, 'important');
 
-      // コアを文字と同じ色にする（ボーダー・グローも同色で統一）
       try {
         coreBtn.style.setProperty('background', 'none', 'important');
         coreBtn.style.setProperty('border-color', textColor, 'important');
         coreBtn.style.setProperty('box-shadow', `0 0 26px ${hslaFromHsl(textColor, 0.65)}`, 'important');
         coreBtn.style.setProperty('border-width', '4px', 'important');
         coreBtn.style.setProperty('animation', 'none', 'important');
-        // SVG 内部がある場合は内部パスにも同色を適用
         const coreSvg = coreBtn.querySelector && coreBtn.querySelector('svg');
         if (coreSvg) {
           const paths = coreSvg.querySelectorAll('path, circle, rect');
@@ -2920,7 +2911,6 @@ window.addEventListener("DOMContentLoaded", () => {
         }
       } catch (e) {}
 
-      // 商品ボタン群も同色で統一
       productButtons.forEach(btn => {
         try {
           btn.style.setProperty('border-color', textColor, 'important');
@@ -2932,9 +2922,7 @@ window.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // stage >= 250: 文字は単色維持、コアは文字色を基準に控えめなグラデーションを許可
     {
-      // 文字は単色
       energyValElem.style.setProperty('animation', 'none', 'important');
       energyValElem.style.setProperty('background', 'none', 'important');
       energyValElem.style.removeProperty('background-clip');
@@ -2943,19 +2931,17 @@ window.addEventListener("DOMContentLoaded", () => {
       energyValElem.style.setProperty('-webkit-text-fill-color', 'initial', 'important');
       energyValElem.style.setProperty('text-shadow', `0 0 20px rgba(0,0,0,0.06)`, 'important');
 
-      // コアは文字色を基準に枠線・グローを合わせ、内部に控えめなグラデーションを入れる
       const accent1 = hsl((hue + 60) % 360, Math.max(50, saturation - 5), Math.max(35, lightness - 8));
       const accent2 = hsl((hue + 180) % 360, Math.max(50, saturation - 10), Math.max(30, lightness - 12));
       try {
         const coreGrad = `linear-gradient(135deg, ${textColor} 0%, ${accent1} 45%, ${accent2} 100%)`;
         coreBtn.style.setProperty('background', coreGrad, 'important');
-        coreBtn.style.setProperty('border-color', textColor, 'important'); // 枠線は文字色に合わせる
+        coreBtn.style.setProperty('border-color', textColor, 'important');
         coreBtn.style.setProperty('box-shadow', `0 0 36px ${hslaFromHsl(textColor, 0.55)}`, 'important');
         coreBtn.style.setProperty('border-width', '5px', 'important');
         coreBtn.style.setProperty('animation', 'corePulse 1.2s ease-in-out infinite', 'important');
       } catch (e) {}
 
-      // SVG 内部がある場合は内部パスに main/textColor を優先して適用（交互に）
       const coreSvg = coreBtn.querySelector && coreBtn.querySelector('svg');
       if (coreSvg) {
         try {
@@ -2967,7 +2953,6 @@ window.addEventListener("DOMContentLoaded", () => {
         } catch (e) {}
       }
 
-      // 商品ボタン群は文字色を基準にアクセントを混ぜるが、主要色は文字色に合わせる
       productButtons.forEach((btn, i) => {
         const c = (i % 3 === 0) ? textColor : (i % 3 === 1) ? accent1 : accent2;
         try {
@@ -2978,7 +2963,7 @@ window.addEventListener("DOMContentLoaded", () => {
       });
     }
   };
-
+})();
   /* -------------------------
      パーティクル（既存機能）
      ------------------------- */
