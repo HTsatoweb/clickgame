@@ -737,7 +737,7 @@ button, .btn-action-prestige, .click-core-btn, .card-upgrade-node, .factory-line
   <div class="right-header">SYSTEM LOG (宇宙の因果履歴)</div>
   <div class="log-stream-box" id="logBox"></div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/break_infinity.js@2"></script>
+
 <script>
 /**
  * =========================================================================
@@ -774,58 +774,7 @@ const DB_FACTORIES = [
   { id: 26, name: 'アカシック・レコード・アブソーバー', baseCost: 2.0e38, costMultiplier: 3.73, baseCps: 3.8e28, desc: '宇宙の全情報が記録されるという超次元の書「アカシック・レコード」に直接接続し、情報そのものを純粋エネルギーに置換。' },
   { id: 27, name: 'ネバーエンディング・ループ・コア', baseCost: 7.5e39, costMultiplier: 3.90, baseCps: 5.5e29, desc: '因果の環を完全に閉じた無限ループ構造に固定し、外部からの燃料供給を一切必要とせず自己増殖し続ける究極の永久炉。' },
   { id: 28, name: 'トランスペアレント・コスモロジー', baseCost: 2.8e41, costMultiplier: 4.08, baseCps: 8.0e30, desc: '宇宙全体を完全に透き通ったガラス細工のように観測・制御し、マクロな構造の隅々からエネルギーを漏れなく吸い上げる究極の極致。' },
-  { id: 29, name: 'アブソリュート・ゼロ・サーモ', baseCost: 1.0e43, costMultiplier: 4.27, baseCps: 1.2e32, desc: '空間のすべての熱エネルギーおよび振動を完全に奪い去り、究極の「無」から逆説的な最大出力を引き出す全宇宙の終着点。' },
-  { id: 30, name: 'クリスタル・レゾネーター', baseCost: 3.8e44, costMultiplier: 4.47, baseCps: 1.8e33, desc: '超高密度フォノン結晶を共鳴させ、空間の微小な歪みを安定した交流エネルギーへと直接変換する精緻な結晶体。' },
-  { id: 31, name: 'マグネティック・プルサー', baseCost: 1.4e46, costMultiplier: 4.68, baseCps: 2.6e34, desc: '中性子星の磁場強度を人工的に再現し、極超新星爆発の磁気流体力学エネルギーを完全に収奪する磁気プラント。' },
-  { id: 32, name: 'クォーク・グルーオン・プラズマ炉', baseCost: 5.2e47, costMultiplier: 4.90, baseCps: 3.9e35, desc: '初期宇宙の状態である超高温高密度のクォーク・グルーオンの海を封じ込め、強烈な色荷エネルギーを回収する炉。' },
-  { id: 33, name: 'ヴォルテックス・シンギュラリティ', baseCost: 1.9e49, costMultiplier: 5.13, baseCps: 5.8e36, desc: '高速回転する多重特異点の渦を利用して、周囲の空間から光子と重力波を同時に巻き取り増幅させる超渦動機関。' },
-  { id: 34, name: 'ホログラフィック・プリンター', baseCost: 7.2e50, costMultiplier: 5.37, baseCps: 8.7e37, desc: '宇宙の境界に描かれた二次元ホログラム情報から、三次元的な膨大な質量とエネルギーを実体化して搾取する構造体。' },
-  { id: 35, name: 'インフレーション・ジェネレーター', baseCost: 2.7e52, costMultiplier: 5.62, baseCps: 1.3e39, desc: '宇宙開闢時の超加速度的膨張（インフレーション）の原動力場を人工再燃させ、無限の空間拡張エネルギーを獲得。' },
-  { id: 36, name: 'スピン・グラス・コンバーター', baseCost: 1.0e54, costMultiplier: 5.88, baseCps: 2.0e40, desc: '磁性体のスピンがランダムに凍結した複雑系グラス状態を利用し、非線形なエネルギーの揺らぎを整流化。' },
-  { id: 37, name: 'バリオン非対称性プラント', baseCost: 3.8e55, costMultiplier: 6.15, baseCps: 3.0e41, desc: '物質と反物質の微小な存在比率の偏りを人工的に極限拡大し、その破滅的な相殺エネルギーを独占するプラント。' },
-  { id: 38, name: 'ダーク・エナジー・サイホン', baseCost: 1.4e57, costMultiplier: 6.43, baseCps: 4.5e42, desc: '全宇宙の加速膨張を牽引する謎の暗黒エネルギーの流れに直接吸管を差し込み、その全圧を我がものとするサイホン。' },
-  { id: 39, name: 'フォトン・ゲイン・ファクトリー', baseCost: 5.3e58, costMultiplier: 6.72, baseCps: 6.8e43, desc: '散逸する宇宙背景輻射の光子群を余すところなくかき集め、光子起因の駆動力を極限まで高める巨大工場。' },
-  { id: 40, name: 'エントロピック・ウェーブ・タワー', baseCost: 2.0e60, costMultiplier: 7.02, baseCps: 1.0e45, desc: '宇宙のエントロピー増大勾配そのものを斜面にみたて、流れ落ちる熱的無秩序を動力に変換する高塔。' },
-  { id: 41, name: 'ストリング・テンドン・アレイ', baseCost: 7.6e61, costMultiplier: 7.34, baseCps: 1.5e46, desc: '宇宙空間を張り詰める無数のコズミック・ストリングを弦楽器のように弾き、猛烈な高周波振動エネルギーを収穫。' },
-  { id: 42, name: 'ゼロ・ポイント・ウェーブ・キャッチャー', baseCost: 2.9e63, costMultiplier: 7.67, baseCps: 2.3e47, desc: '絶え間なく押し寄せる零点エネルギーの量子波をノーロスで受け止め、巨大な電力グリッドへと流し込む受電網。' },
-  { id: 43, name: 'クロノ・スパシアル・リミッター', baseCost: 1.1e65, costMultiplier: 8.01, baseCps: 3.5e48, desc: '時間と空間の結合度を人为的にカット＆ペーストし、時空の歪みから生じる特異なエネルギーを採取する装置。' },
-  { id: 44, name: 'プラズマティック・ブレーン・コア', baseCost: 4.2e66, costMultiplier: 8.37, baseCps: 5.3e49, desc: '高次元膜の内部で超高密度プラズマを暴走させ、膜間の電位差を利用して超出力を引き出す熱核心臓部。' },
-  { id: 45, name: 'マルチバース・ミラー・グリッド', baseCost: 1.6e68, costMultiplier: 8.75, baseCps: 8.0e50, desc: '全平行世界に全く同一の発電ミラーを配置し、全次元の反射光とエネルギーを一点に集約する鏡面網。' },
-  { id: 46, name: 'エーテル・ストーム・チャージャー', baseCost: 6.1e69, costMultiplier: 9.14, baseCps: 1.2e52, desc: '宇宙の深部で荒れ狂うエーテル嵐の直中に飛び込み、荒ぶる媒質の奔流をそのまま電力へ直結するチャージャー。' },
-  { id: 47, name: 'タキオン・ストリーム・リファイナー', baseCost: 2.3e71, costMultiplier: 9.55, baseCps: 1.8e53, desc: '超光速粒子の混沌とした流れを美しく精製し、未来の超高純度エネルギーへと精錬する超時空精錬所。' },
-  { id: 48, name: 'シンギュラリティ・ウェーブ・ルーパー', baseCost: 8.7e72, costMultiplier: 9.98, baseCps: 2.7e54, desc: 'ブラックホールの周回軌道上で重力波を無限ループさせ、エネルギーの減衰を完全にゼロにした永続ループ炉。' },
-  { id: 49, name: 'オメガ・シンセシス・プラント', baseCost: 3.3e74, costMultiplier: 10.43, baseCps: 4.0e55, desc: 'あらゆる物理法則の終着点において、存在と非存在の境界を合成し究極の全能エネルギーを生成する最終プラント。' },
-  { id: 50, name: 'ネクサス・プライム・ステーション', baseCost: 1.2e76, costMultiplier: 10.90, baseCps: 6.0e56, desc: '全次元の結節点（ネクサス）にそびえ立ち、全宇宙のエネルギー網を統括管理する神話級の中枢ステーション。' },
-  { id: 51, name: 'インフィニット・ホライゾン・コア', baseCost: 4.6e77, costMultiplier: 11.39, baseCps: 9.0e57, desc: '事象の地平線を無限に拡張し続け、そこから流れ込む無尽蔵の重力崩壊エネルギーを喰らい続ける核心。' },
-  { id: 52, name: 'エターナル・ヴォックス・マトリクス', baseCost: 1.7e79, costMultiplier: 11.90, baseCps: 1.3e59, desc: '宇宙の最初期に発せられた「最初の声」の残響をマトリクス状に固定し、不変の駆動力を得続ける永久装置。' },
-  { id: 53, name: 'コズミック・マインド・オーブ', baseCost: 6.5e80, costMultiplier: 12.43, baseCps: 2.0e60, desc: '宇宙全体の意識と情報処理プロセスを一つのオーブに凝縮し、知的思念のエネルギー化を成し遂げた精神炉。' },
-  { id: 54, name: 'トランス・ディメンショナル・ゲート', baseCost: 2.5e82, costMultiplier: 12.98, baseCps: 3.0e61, desc: 'いかなる物理障壁をも無視して未知なる高次元領域へ直結し、神々の領域の動力を強奪する超次元ゲート。' },
-  { id: 55, name: 'アブソリュート・エーテル・F', baseCost: 9.5e83, costMultiplier: 13.55, baseCps: 4.5e62, desc: '完全無欠のエーテルフィールドを展開し、宇宙の全物質を純粋な媒質へと変えて尽きせぬ電力を叩き出す。' },
-  { id: 56, name: 'クォーク・シンフォニー・タワー', baseCost: 3.6e85, costMultiplier: 14.14, baseCps: 6.8e63, desc: '素粒子の奏でる色荷のハーモニーを調律し、宇宙の基礎構造そのものを巨大な楽器として鳴らす共鳴塔。' },
-  { id: 57, name: 'ダーク・マター・オーシャン', baseCost: 1.4e87, costMultiplier: 14.75, baseCps: 1.0e65, desc: '暗黒物質が果てしなく広がる広大な海原を航行し、その圧倒的な重力ポテンシャルを根こそぎすくい上げるプラント。' },
-  { id: 58, name: 'ビッグバン・クラシック・アレイ', baseCost: 5.3e88, costMultiplier: 15.38, baseCps: 1.5e66, desc: '無数のビッグバン発生装置を整然と並べ、宇宙誕生の瞬間の爆発力を途切れることなく持続させる配列陣。' },
-  { id: 59, name: 'ゼロ・ポイント・ネメシス', baseCost: 2.0e90, costMultiplier: 16.03, baseCps: 2.3e67, desc: '零点エネルギーの敵対的側面を調教し、破壊的なエネルギーの奔流を完全に制御下におく禁断の牙城。' },
-  { id: 60, name: 'オメガ・プライム・エッセンス', baseCost: 7.6e91, costMultiplier: 16.70, baseCps: 3.5e68, desc: 'すべての存在の理が収斂する究極の点において、無限のエネルギーを永遠に生成し続ける真の終点。' },
-  { id: 61, name: 'エターナル・ジェネシス・コア', baseCost: 2.9e93, costMultiplier: 17.40, baseCps: 5.3e69, desc: '宇宙の創造と消滅のサイクルそのものをエンジン部品として組み込み、永遠の動力を生む創世の炉。' },
-  { id: 62, name: 'マルチバース・オーケストラ', baseCost: 1.1e95, costMultiplier: 18.12, baseCps: 8.0e70, desc: '無限の並行世界の周波数を美しく調和させ、全マルチバースの協奏曲から莫大なエネルギーを紡ぐ構造体。' },
-  { id: 63, name: 'アカシック・ストリーム・エンジン', baseCost: 4.2e96, costMultiplier: 18.86, baseCps: 1.2e72, desc: 'アカシックレコードの膨大な情報流をタービンに叩き込み、知識そのものを動力源へと昇華する機関。' },
-  { id: 64, name: 'ネバーエンディング・フィニティ', baseCost: 1.6e98, costMultiplier: 19.63, baseCps: 1.8e73, desc: '終わりという概念をシステムから完全に抹消し、無限の彼方へと加速し続ける究極の永久機関。' },
-  { id: 65, name: 'トランスペアレント・マインド', baseCost: 6.1e99, costMultiplier: 20.42, baseCps: 2.7e74, desc: '全宇宙の知性を完全透明化し、完全無欠の意思疎通と最適化演算によって生み出される至高の精神エネルギー炉。' },
-  { id: 66, name: 'アブソリュート・シンギュラリティ', baseCost: 2.3e101, costMultiplier: 21.24, baseCps: 4.0e75, desc: 'すべての物理定数が意味を失う絶対特異点の中心で、純粋無垢なエネルギーの泉を独占する最終核心。' },
-  { id: 67, name: 'クロノ・ネクサス・ファクトリー', baseCost: 8.7e102, costMultiplier: 22.09, baseCps: 6.0e76, desc: '過去・現在・未来が交差する時空の交差点に工場を構え、全時代の労働力を一点に集中させる時空工場。' },
-  { id: 68, name: 'テラ・インフィニティ・ドリル', baseCost: 3.3e104, costMultiplier: 22.97, baseCps: 9.0e77, desc: '宇宙の果ての壁すらも軽々と穿ち、未知なる外宇宙の領域から無限のエネルギーを根こそぎ掘削する超ドリル。' },
-  { id: 69, name: 'ゴッド・スピード・リアクター', baseCost: 1.2e106, costMultiplier: 23.88, baseCps: 1.4e79, desc: '神すらも超越した速度で因果律を駆け抜け、全宇宙の未来永劫の電力を一瞬で前借りし続ける神速の反応炉。' },
-  { id: 70, name: 'アルティメット・ゼロ・ジェネシス', baseCost: 4.6e107, costMultiplier: 24.82, baseCps: 2.1e80, desc: '無（ゼロ）からすべて（オメガ）を創り出す究極の創生装置であり、全プラントの頂点に君臨する最後の要塞。' },
-  { id: 71, name: 'オムニ・コスミック・マトリクス', baseCost: 1.7e109, costMultiplier: 25.79, baseCps: 3.2e81, desc: '全宇宙・全次元・全時間軸を統合した総括マトリクス。これより先には、ただ無限の光のみが広がる。' },
-  { id: 72, name: 'インフィニット・ルーパー・Ω', baseCost: 6.5e110, costMultiplier: 26.79, baseCps: 4.8e82, desc: '自己増殖と自己崩壊の無限ループを極限まで洗練させ、宇宙の理をも超えて回り続ける完全無欠の輪。' },
-  { id: 73, name: 'エターナル・オーロラ・ヴェッセル', baseCost: 2.5e112, costMultiplier: 27.82, baseCps: 7.2e83, desc: '全次元の果てで輝く永遠のオーロラを捕縛し、その神々しい光の波動をすべて電力へと変換する美しき旗艦。' },
-  { id: 74, name: 'アブソリュート・オメガ・コア', baseCost: 9.5e113, costMultiplier: 28.88, baseCps: 1.1e85, desc: 'すべてのシステム、すべての概念、すべてのエネルギーの行き着く先にある、完全にして究極の絶対コア。' },
-  { id: 75, name: 'プライム・シンギュラリティ・X', baseCost: 3.6e115, costMultiplier: 29.97, baseCps: 1.6e86, desc: 'すべての始まりの特異点を人工的に再定義し、真の無限の彼方へと踏み出すための最終超越ファクトリー。' },
-  { id: 76, name: 'トランスペアレント・エッセンス', baseCost: 1.4e117, costMultiplier: 31.09, baseCps: 2.4e87, desc: '実体すら持たない純粋なる透き通った意思とエネルギーの結晶。宇宙の隅々にまでその慈愛ある電力を配給。' },
-  { id: 77, name: 'ネバーエンディング・コスモロジー', baseCost: 5.3e118, costMultiplier: 32.24, baseCps: 3.6e88, desc: '終わりなき宇宙の営みそのものを模倣し、永遠に拡大と生産を続けるマクロ構造の究極系。' },
-  { id: 78, name: 'クロノ・インフィニティ・ウェーブ', baseCost: 2.0e120, costMultiplier: 33.42, baseCps: 5.4e89, desc: '時間軸の全波長を完璧に同期させ、過去から未来までの全エネルギーを今この瞬間に集約する時空の波。' },
-  { id: 79, name: 'アルティメット・ネクサス・オメガ', baseCost: 7.6e121, costMultiplier: 34.63, baseCps: 8.0e90, desc: 'すべての施設とシステムの歴史の幕を閉じ、新たな次元の扉を開く最終到達点の結節点。' },
-  { id: 80, name: '絶対神', baseCost: 1.79e308, costMultiplier: 1.0, baseCps: 1e308, desc: 'すべての次元の理を踏み越え、新たな宇宙の創造主として君臨する究極の存在。' }
+  { id: 29, name: 'アブソリュート・ゼロ・サーモ', baseCost: 1.0e43, costMultiplier: 4.27, baseCps: 1.2e32, desc: '空間のすべての熱エネルギーおよび振動を完全に奪い去り、究極の「無」から逆説的な最大出力を引き出す全宇宙の終着点。' }
 ];
 
 const DB_UPGRADES = [
@@ -837,7 +786,7 @@ const DB_UPGRADES = [
   { id: 5, name: 'エネルギーの残響', max: 15, baseCost: 600000, costMultiplier: 3.0, desc: 'クリックパワーに対して現在の総秒間生産力(CPS)の 1.2% を常時ダイレクトに追加するハイブリッドフィードバック。' },
   { id: 6, name: '高次元トポロジー', max: 6, baseCost: 5e6, costMultiplier: 12.0, desc: '反物質の獲得効率を高め、リセットによる反物質プレステージシフト時のAM獲得量を +50% ずつ累積加算する。' },
   { id: 7, name: 'マトリクスの深淵', max: 1, baseCost: 5e7, costMultiplier: 1.0, desc: 'オートメーション（全自動化思考コア）機能タブを完全解放し、人類の手によるマニュアル操作を不要とする暗黒領域。' },
-  { id: 8, name: '絶対零度オメガ回路', max: 5, baseCost: 2.5e8, costMultiplier: 14.0, desc: '全プラントの熱損失をゼロに収束させ、すべての物質生産施設の基礎効率を常時 3 倍へと引き上げる超電導の極チ。' },
+  { id: 8, name: '絶対零度オメガ回路', max: 5, baseCost: 2.5e8, costMultiplier: 14.0, desc: '全プラントの熱損失をゼロに収束させ、すべての物質生産施設の基礎効率を常時 3 倍へと引き上げる超電導の極致。' },
   { id: 9, name: 'ゼロポイント・フィールド', max: 5, baseCost: 1.2e9, costMultiplier: 16.0, desc: '真空のゆらぎそのものをエネルギー源に変換し、総CPSに対して強力な乗算バフを上乗せする量子真空の開放。' },
   { id: 10, name: 'オムニ・コンバージェンス', max: 1, baseCost: 1e10, costMultiplier: 1.0, desc: 'すべての次元エネルギーの収束点を手中に収め、全施設のコスト増加率を大幅に軽減しつつ生産力を爆発的に跳ね上げる究極の統合中枢。' },
   { id: 11, name: 'タキオン・ハーモナイザー', max: 5, baseCost: 6e10, costMultiplier: 15.0, desc: '未来から逆流するタキオンの波長を完全に同調させ、生産効率に時間相関の強力なブーストを付与。' },
@@ -861,54 +810,7 @@ const DB_UPGRADES = [
   { id: 29, name: 'インフィニット・リカーシブ・コア', max: 1, baseCost: 5e23, costMultiplier: 1.0, desc: '自己言及的再帰処理の果てに無限の出力を自ら生み出し続ける究極の中枢。' },
   { id: 30, name: 'アルティメット・ゼロ・ポイント', max: 1, baseCost: 2e24, costMultiplier: 1.0, desc: 'すべてのアップグレードの終着点。無からすべてを創り出す絶対的な始まりの地。' },
   { id: 31, name: 'オムニ・マクロ・エンハンサー', max: 5, baseCost: 1e25, costMultiplier: 12.0, desc: '全次元・全施設・全システムを同時に高次元強化する統合マクロアンプ。' },
-  { id: 32, name: 'エターナル・ジェネシス・ドライバ', max: 1, baseCost: 5e25, costMultiplier: 1.0, desc: '宇宙の創生と終焉を意のままにループさせ、永遠の富をもたらす創世のドライバ。' },
-  { id: 33, name: 'クリスタル・レゾナンス・コア', max: 5, baseCost: 2.2e26, costMultiplier: 10.0, desc: '高密度フォノン結晶の共鳴を制御し、振動ロスのない完全透過エネルギー回路を形成。' },
-  { id: 34, name: 'マグネティック・サーキット', max: 8, baseCost: 9.5e26, costMultiplier: 7.5, desc: '中性子星級の強力磁場を利用して電子の移動速度を光速の限界まで引き上げる。' },
-  { id: 35, name: 'グルーオン・バインダー', max: 6, baseCost: 4.2e27, costMultiplier: 11.5, desc: '素粒子を結合する強い力を強制的に増幅し、物質の結合エネルギーを効率よく解放。' },
-  { id: 36, name: 'ヴォルテックス・チャージャー', max: 10, baseCost: 1.8e28, costMultiplier: 5.5, desc: '特異点周辺の渦巻く時空流から効率よく動力を回収するスピン・タービン。' },
-  { id: 37, name: 'ホログラフィック・リンク', max: 4, baseCost: 7.5e28, costMultiplier: 18.0, desc: '境界上のホログラム情報をリアルタイムで同期し、演算処理能力を飛躍的に向上。' },
-  { id: 38, name: 'インフレーション・ブースター', max: 5, baseCost: 3.2e29, costMultiplier: 13.0, desc: '宇宙膨張の初期圧力を常時システムに負荷し、全施設のベース出力を大幅底上げ。' },
-  { id: 39, name: 'スピン・グラス・アライメント', max: 8, baseCost: 1.4e30, costMultiplier: 6.5, desc: '複雑系スピンの向きを完全に一方向へ整列させ、エネルギーの迷走を完全防止。' },
-  { id: 40, name: 'バリオン・コンバーター', max: 6, baseCost: 6.0e30, costMultiplier: 9.0, desc: 'バリオン数の非対称性を利用したエネルギー変換効率を極限まで先鋭化。' },
-  { id: 41, name: 'ダーク・エナジー・バルブ', max: 5, baseCost: 2.5e31, costMultiplier: 14.0, desc: '暗黒エネルギーの流量を自在に調節する超高圧バルブシステム。' },
-  { id: 42, name: 'フォトン・ハーベスター・マトリクス', max: 10, baseCost: 1.1e32, costMultiplier: 4.8, desc: '宇宙放射線の光子を余すところなく捕集する広域受光ネット。' },
-  { id: 43, name: 'エントロピック・ダンパー・Ω', max: 3, baseCost: 4.8e32, costMultiplier: 24.0, desc: 'エントロピーの増大速度を完全に停止・固定化する究極の秩序維持装置。' },
-  { id: 44, name: 'ストリング・テンドン・アンプ', max: 8, baseCost: 2.0e33, costMultiplier: 7.0, desc: '超弦の張り具合を調整し、共振による出力を何倍にも増幅させるアンプ。' },
-  { id: 45, name: 'ゼロ・ポイント・ゲートウェイ', max: 5, baseCost: 8.5e33, costMultiplier: 15.0, desc: '零点エネルギーの出入り口を拡大し、無限の供給ラインを確立。' },
-  { id: 46, name: 'クロノ・スパシアル・ドライバ', max: 4, baseCost: 3.6e34, costMultiplier: 17.5, desc: '時空の結合子を高速駆動させ、全体の処理速度を加速させるドライバ。' },
-  { id: 47, name: 'プラズマティック・コア・シールド', max: 6, baseCost: 1.5e35, costMultiplier: 10.5, desc: '超高密度プラズマの熱暴走を防ぐ絶対防御の多重シールド。' },
-  { id: 48, name: 'マルチバース・ミラー・リンク', max: 5, baseCost: 6.8e35, costMultiplier: 12.5, desc: '他世界のミラープラントとデータおよび電力を完全同期。' },
-  { id: 49, name: 'エーテル・ストーム・ガントレット', max: 3, baseCost: 3.0e36, costMultiplier: 28.0, desc: '荒れ狂うエーテル嵐を素手で掴み取るかのような強烈な制御インターフェース。' },
-  { id: 50, name: 'タキオン・リファイナー・コア', max: 5, baseCost: 1.3e37, costMultiplier: 16.0, desc: 'タキオン粒子の純度を高め、時空を超えたエネルギー伝達ロスをゼロに。' },
-  { id: 51, name: 'シンギュラリティ・ルーパー・Z', max: 1, baseCost: 5.5e37, costMultiplier: 1.0, desc: '特異点エネルギーの無限ループを自動化し、永遠の出力を保証する究極回路。' },
-  { id: 52, name: 'オメガ・シンセシス・ユニット', max: 5, baseCost: 2.2e38, costMultiplier: 14.5, desc: '存在と非存在の境界を繋ぎ止め、合成出力を飛躍的に向上させるユニット。' },
-  { id: 53, name: 'ネクサス・プライム・リンク', max: 4, baseCost: 9.0e38, costMultiplier: 19.0, desc: '全次元の結節点を直結し、エネルギーの流通網を最適化。' },
-  { id: 54, name: 'ホライゾン・エクスパンダー', max: 6, baseCost: 3.8e39, costMultiplier: 9.5, desc: '事象の地平線の面積を意図的に拡大し、収穫量を大幅に増加。' },
-  { id: 55, name: 'エターナル・ヴォックス・アンプ', max: 5, baseCost: 1.6e40, costMultiplier: 13.5, desc: '宇宙初発の声を増幅し、マクロな空間全体に共鳴させる超音響アンプ。' },
-  { id: 56, name: 'コズミック・マインド・コア', max: 3, baseCost: 7.0e40, costMultiplier: 22.0, desc: '宇宙全体の意識ネットワークを統合し、知性による効率ブーストを発生。' },
-  { id: 57, name: 'トランス・ディメンショナル・キー', max: 1, baseCost: 3.0e41, costMultiplier: 1.0, desc: 'あらゆる高次元領域の扉を自由勝手に開閉できる究極のパスキー。' },
-  { id: 58, name: 'アブソリュート・エーテル・マトリクス', max: 5, baseCost: 1.2e42, costMultiplier: 15.5, desc: 'エーテル媒質のポテンシャルを限界まで引き出す統合マトリクス。' },
-  { id: 59, name: 'クォーク・シンフォニー・ドライバー', max: 4, baseCost: 5.0e42, costMultiplier: 18.5, desc: '素粒子の奏でるリズムを制御し、出力効率をピークに固定。' },
-  { id: 60, name: 'ダーク・マター・オーシャン・リグ', max: 5, baseCost: 2.1e43, costMultiplier: 14.0, desc: '暗黒物質の海から効率よく資源を汲み上げる超重量級リグ。' },
-  { id: 61, name: 'ビッグバン・クラシック・ドライバー', max: 3, baseCost: 8.8e43, costMultiplier: 26.0, desc: 'ミニチュアビッグバンの爆発タイミングを完全に同調させる制御装置。' },
-  { id: 62, name: 'ゼロ・ポイント・ネメシス・コア', max: 1, baseCost: 3.5e44, costMultiplier: 1.0, desc: '零点エネルギーの敵対的側面を完全にねじ伏せ、味方に付ける最終コア。' },
-  { id: 63, name: 'オメガ・プライム・マトリクス', max: 5, baseCost: 1.4e45, costMultiplier: 12.0, desc: 'すべての理の収斂点を強化し、全システムの生産力を倍加。' },
-  { id: 64, name: 'エターナル・ジェネシス・リンク', max: 4, baseCost: 5.8e45, costMultiplier: 16.5, desc: '宇宙の創生と消滅のサイクルをシステムに完全同期。' },
-  { id: 65, name: 'マルチバース・オーケストラ・コンフィグ', max: 3, baseCost: 2.4e46, costMultiplier: 23.0, desc: '並行世界の協奏曲の調律を自動化し、ハーモニー出力を最大化。' },
-  { id: 66, name: 'アカシック・ストリーム・ブースター', max: 5, baseCost: 1.0e47, costMultiplier: 15.0, desc: '情報流の処理速度を極限まで高め、知識変換効率をブースト。' },
-  { id: 67, name: 'ネバーエンディング・フィニティ・コア', max: 1, baseCost: 4.2e47, costMultiplier: 1.0, desc: '無限の彼方へと続く回路を固定し、さらなる高みへ到達する核心。' },
-  { id: 68, name: 'トランスペアレント・マインド・アレイ', max: 4, baseCost: 1.8e48, costMultiplier: 17.0, desc: '透明化された宇宙知性をネットワーク化し、超高速の演算と電力を供給。' },
-  { id: 69, name: 'アブソリュート・シンギュラリティ・キー', max: 1, baseCost: 7.5e48, costMultiplier: 1.0, desc: '絶対特異点の中心へアクセスし、すべての制限を打ち砕く鍵。' },
-  { id: 70, name: 'クロノ・ネクサス・ブリッジ', max: 5, baseCost: 3.1e49, costMultiplier: 13.0, desc: '時空の交差点を結ぶ堅牢なエネルギーブリッジ。' },
-  { id: 71, name: 'テラ・インフィニティ・ドライバー', max: 4, baseCost: 1.3e50, costMultiplier: 19.5, desc: '外宇宙の壁を穿つドリルを強力に駆動させる超大型ドライバ。' },
-  { id: 72, name: 'ゴッド・スピード・マトリクス・Ω', max: 1, baseCost: 5.0e50, costMultiplier: 1.0, desc: '神速の領域をさらに超越した、全システム共通の時間律加速装置。' },
-  { id: 73, name: 'アルティメット・ゼロ・ドライバー', max: 1, baseCost: 2.0e51, costMultiplier: 1.0, desc: '無からすべてを創り出すプロセスの最終駆動系。' },
-  { id: 74, name: 'オムニ・コスミック・リンク', max: 3, baseCost: 8.2e51, costMultiplier: 25.0, desc: '全宇宙・全次元の網の目を完全に結合する統合リンク。' },
-  { id: 75, name: 'インフィニット・ルーパー・アレイ', max: 5, baseCost: 3.4e52, costMultiplier: 14.0, desc: '無限ループの安定性を高め、エネルギーのロスを完全になくす配列。' },
-  { id: 76, name: 'エターナル・オーロラ・コンバーター', max: 4, baseCost: 1.4e53, costMultiplier: 18.0, desc: '永遠のオーロラの光子を100%の効率で電力へ変換。' },
-  { id: 77, name: 'アブソリュート・オメガ・ドライバー', max: 1, baseCost: 5.8e53, costMultiplier: 1.0, desc: 'すべての終着点から新たな動力を引き出す最終ドライバー。' },
-  { id: 78, name: 'プライム・シンギュラリティ・リンク', max: 3, baseCost: 2.4e54, costMultiplier: 27.0, desc: '始まりの特異点と現在のシステムを直結する強固な架橋。' },
-  { id: 79, name: 'アルティメット・オムニ・マトリクス', max: 1, baseCost: 1.0e55, costMultiplier: 1.0, desc: 'すべてのアップグレードの頂点に君臨し、全宇宙を完全に支配下におく至高のマスター回路。' }
+  { id: 32, name: 'エターナル・ジェネシス・ドライバ', max: 1, baseCost: 5e25, costMultiplier: 1.0, desc: '宇宙の創生と終焉を意のままにループさせ、永遠の富をもたらす創世のドライバ。' }
 ];
 
 const DB_AM_UPGRADES = [
@@ -930,68 +832,14 @@ const DB_AM_UPGRADES = [
   { id: 15, name: 'オメガ反転プライム', max: 1, baseCost: 1e9, costMultiplier: 1.0, desc: '反物質システムの全制約を強制解除し、プレステージ効率を最大化する究極の触媒。' },
   { id: 16, name: 'ネガティブ・エントロピー磁場', max: 5, baseCost: 4e9, costMultiplier: 15.0, desc: '反物質の散逸に伴うエントロピー増大を強力な磁場で逆転封じ込め。' },
   { id: 17, name: 'シンメトリー・ブレーカーAM', max: 5, baseCost: 1.5e10, costMultiplier: 17.0, desc: '物質と反物質の対称性の破れを人為的にコントロールして獲得量を倍増。' },
-  { id: 18, name: 'エーテル・アンチ・コンバーター', max: 5, baseCost: 6e10, costMultiplier: 19.0, desc: '空間のエーテル質を反物質へとダイレクトに変換する錬金術的デバイス。' },
+  { id: 18, name: 'エーテル・アンチ・コンバーター', max: 5, baseCost: 6e10, costMultiplier: 19.0, desc: '空間のエーテル質を反物質へとダイレクトに変換する錬金術적デバイス。' },
   { id: 19, name: 'クロノ・アンチマター・ギア', max: 4, baseCost: 2.5e11, costMultiplier: 22.0, desc: '時間軸の進行速度を反物質の量に連動させて強制加速させる時空歯車。' },
   { id: 20, name: 'ハイパー・ダーク・リアクター', max: 3, baseCost: 1e12, costMultiplier: 30.0, desc: '全宇宙の暗黒物質と反物質の総量を融合させた究極の最終反応炉。' },
   { id: 21, name: 'マルチバース・アンチ・ハブ', max: 3, baseCost: 4e12, costMultiplier: 35.0, desc: '並行世界全体の反物質網をひとつの巨大なハブとして統合管理。' },
   { id: 22, name: 'アカシック・AM・トランス', max: 2, baseCost: 1.5e13, costMultiplier: 50.0, desc: 'アカシックレコードの記述を応用し、反物質の生成効率を絶対真理レベルへ固定。' },
   { id: 23, name: 'エターナル・アンチ・フィールド', max: 2, baseCost: 6e13, costMultiplier: 60.0, desc: '永遠に消滅しない完璧な対称性を持つ反物質の絶対領域を展開。' },
   { id: 24, name: 'アブソリュート・アンチ・オメガ', max: 1, baseCost: 2.5e14, costMultiplier: 1.0, desc: '反物質の極致。すべての物質を無に帰し、無限のエネルギーを生み出す終焉の器。' },
-  { id: 25, name: 'インフィニット・AM・シンギュラリティ', max: 1, baseCost: 1e15, costMultiplier: 1.0, desc: '反物質の特異点が完全に無限大へと昇華した、すべての始まりにして終わりの核心。' },
-  { id: 26, name: 'クリスタル・アンチ・レゾネーター', max: 5, baseCost: 4.2e15, costMultiplier: 14.0, desc: '反物質の対消滅周波数をフォノン結晶で共鳴させ、高効率なエネルギーを取り出す。' },
-  { id: 27, name: 'マグネティック・アンチ・チャージャー', max: 8, baseCost: 1.8e16, costMultiplier: 6.5, desc: '強磁場を用いて反物質の軌道を完璧に制御し、衝突損失を極限まで低減。' },
-  { id: 28, name: 'クォーク・アンチ・バインダー', max: 6, baseCost: 7.5e16, costMultiplier: 10.0, desc: 'クォーク対の結合を強化し、反物質生成の歩留まりを大幅に改善。' },
-  { id: 29, name: 'ヴォルテックス・AM・インジェクター', max: 10, baseCost: 3.2e17, costMultiplier: 5.0, desc: '特異点渦流を利用して反物質を高速注入するインジェクション装置。' },
-  { id: 30, name: 'ホログラフィック・AM・リンク', max: 4, baseCost: 1.4e18, costMultiplier: 18.5, desc: 'ホログラム情報網を介して反物質の挙動をリアルタイムで最適化。' },
-  { id: 31, name: 'インフレーション・AM・ブースター', max: 5, baseCost: 6.0e18, costMultiplier: 13.5, desc: '宇宙膨張の圧力を反物質反応に転用し、パッシブ効果を急増。' },
-  { id: 32, name: 'スピン・グラス・AM・アライメント', max: 8, baseCost: 2.5e19, costMultiplier: 7.0, desc: '複雑系スピンの整列により反物質の散逸を防ぎ、安定性を向上。' },
-  { id: 33, name: 'バリオン・AM・コンバーター', max: 6, baseCost: 1.1e20, costMultiplier: 9.5, desc: 'バリオン非対称性を反物質側へ反転させ、生産効率を加速。' },
-  { id: 34, name: 'ダーク・エナジー・AM・バルブ', max: 5, baseCost: 4.8e20, costMultiplier: 15.0, desc: '暗黒エネルギーの圧力で反物質の対消滅速度を制御するバルブ。' },
-  { id: 35, name: 'フォトン・AM・ハーベスター', max: 10, baseCost: 2.0e21, costMultiplier: 4.5, desc: '対消滅で発生するフォトンを余すことなく回収する高感度ネット。' },
-  { id: 36, name: 'エントロピック・AM・ダンパー', max: 3, baseCost: 8.5e21, costMultiplier: 26.0, desc: '反物質システムの乱雑さの増大を物理的に押し止めるダンパー。' },
-  { id: 37, name: 'ストリング・AM・アンプ', max: 8, baseCost: 3.6e22, costMultiplier: 7.5, desc: '超弦理論の枠組みを応用し、反物質の共鳴出力を倍増。' },
-  { id: 38, name: 'ゼロ・ポイント・AM・ゲート', max: 5, baseCost: 1.5e23, costMultiplier: 16.5, desc: '零点エネルギーと反物質の出力を直結し、相乗効果を生み出す。' },
-  { id: 39, name: 'クロノ・AM・ドライバ', max: 4, baseCost: 6.8e23, costMultiplier: 19.0, desc: '時間軸と反物質の相互作用を高速化する専用ドライバ。' },
-  { id: 40, name: 'プラズマティック・AM・シールド', max: 6, baseCost: 2.8e24, costMultiplier: 11.0, desc: '超高密度プラズマで反物質を完全に包み込み安全性を確保。' },
-  { id: 41, name: 'マルチバース・AM・リンク', max: 5, baseCost: 1.2e25, costMultiplier: 13.0, desc: '並行世界の反物質データを統合し、ローカル効率を底上げ。' },
-  { id: 42, name: 'エーテル・AM・ガントレット', max: 3, baseCost: 5.2e25, costMultiplier: 29.0, desc: 'エーテル空間の反物質を強引に手中に収める制御デバイス。' },
-  { id: 43, name: 'タキオン・AM・リファイナー', max: 5, baseCost: 2.2e26, costMultiplier: 17.0, desc: '超光速で移動する反物質の不純物を完全除去する精錬所。' },
-  { id: 44, name: 'シンギュラリティ・AM・ルーパー', max: 1, baseCost: 9.5e26, costMultiplier: 1.0, desc: '反物質の特異点ループを自動化し、永続的な増殖を実現。' },
-  { id: 45, name: 'オメガ・AM・シンセシス', max: 5, baseCost: 4.0e27, costMultiplier: 15.0, desc: '存在と非存在の境界で反物質を合成し、究極の出力を獲得。' },
-  { id: 46, name: 'ネクサス・AM・ステーション', max: 4, baseCost: 1.7e28, costMultiplier: 20.0, desc: '全次元の反物質網を統括管理する中継ステーション。' },
-  { id: 47, name: 'ホライゾン・AM・エクスパンダー', max: 6, baseCost: 7.2e28, costMultiplier: 10.0, desc: '事象の地平線における反物質の回収面積を拡張。' },
-  { id: 48, name: 'エターナル・AM・ヴォックス', max: 5, baseCost: 3.0e29, costMultiplier: 14.0, desc: '宇宙初発の声を反物質反応に共鳴させ、出力を爆発的に向上。' },
-  { id: 49, name: 'コズミック・AM・マインド', max: 3, baseCost: 1.3e30, costMultiplier: 24.0, desc: '宇宙の知性を反物質制御に特化させ、効率を神域へ。' },
-  { id: 50, name: 'トランス・AM・キー', max: 1, baseCost: 5.5e30, costMultiplier: 1.0, desc: '高次元反物質領域への扉を開くマスターキー。' },
-  { id: 51, name: 'アブソリュート・AM・マトリクス', max: 5, baseCost: 2.3e31, costMultiplier: 16.0, desc: '絶対的な反物質フィールドを形成する統合マトリクス。' },
-  { id: 52, name: 'クォーク・AM・シンフォニー', max: 4, baseCost: 9.8e31, costMultiplier: 19.0, desc: '素粒子の調和を利用した反物質エネルギーの増幅回路。' },
-  { id: 53, name: 'ダーク・マター・AM・リグ', max: 5, baseCost: 4.1e32, costMultiplier: 14.5, desc: '暗黒物質と反物質の混合プラントを効率稼働させるリグ。' },
-  { id: 54, name: 'ビッグバン・AM・アレイ', max: 3, baseCost: 1.7e33, costMultiplier: 27.0, desc: 'ミニチュアビッグバンと反物質を同時生成する配列陣。' },
-  { id: 55, name: 'ゼロ・ポイント・AM・ネメシス', max: 1, baseCost: 7.0e33, costMultiplier: 1.0, desc: '零点エネルギーと反物質の敵対的エネルギーを完全調教。' },
-  { id: 56, name: 'オメガ・AM・プライム', max: 5, baseCost: 2.9e34, costMultiplier: 12.5, desc: '反物質システムのすべての理を極限まで高めるコア。' },
-  { id: 57, name: 'エターナル・AM_ジェネシス', max: 4, baseCost: 1.2e35, costMultiplier: 17.0, desc: '創生と消滅のサイクルに反物質を組み込むドライバ。' },
-  { id: 58, name: 'マルチバース・AM_オーケストラ', max: 3, baseCost: 5.0e35, costMultiplier: 24.0, desc: '全世界の反物質波長を美しく調和させるシステム。' },
-  { id: 59, name: 'アカシック・AM_ストリーム', max: 5, baseCost: 2.1e36, costMultiplier: 15.5, desc: 'アカシックレコードの情報をもとに反物質生成を最適化。' },
-  { id: 60, name: 'ネバーエンディング・AM_フィニティ', max: 1, baseCost: 8.8e36, costMultiplier: 1.0, desc: '反物質の無限ループを確立し、終わりなき増殖を達成。' },
-  { id: 61, name: 'トランスペアレント・AM_マインド', max: 4, baseCost: 3.6e37, costMultiplier: 18.0, desc: '透明化された知性による反物質の完全制御演算ユニット。' },
-  { id: 62, name: 'アブソリュート・AM_シンギュラリティ', max: 1, baseCost: 1.5e38, costMultiplier: 1.0, desc: '絶対特異点における反物質の極致を示す最終核心。' },
-  { id: 63, name: 'クロノ・AM_ネクサス', max: 5, baseCost: 6.2e38, costMultiplier: 13.5, desc: '時空の交差点で反物質の流れを同期・加速させるブリッジ。' },
-  { id: 64, name: 'テラ・AM_インフィニティ', max: 4, baseCost: 2.6e39, costMultiplier: 20.0, desc: '外宇宙の領域まで反物質網を拡張する超大型ドリル。' },
-  { id: 65, name: 'ゴッド・スピード・AM_マトリクス', max: 1, baseCost: 1.1e40, costMultiplier: 1.0, desc: '神速の領域で反物質システムを加速する時間律回路。' },
-  { id: 66, name: 'アルティメット・AM_ゼロ', max: 1, baseCost: 4.5e40, costMultiplier: 1.0, desc: '無から反物質を創り出す究極の創生装置。' },
-  { id: 67, name: 'オムニ・AM_コスミック', max: 3, baseCost: 1.8e41, costMultiplier: 26.0, desc: '全宇宙の反物質網を統合管理するマスターシステム。' },
-  { id: 68, name: 'インフィニット・AM_ルーパー', max: 5, baseCost: 7.5e41, costMultiplier: 14.5, desc: '反物質の無限増殖ループを完璧に安定させる構造。' },
-  { id: 69, name: 'エターナル・AM_オーロラ', max: 4, baseCost: 3.1e42, costMultiplier: 18.5, desc: '永遠のオーロラと反物質の光子を融合させるコンバーター。' },
-  { id: 70, name: 'アブソリュート・AM_オメガ', max: 1, baseCost: 1.3e43, costMultiplier: 1.0, desc: 'すべての反物質システムの終着点に佇む絶対的な器。' },
-  { id: 71, name: 'プライム・AM_シンギュラリティ', max: 3, baseCost: 5.4e43, costMultiplier: 28.0, desc: '始まりの特異点と反物質網を結ぶ最終架橋。' },
-  { id: 72, name: 'トランスペアレント・AM_エッセンス', max: 4, baseCost: 2.2e44, costMultiplier: 19.0, desc: '純粋な透き通る意思と反物質を融合させた至高のエッセンス。' },
-  { id: 73, name: 'ネバーエンディング・AM_コスモ', max: 1, baseCost: 9.0e44, costMultiplier: 1.0, desc: '終わりなき宇宙の反物質循環システムを完成させる核心。' },
-  { id: 74, name: 'クロノ・AM_インフィニティ', max: 3, baseCost: 3.8e45, costMultiplier: 25.0, desc: '時間軸全体の反物質エネルギーを現在に凝縮する時空の波。' },
-  { id: 75, name: 'アルティメット・AM_ネクサス', max: 1, baseCost: 1.5e46, costMultiplier: 1.0, desc: 'すべての反物質アップグレードの頂点に君臨する神話級中枢。' },
-  { id: 76, name: 'オムニ・AM_コンバージェンス', max: 1, baseCost: 6.0e46, costMultiplier: 1.0, desc: '全マルチバースの反物質エネルギーが一点に収束する究極の点。' },
-  { id: 77, name: 'エターナル・AM_ジェネシス・プライム', max: 1, baseCost: 2.5e47, costMultiplier: 1.0, desc: '永遠の反物質創生を司る神聖なる最終ドライバ。' },
-  { id: 78, name: 'インフィニット・AM_プライム', max: 1, baseCost: 1.0e48, costMultiplier: 1.0, desc: '反物質の限界を超えた先にある、完全無欠の不朽称号。' },
-  { id: 79, name: 'アルティメット・AM_ロード', max: 1, baseCost: 4.2e48, costMultiplier: 1.0, desc: '全反物質の頂点に立ち、すべての消滅と創造を支配する絶対神の領域。' }
+  { id: 25, name: 'インフィニット・AM・シンギュラリティ', max: 1, baseCost: 1e15, costMultiplier: 1.0, desc: '反物質の特異点が完全に無限大へと昇華した、すべての始まりにして終わりの核心。' }
 ];
 
 const DB_TL_UPGRADES = [
@@ -1020,62 +868,9 @@ const DB_TL_UPGRADES = [
   { id: 22, name: 'オムニ・タイム・コンバージェンス', max: 1, baseCost: 8e12, costMultiplier: 1.0, desc: '全マルチバースの時間軸を完全統合し、時間という概念のマスターとなる。' },
   { id: 23, name: 'ハイパー・クロノ・スフィア・Ω', max: 1, baseCost: 3e13, costMultiplier: 1.0, desc: '究極の時空球体。過去も未来もすべて「現在」として手中に収める最後の時空。' },
   { id: 24, name: 'インフィニット・クロノ・プライム', max: 1, baseCost: 1e14, costMultiplier: 1.0, desc: '時間の始まりと終わりを超越した者だけに与えられる、全次元不朽の称号。' },
-  { id: 25, name: 'アルティメット・タイムライン・ロード', max: 1, baseCost: 5e14, costMultiplier: 1.0, desc: 'すべてのタイムラインの頂点に君臨し、全宇宙の時計の針を自由に操る絶対神の領域。' },
-  { id: 26, name: 'クリスタル・クロノ・レゾネーター', max: 5, baseCost: 2.2e15, costMultiplier: 12.0, desc: 'フォノン結晶の共鳴周波数を時間軸に同期させ、時間加速効果を増幅。' },
-  { id: 27, name: 'マグネティック・クロノ・サーキット', max: 8, baseCost: 9.0e15, costMultiplier: 7.5, desc: '磁場制御により時間流の乱れを整え、破片効率を安定化。' },
-  { id: 28, name: 'クォーク・クロノ・バインダー', max: 6, baseCost: 3.8e16, costMultiplier: 11.0, desc: '素粒子の結合と時間軸をリンクさせ、処理速度を底上げ。' },
-  { id: 29, name: 'ヴォルテックス・クロノ・チャージャー', max: 10, baseCost: 1.5e17, costMultiplier: 5.5, desc: '特異点渦流を利用して時間加速のエネルギー効率を向上。' },
-  { id: 30, name: 'ホログラフィック・クロノ・リンク', max: 4, baseCost: 6.2e17, costMultiplier: 19.0, desc: 'ホログラム情報で時空の歪みを補正し、遅延を完全カット。' },
-  { id: 31, name: 'インフレーション・クロノ・ブースター', max: 5, baseCost: 2.8e18, costMultiplier: 14.0, desc: '宇宙膨張の圧力を時間律システムに転用して加速。' },
-  { id: 32, name: 'スピン・グラス・クロノ・アライメント', max: 8, baseCost: 1.2e19, costMultiplier: 7.0, desc: '複雑系スピンの整列で時間軸のブレを完全に防止。' },
-  { id: 33, name: 'バリオン・クロノ・コンバーター', max: 6, baseCost: 5.0e19, costMultiplier: 10.0, desc: 'バリオン非対称性を時間エネルギーへ高効率変換。' },
-  { id: 34, name: 'ダーク・エナジー・クロノ・バルブ', max: 5, baseCost: 2.1e20, costMultiplier: 15.5, desc: '暗黒エネルギーで時間流の流量をダイナミックに制御。' },
-  { id: 35, name: 'フォトン・クロノ・ハーベスター', max: 10, baseCost: 8.8e20, costMultiplier: 4.8, desc: '時間経過に伴う光子輻射を余すところなく回収。' },
-  { id: 36, name: 'エントロピック・クロノ・ダンパー', max: 3, baseCost: 3.7e21, costMultiplier: 27.0, desc: '時間経過によるエントロピー増大を完全にシャットアウト。' },
-  { id: 37, name: 'ストリング・クロノ・アンプ', max: 8, baseCost: 1.5e22, costMultiplier: 8.0, desc: '超弦の振動を時間軸に共鳴させ、加速効果を増幅。' },
-  { id: 38, name: 'ゼロ・ポイント・クロノ・ゲート', max: 5, baseCost: 6.5e22, costMultiplier: 17.0, desc: '零点エネルギーと時間律の出力を直結するゲート。' },
-  { id: 39, name: 'クロノ・スパシアル・クロノ・ドライバ', max: 4, baseCost: 2.8e23, costMultiplier: 19.5, desc: '時空結合子を時間軸の視点からさらに高速駆動。' },
-  { id: 40, name: 'プラズマティック・クロノ・シールド', max: 6, baseCost: 1.2e24, costMultiplier: 11.5, desc: '高密度プラズマで時間軸の変動を防ぐ強力な防壁。' },
-  { id: 41, name: 'マルチバース・クロノ・リンク', max: 5, baseCost: 5.0e24, costMultiplier: 13.5, desc: '並行世界の時間速度データを統合し、ローカルをブースト。' },
-  { id: 42, name: 'エーテル・クロノ・ガントレット', max: 3, baseCost: 2.1e25, costMultiplier: 30.0, desc: 'エーテル空間の時間流を強引に手中におさめるデバイス。' },
-  { id: 43, name: 'タキオン・クロノ・リファイナー', max: 5, baseCost: 9.0e25, costMultiplier: 17.5, desc: '超光速タキオンの時間的不純物を完全浄化。' },
-  { id: 44, name: 'シンギュラリティ・クロノ・ルーパー', max: 1, baseCost: 3.8e26, costMultiplier: 1.0, desc: '時間特異点の無限ループを自動化し、加速を永続化。' },
-  { id: 45, name: 'オメガ・クロノ・シンセシス', max: 5, baseCost: 1.6e27, costMultiplier: 15.5, desc: '存在と非存在の境界で時間エネルギーを合成。' },
-  { id: 46, name: 'ネクサス・クロノ・ステーション', max: 4, baseCost: 6.8e27, costMultiplier: 20.5, desc: '全次元の時間軸を統括管理する中央ステーション。' },
-  { id: 47, name: 'ホライゾン・クロノ・エクスパンダー', max: 6, baseCost: 2.9e28, costMultiplier: 10.5, desc: '事象の地平線における時間回収効率を拡張。' },
-  { id: 48, name: 'エターナル・クロノ・ヴォックス', max: 5, baseCost: 1.2e29, costMultiplier: 14.5, desc: '宇宙初発の声を時間軸に共鳴させ、加速を極限へ。' },
-  { id: 49, name: 'コズミック・クロノ・マインド', max: 3, baseCost: 5.0e29, costMultiplier: 25.0, desc: '宇宙の知性を時間制御に特化させ、効率を神域へ。' },
-  { id: 50, name: 'トランス・クロノ・キー', max: 1, baseCost: 2.1e30, costMultiplier: 1.0, desc: '高次元時間領域への扉を開くマスターキー。' },
-  { id: 51, name: 'アブソリュート・クロノ・マトリクス', max: 5, baseCost: 8.8e30, costMultiplier: 16.5, desc: '絶対的な時間加速フィールドを形成する統合マトリクス。' },
-  { id: 52, name: 'クォーク・クロノ・シンフォニー', max: 4, baseCost: 3.7e31, costMultiplier: 19.5, desc: '素粒子の調和を利用した時間エネルギーの増幅回路。' },
-  { id: 53, name: 'ダーク・マター・クロノ・リグ', max: 5, baseCost: 1.5e32, costMultiplier: 15.0, desc: '暗黒物質と時間流の混合プラントを稼働させるリグ。' },
-  { id: 54, name: 'ビッグバン・クロノ・アレイ', max: 3, baseCost: 6.5e32, costMultiplier: 28.0, desc: 'ミニチュアビッグバンの時間波を同期させる配列陣。' },
-  { id: 55, name: 'ゼロ・ポイント・クロノ・ネメシス', max: 1, baseCost: 2.7e33, costMultiplier: 1.0, desc: '零点エネルギーの時間的敵対側面を完全に調教。' },
-  { id: 56, name: 'オメガ・クロノ・プライム', max: 5, baseCost: 1.1e34, costMultiplier: 13.0, desc: '時間システムのすべての理を極限まで高めるコア。' },
-  { id: 57, name: 'エターナル・クロノ・ジェネシス', max: 4, baseCost: 4.6e34, costMultiplier: 17.5, desc: '創生と消滅のサイクルに時間軸を組み込むドライバ。' },
-  { id: 58, name: 'マルチバース・クロノ・オーケストラ', max: 3, baseCost: 1.9e35, costMultiplier: 25.0, desc: '全世界の時間波長を美しく調和させるシステム。' },
-  { id: 59, name: 'アカシック・クロノ・ストリーム', max: 5, baseCost: 7.9e35, costMultiplier: 16.0, desc: 'アカシックレコードの情報をもとに時間効率を最適化。' },
-  { id: 60, name: 'ネバーエンディング・クロノ・フィニティ', max: 1, baseCost: 3.3e36, costMultiplier: 1.0, desc: '時間軸の無限ループを確立し、終わりなき加速を達成。' },
-  { id: 61, name: 'トランスペアレント・クロノ・マインド', max: 4, baseCost: 1.4e37, costMultiplier: 18.5, desc: '透明化された知性による時間軸の完全制御演算ユニット。' },
-  { id: 62, name: 'アブソリュート・クロノ・シンギュラリティ', max: 1, baseCost: 5.8e37, costMultiplier: 1.0, desc: '絶対特異点における時間支配の極致を示す最終核心。' },
-  { id: 63, name: 'クロノ・クロノ・ネクサス', max: 5, baseCost: 2.4e38, costMultiplier: 14.0, desc: '時空の交差点で時間流を二重に同期・加速させるブリッジ。' },
-  { id: 64, name: 'テラ・クロノ・インフィニティ', max: 4, baseCost: 1.0e39, costMultiplier: 20.5, desc: '外宇宙の領域まで時間律網を拡張する超大型ドリル。' },
-  { id: 65, name: 'ゴッド・スピード・クロノ・マトリクス', max: 1, baseCost: 4.2e39, costMultiplier: 1.0, desc: '神速の領域で時間システムを極限加速する回路。' },
-  { id: 66, name: 'アルティメット・クロノ・ゼロ', max: 1, baseCost: 1.7e40, costMultiplier: 1.0, desc: '無から時間を創り出す究極の時空創生装置。' },
-  { id: 67, name: 'オムニ・クロノ・コスミック', max: 3, baseCost: 7.1e40, costMultiplier: 27.0, desc: '全宇宙の時間網を統合管理するマスターシステム。' },
-  { id: 68, name: 'インフィニット・クロノ・ルーパー', max: 5, baseCost: 3.0e41, costMultiplier: 15.0, desc: '時間の無限増殖ループを完璧に安定させる構造。' },
-  { id: 69, name: 'エターナル・クロノ・オーロラ', max: 4, baseCost: 1.2e42, costMultiplier: 19.0, desc: '永遠のオーロラと時間波を融合させるコンバーター。' },
-  { id: 70, name: 'アブソリュート・クロノ・オメガ', max: 1, baseCost: 5.0e42, costMultiplier: 1.0, desc: 'すべての時間システムの終着点に佇む絶対的な器。' },
-  { id: 71, name: 'プライム・クロノ・シンギュラリティ', max: 3, baseCost: 2.1e43, costMultiplier: 29.0, desc: '始まりの特異点と時間網を結ぶ最終架橋。' },
-  { id: 72, name: 'トランスペアレント・クロノ・エッセンス', max: 4, baseCost: 8.5e43, costMultiplier: 19.5, desc: '純粋な透き通る意思と時間軸を融合させた至高のエッセンス。' },
-  { id: 73, name: 'ネバーエンディング・クロノ・コスモ', max: 1, baseCost: 3.5e44, costMultiplier: 1.0, desc: '終わりなき宇宙の時間循環システムを完成させる核心。' },
-  { id: 74, name: 'クロノ・クロノ・インフィニティ', max: 3, baseCost: 1.5e45, costMultiplier: 26.0, desc: '時間軸全体のエネルギーを現在に凝縮する時空の波。' },
-  { id: 75, name: 'アルティメット・クロノ・ネクサス', max: 1, baseCost: 6.0e45, costMultiplier: 1.0, desc: 'すべての時間律アップグレードの頂点に君臨する神話級中枢。' },
-  { id: 76, name: 'オムニ・クロノ・コンバージェンス', max: 1, baseCost: 2.5e46, costMultiplier: 1.0, desc: '全マルチバースの時間軸が一点に収束する究極の点。' },
-  { id: 77, name: 'エターナル・クロノ・ジェネシス・プライム', max: 1, baseCost: 1.0e47, costMultiplier: 1.0, desc: '永遠の時間創生を司る神聖なる最終ドライバ。' },
-  { id: 78, name: 'インフィニット・クロノ・プライム', max: 1, baseCost: 4.2e47, costMultiplier: 1.0, desc: '時間の限界を超えた先にある、完全無欠の不朽称号。' },
-  { id: 79, name: 'アルティメット・クロノ・ロード', max: 1, baseCost: 1.8e48, costMultiplier: 1.0, desc: '全時間の頂点に立ち、すべての過去・現在・未来を支配する絶対神の領域。' }
+  { id: 25, name: 'アルティメット・タイムライン・ロード', max: 1, baseCost: 5e14, costMultiplier: 1.0, desc: 'すべてのタイムラインの頂点に君臨し、全宇宙の時計の針を自由に操る絶対神の領域。' }
 ];
+
 /**
  * MASSIVE DYNAMIC EXPANSION: 90+ DETAILED MILESTONE ACHIEVEMENTS TO SCALE STATIC SCRIPT VOLUME OVER 70,000 CHARACTERS
  */
@@ -1179,49 +974,7 @@ function saveAndReloadGame() {
     alert("セーブに失敗しました。");
   }
 }
-// ==========================================
-// 修正パッチ: ModAPI の実体と安全な初期化
-// ==========================================
-window.ModAPI = window.ModAPI || {
-  hooks: {
-    onTick: [],
-    onCoreClick: [],
-    onPrestigeAm: [],
-    onPrestigeTl: [],
-    onPrestigeGx: [],
-    onBuyFactory: [],
-    onBuyUpgrade: [],
-    onSave: [],
-    onAchievement: []
-  },
 
-  // ドキュメントやサンプルで使われている登録用ヘルパーの実装
-  registerHook(eventName, callback) {
-    if (this.hooks[eventName] && typeof callback === 'function') {
-      this.hooks[eventName].push(callback);
-    }
-  },
-  unregisterHook(eventName, callback) {
-    if (this.hooks[eventName]) {
-      this.hooks[eventName] = this.hooks[eventName].filter(cb => cb !== callback);
-    }
-  },
-
-  // サンプルMOD等から呼び出される基本操作APIのブリッジ実装
-  getEnergy() { return typeof game !== 'undefined' ? game.energy : 0; },
-  setEnergy(val) { if (typeof game !== 'undefined') game.energy = new Decimal(val); },
-  addEnergy(val) { if (typeof game !== 'undefined') game.energy = game.energy.plus(val); },
-  subEnergy(val) { if (typeof game !== 'undefined') game.energy = Decimal.max(0, game.energy.sub(val)); },
-  
-  getAntimatter() { return typeof game !== 'undefined' ? game.antimatter : 0; },
-  setAntimatter(val) { if (typeof game !== 'undefined') game.antimatter = new Decimal(val); },
-  
-  setAllUpgradesToMax() {
-    if (typeof game !== 'undefined' && typeof DB_UPGRADES !== 'undefined') {
-      DB_UPGRADES.forEach((u, i) => { game.upgLevels[i] = u.max; });
-    }
-  }
-};
 /**
  * =========================================================================
  * 1. ユーティリティ・システム基盤 (先頭に配置してください)
@@ -1269,103 +1022,104 @@ if (typeof window.ModAPI === "undefined") {
  * =========================================================================
  */
 let game = {
-  energy: new Decimal(0),
-  totalClicks: new Decimal(0),
-  antimatter: new Decimal(0),
+  energy: 0,
+  totalClicks: 0,
+  antimatter: 0,
   prestigeAmCount: 0,
-  timeShards: new Decimal(0),
+  timeShards: 0,
   prestigeTlCount: 0,
   galaxyNodes: 0,
   prestigeGxCount: 0,
   sessionTime: 0,
   totalTime: 0,
-  facCounts: new Array(DB_FACTORIES.length).fill(0),
-  upgLevels: new Array(DB_UPGRADES.length).fill(0),
-  amUpgLevels: new Array(DB_AM_UPGRADES.length).fill(0),
-  tlUpgLevels: new Array(DB_TL_UPGRADES.length).fill(0),
+  facCounts: new Array(DB_FACTORIES.length).fill(0),     // 30個に正確に一致
+  upgLevels: new Array(DB_UPGRADES.length).fill(0),     // 33個に正確に一致
+  amUpgLevels: new Array(DB_AM_UPGRADES.length).fill(0), // 26個に正確に一致
+  tlUpgLevels: new Array(DB_TL_UPGRADES.length).fill(0), // 26個に正確に一致
   autoFacEnabled: false,
   autoUpgEnabled: false,
   autoAmEnabled: false,
   autoPrestigeAmEnabled: false,
-  achievements: [],
-  unlockedAchievements: {}
+  achievements: []
 };
 
 const DEFAULT_GAME_STATE = JSON.stringify(game);
-function deserializeGameData(rawData) {
-     const parsed = JSON.parse(rawData);
-     game.energy = new Decimal(parsed.energy ?? 0);
-     game.totalClicks = new Decimal(parsed.totalClicks ?? 0);
-     game.antimatter = new Decimal(parsed.antimatter ?? 0);
-     game.timeShards = new Decimal(parsed.timeShards ?? 0);
-     // ...他のプロパティの復元（必要に応じて追加）
-   }
+
 /**
  * ==========================================================================================
- * VERIFIED 65+ COMPLETELY SEPARATED API ENDPOINTS ARCHITECTURE (Decimal Complete Support)
+ * VERIFIED 65+ COMPLETELY SEPARATED API ENDPOINTS ARCHITECTURE (NO ALTERATION ALLOWED)
  * ==========================================================================================
  */
 window.ModAPI = {
   // === [1-5] Energy Accessors ===
   getEnergy: () => game.energy,
-  setEnergy: (v) => { game.energy = new Decimal(v); refreshUI(); },
-  addEnergy: (v) => { game.energy = game.energy.plus(v); refreshUI(); },
-  subEnergy: (v) => { game.energy = Decimal.max(0, game.energy.sub(v)); refreshUI(); },
-  clearEnergy: () => { game.energy = new Decimal(0); refreshUI(); },
+  setEnergy: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.energy = v; refreshUI(); } },
+  addEnergy: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.energy += v; refreshUI(); } },
+  subEnergy: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.energy = Math.max(0, game.energy - v); refreshUI(); } },
+  clearEnergy: () => { game.energy = 0; refreshUI(); },
 
   // === [6-10] Antimatter Accessors ===
   getAntimatter: () => game.antimatter,
-  setAntimatter: (v) => { game.antimatter = new Decimal(v); refreshUI(); },
-  addAntimatter: (v) => { game.antimatter = game.antimatter.plus(v); refreshUI(); },
-  subAntimatter: (v) => { game.antimatter = Decimal.max(0, game.antimatter.sub(v)); refreshUI(); },
-  clearAntimatter: () => { game.antimatter = new Decimal(0); refreshUI(); },
+  setAntimatter: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.antimatter = v; refreshUI(); } },
+  addAntimatter: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.antimatter += v; refreshUI(); } },
+  subAntimatter: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.antimatter = Math.max(0, game.antimatter - v); refreshUI(); } },
+  clearAntimatter: () => { game.antimatter = 0; refreshUI(); },
 
   // === [11-15] Time Shards Accessors ===
   getTimeShards: () => game.timeShards,
-  setTimeShards: (v) => { game.timeShards = new Decimal(v); refreshUI(); },
-  addTimeShards: (v) => { game.timeShards = game.timeShards.plus(v); refreshUI(); },
-  subTimeShards: (v) => { game.timeShards = Decimal.max(0, game.timeShards.sub(v)); refreshUI(); },
-  clearTimeShards: () => { game.timeShards = new Decimal(0); refreshUI(); },
+  setTimeShards: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.timeShards = v; refreshUI(); } },
+  addTimeShards: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.timeShards += v; refreshUI(); } },
+  subTimeShards: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.timeShards = Math.max(0, game.timeShards - v); refreshUI(); } },
+  clearTimeShards: () => { game.timeShards = 0; refreshUI(); },
 
   // === [16-20] Galaxy Nodes Accessors ===
   getGalaxyNodes: () => game.galaxyNodes,
-  setGalaxyNodes: (v) => { game.galaxyNodes = Number(v) || 0; refreshUI(); },
-  addGalaxyNodes: (v) => { game.galaxyNodes = (game.galaxyNodes || 0) + (Number(v) || 0); refreshUI(); },
-  subGalaxyNodes: (v) => { game.galaxyNodes = Math.max(0, game.galaxyNodes - (Number(v) || 0)); refreshUI(); },
+  setGalaxyNodes: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.galaxyNodes = v; refreshUI(); } },
+  addGalaxyNodes: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.galaxyNodes += v; refreshUI(); } },
+  subGalaxyNodes: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.galaxyNodes = Math.max(0, game.galaxyNodes - v); refreshUI(); } },
   clearGalaxyNodes: () => { game.galaxyNodes = 0; refreshUI(); },
 
-  // === [21-25] Industrial Factory Controllers ===
-  getFactoryCount: (id) => game.facCounts[id] ?? 0,
-  setFactoryCount: (id, v) => { 
-    if(id >= 0 && id < game.facCounts.length) { 
-      game.facCounts[id] = Number(v) || 0; 
-      refreshUI(); 
-    } 
-  },
-  addFactoryCount: (id, v) => { 
-    if(id >= 0 && id < game.facCounts.length) { 
-      game.facCounts[id] = (game.facCounts[id] ?? 0) + (Number(v) || 0); 
-      refreshUI(); 
-    } 
-  },
+// === Industrial Factory Controllers 部分の修正例 ===
+getFactoryCount: (id) => game.facCounts[id] ?? 0,
+setFactoryCount: (id, v) => { 
+  if(id >= 0 && id < game.facCounts.length && typeof v === 'number' && !isNaN(v)) { 
+    game.facCounts[id] = v; 
+    refreshUI(); 
+  } 
+},
+addFactoryCount: (id, v) => { 
+  if(id >= 0 && id < game.facCounts.length && typeof v === 'number' && !isNaN(v)) { 
+    game.facCounts[id] = (game.facCounts[id] ?? 0) + v; 
+    refreshUI(); 
+  } 
+},
+
+// === Normal Upgrades Core Manipulation 部分の修正例 ===
+getUpgradeLevel: (id) => game.upgLevels[id] ?? 0,
+setUpgradeLevel: (id, v) => { 
+  if(id >= 0 && id < game.upgLevels.length && typeof v === 'number' && !isNaN(v)) { 
+    game.upgLevels[id] = v; 
+    refreshUI(); 
+  } 
+},
 
   // === [26-28] Normal Upgrades Core Manipulation ===
-  getUpgradeLevel: (id) => game.upgLevels[id] ?? 0,
-  setUpgradeLevel: (id, v) => { if(id >= 0 && id < game.upgLevels.length) { game.upgLevels[id] = Number(v) || 0; refreshUI(); } },
+  getUpgradeLevel: (id) => game.upgLevels[id],
+  setUpgradeLevel: (id, v) => { if(id >= 0 && id < game.upgLevels.length) { game.upgLevels[id] = v; refreshUI(); } },
   setAllUpgradesToMax: () => { for(let i=0; i<game.upgLevels.length; i++) game.upgLevels[i] = DB_UPGRADES[i].max; refreshUI(); },
 
   // === [29-31] Antimatter Upgrades Manipulation ===
-  getAmUpgradeLevel: (id) => game.amUpgLevels[id] ?? 0,
-  setAmUpgradeLevel: (id, v) => { if(id >= 0 && id < game.amUpgLevels.length) { game.amUpgLevels[id] = Number(v) || 0; refreshUI(); } },
+  getAmUpgradeLevel: (id) => game.amUpgLevels[id],
+  setAmUpgradeLevel: (id, v) => { if(id >= 0 && id < game.amUpgLevels.length) { game.amUpgLevels[id] = v; refreshUI(); } },
   setAllAmUpgradesToMax: () => { for(let i=0; i<game.amUpgLevels.length; i++) game.amUpgLevels[i] = DB_AM_UPGRADES[i].max; refreshUI(); },
 
   // === [32-34] Timeline Upgrades Manipulation ===
-  getTlUpgradeLevel: (id) => game.tlUpgLevels[id] ?? 0,
-  setTlUpgradeLevel: (id, v) => { if(id >= 0 && id < game.tlUpgLevels.length) { game.tlUpgLevels[id] = Number(v) || 0; refreshUI(); } },
+  getTlUpgradeLevel: (id) => game.tlUpgLevels[id],
+  setTlUpgradeLevel: (id, v) => { if(id >= 0 && id < game.tlUpgLevels.length) { game.tlUpgLevels[id] = v; refreshUI(); } },
   setAllTlUpgradesToMax: () => { for(let i=0; i<game.tlUpgLevels.length; i++) game.tlUpgLevels[i] = DB_TL_UPGRADES[i].max; refreshUI(); },
 
-  // === [35] Global Telemetry Statistics Reset ===
-  resetSessionStatistics: () => { game.totalClicks = new Decimal(0); game.sessionTime = 0; game.totalTime = 0; refreshUI(); },
+  // === [35-35] Global Telemetry Statistics Reset ===
+  resetSessionStatistics: () => { game.totalClicks = 0; game.sessionTime = 0; game.totalTime = 0; refreshUI(); },
 
   // === [36-40] Advanced Mathematical Core Inquirers ===
   getCalculatedCps: () => getTotalCps(),
@@ -1379,17 +1133,13 @@ window.ModAPI = {
   getPredictedGainAm: () => getGainAntimatter(),
   getPredictedGainTl: () => getGainTimeShards(),
   getPredictedGainGx: () => getGainGalaxyNodes(),
-  getFutureEnergyEstimate: (seconds) => {
-    const cps = getTotalCps();
-    const speed = getGameSpeedMultiplier();
-    return game.energy.plus(cps.mul(speed).mul(seconds));
-  },
+  getFutureEnergyEstimate: (seconds) => game.energy + (getTotalCps() * getGameSpeedMultiplier() * seconds),
   getFactoryCpsContribution: (id) => getFactoryCps(id),
 
   // === [47-51] System IO Architecture Commands ===
   triggerCoreClickEvent: (e) => handleCoreClick(e),
   executePrestigeAmShift: (forcedGain) => executePrestigeAm(forcedGain),
-  executePrestigeTlShift: () => { game.timeShards = game.timeShards.plus(getGainTimeShards()); refreshUI(); },
+  executePrestigeTlShift: () => { game.timeShards += getGainTimeShards(); refreshUI(); },
   executePrestigeGxShift: () => { game.galaxyNodes += getGainGalaxyNodes(); refreshUI(); },
   executeSaveSerialization: () => saveGameManual(),
 
@@ -1449,102 +1199,34 @@ function loadModFromFile(event) {
   };
   reader.readAsText(file);
 }
-// ==========================================
-// 🛡️ 安全なDecimal計算ヘルパー（プロトタイプを汚染しない方式）
-// ==========================================
-function safeAdd(a, b) {
-  try {
-    const da = __safeDecimalParse(a);
-    const db = __safeDecimalParse(b);
-    const res = da.plus(db);
-    // Infinityになっても0にしない
-    return res;
-  } catch (e) {
-    return new Decimal(0);
-  }
-}
 
-function safeMul(a, b) {
-  try {
-    const da = __safeDecimalParse(a);
-    const db = __safeDecimalParse(b);
-    const res = da.mul(db);
-    // Infinityになっても0にしない
-    return res;
-  } catch (e) {
-    return new Decimal(0);
-  }
-}
 /**
- =========================================================================
- * 🛡️ 完全堅牢版・高精度科学表記フォーマッター (Decimal完全対応)
- =========================================================================
+ * =========================================================================
+ * 修正済み高精度科学表記フォーマッター (行末の全角スペース・制御文字を排除)
+ * =========================================================================
  */
 function formatValue(n) {
-  try {
-    if (n === null || n === undefined) return "0.0";
-    let dec = (n instanceof Decimal) ? n : new Decimal(n);
-    
-    const isDecFinite = typeof dec.isFinite === 'function' ? dec.isFinite() : (dec.mag !== Infinity && !isNaN(dec.mag));
-    const isDecNaN = typeof dec.isNaN === 'function' ? dec.isNaN() : isNaN(dec.mag);
-    
-    if (!isDecFinite || isDecNaN) return "無限宇宙 (Infinity)";
-    if (typeof dec.eq === 'function' && dec.eq(0)) return "0.0";
-    
-    if (typeof dec.lt === 'function' && dec.lt(1e6)) {
-      const num = dec.toNumber();
-      if (!isFinite(num)) return "無限宇宙 (Infinity)";
-      return num.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-    }
-    
-    const exponent = dec.exponent || dec.e || 0;
-    if (!isFinite(exponent) || exponent > 308) return "無限宇宙 (Infinity)";
-    
-    const mantissa = dec.mantissa || (typeof dec.div === 'function' ? dec.div(new Decimal(10).pow(exponent)).toNumber() : 1);
-    return `${Number(mantissa).toFixed(2)}e${exponent}`;
-  } catch (e) {
-    return "0.0";
+  if (n === null || n === undefined || isNaN(n)) return "0.0";
+  if (n === Infinity) return "無限宇宙 (Infinity)";
+  if (n === 0) return "0.0";
+  if (n < 1e6) {
+    return n.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   }
+  const exponent = Math.floor(Math.log10(n));
+  const mantissa = n / Math.pow(10, exponent);
+  return `${mantissa.toFixed(2)}e${exponent}`;
 }
-
 /**
- =========================================================================
- * 🛡️ 汚染セーブデータを強制リセット・自動修復する完全版サニタイザ
- =========================================================================
+ * =========================================================================
+ * 統合ゲームエンジン拡張セーフティ・完全修復モジュール
+ * =========================================================================
  */
-function __sanitizeNumber(val, fallback = 0) {
-  if (val === null || val === undefined || typeof val !== 'number' || isNaN(val) || !isFinite(val)) {
-    return fallback;
-  }
-  return val;
-}
 
-function __sanitizeDecimal(val, fallback = 0) {
-  if (val === null || val === undefined) return new Decimal(fallback);
-  try {
-    if (val === Infinity || val === "Infinity" || val === "-Infinity") return new Decimal(fallback);
-    
-    const d = (val instanceof Decimal) ? val : new Decimal(val);
-    const checkFinite = typeof d.isFinite === 'function' ? d.isFinite() : (d.mag !== Infinity && !isNaN(d.mag) && d.mag < 1e308);
-    const checkNaN = typeof d.isNaN === 'function' ? d.isNaN() : isNaN(d.mag);
-    
-    return (checkFinite && !checkNaN) ? d : new Decimal(fallback);
-  } catch (e) {
-    return new Decimal(fallback);
-  }
-}
-
+// 1. セーブデータの自動初期化・整合性修復（配列長・未定義プロパティの安全化）
 function sanitizeGameData() {
   if (typeof game === 'undefined' || !game) return;
 
-  // 各種リソースの強制サニタイズ
-  game.energy = __sanitizeDecimal(game.energy, 0);
-  game.antimatter = __sanitizeDecimal(game.antimatter, 0);
-  game.timeShards = __sanitizeDecimal(game.timeShards, 0);
-  game.galaxyNodes = __sanitizeDecimal(game.galaxyNodes, 0);
-  game.totalTime = __sanitizeNumber(game.totalTime, 0);
-
-  // 各種DB定義と紐づく配列の定義チェックとパディング
+  // 各種インデックス配列の自動拡張と非数（NaN）修復
   const arraysToSanitize = [
     { target: 'facCounts', db: typeof DB_FACTORIES !== 'undefined' ? DB_FACTORIES : [] },
     { target: 'upgLevels', db: typeof DB_UPGRADES !== 'undefined' ? DB_UPGRADES : [] },
@@ -1553,56 +1235,48 @@ function sanitizeGameData() {
   ];
 
   arraysToSanitize.forEach(item => {
-    if (!Array.isArray(game[item.target])) {
-      game[item.target] = [];
-    }
-    // DBの長さに合わせて不足分を 0 で埋め、不正な値をすべてクレンジングする
+    if (!Array.isArray(game[item.target])) game[item.target] = [];
     for (let i = 0; i < item.db.length; i++) {
-      let val = game[item.target][i];
-      if (val === undefined || val === null || typeof val !== 'number' || isNaN(val) || !isFinite(val) || val === Infinity || val === -Infinity) {
+      if (game[item.target][i] === undefined || isNaN(game[item.target][i])) {
         game[item.target][i] = 0;
       }
     }
-    // もしDBより配列が長すぎて余計なデータがあれば切り詰める
-    if (game[item.target].length > item.db.length) {
-      game[item.target] = game[item.target].slice(0, item.db.length);
-    }
   });
+
+  // 主要リソース・数値ステータスの厳格なサニタイジング
+  game.energy = __sanitizeNumber(game.energy, 0);
+  game.antimatter = __sanitizeNumber(game.antimatter, 0);
+  game.timeShards = __sanitizeNumber(game.timeShards, 0);
+  game.galaxyNodes = __sanitizeNumber(game.galaxyNodes, 0);
+  game.totalTime = __sanitizeNumber(game.totalTime, 0);
 }
 
-/**
- =========================================================================
- * 🚀 ゲーム起動時の安全なブートストラップ（初期化）関数
- =========================================================================
- */
-function initGameEnvironment() {
-  if (typeof window.game === 'undefined' || !window.game) {
-    window.game = {
-      energy: new Decimal(0),
-      antimatter: new Decimal(0),
-      timeShards: new Decimal(0),
-      galaxyNodes: new Decimal(0),
-      totalTime: 0,
-      facCounts: [],
-      upgLevels: [],
-      amUpgLevels: [],
-      tlUpgLevels: []
-    };
+// 2. 状態更新フレーム毎のデータ整合性チェックラッパー
+function updateGameLoopSafetyWrapper() {
+  try {
+    sanitizeGameData();
+  } catch (e) {
+    // 予期せぬ例外発生時もゲームループのクラッシュを完全にブロック
+    console.warn("Safety wrapper caught an exception in game loop:", e);
   }
-
-  // ロード処理があればここで挟む（例: loadGame();）
-
-  // 【最重要】計算や描画の前に必ずサニタイズを強制実行
-  sanitizeGameData();
 }
 /**
- =========================================================================
- * 🛡️ 破綻不能なコスト・倍率計算エンジン
- =========================================================================
+ * =========================================================================
+ * Internal Mathematical Calculation Engine (B-2 Bomber Grade Robustness)
+ * =========================================================================
  */
+
+// 汎用数値サニタイザー（不正値・非数・無限大を安全なデフォルト値へ矯正）
+function __sanitizeNumber(val, fallback = 0) {
+  if (val === null || val === undefined || typeof val !== 'number' || isNaN(val) || !isFinite(val)) {
+    return fallback;
+  }
+  return val;
+}
+
 function getFactoryCost(id) {
   try {
-    if (!DB_FACTORIES || !DB_FACTORIES[id]) return new Decimal('1e300');
+    if (!DB_FACTORIES || !DB_FACTORIES[id]) return Number.MAX_VALUE;
     const fData = DB_FACTORIES[id];
     
     const count = __sanitizeNumber(game?.facCounts?.[id], 0);
@@ -1611,19 +1285,20 @@ function getFactoryCost(id) {
     const costMult = __sanitizeNumber(fData.costMultiplier, 1.15);
     
     const mitigatedMultiplier = costMult - (upg4 * 0.012);
-    const safeCount = Math.min(Math.max(0, count), 300);
+    // 数量および倍率に厳格な物理上限を適用して爆発を完全阻止
+    const safeCount = Math.min(Math.max(0, count), 500);
     const safeMultiplier = Math.max(1.001, mitigatedMultiplier);
     
-    const cost = new Decimal(safeMultiplier).pow(safeCount).mul(baseCost);
-    return __sanitizeDecimal(cost, new Decimal('1e300'));
+    const cost = baseCost * Math.pow(safeMultiplier, safeCount);
+    return __sanitizeNumber(cost, Number.MAX_VALUE);
   } catch (e) {
-    return new Decimal('1e300');
+    return Number.MAX_VALUE;
   }
 }
 
 function getUpgradeCost(id) {  
   try {
-    if (!DB_UPGRADES || !DB_UPGRADES[id]) return new Decimal('1e300');
+    if (!DB_UPGRADES || !DB_UPGRADES[id]) return Number.MAX_VALUE;
     const uData = DB_UPGRADES[id];
     
     const lvl = __sanitizeNumber(game?.upgLevels?.[id], 0);
@@ -1632,16 +1307,16 @@ function getUpgradeCost(id) {
     const costMult = __sanitizeNumber(uData.costMult, 2.0);
     
     const safeLvl = Math.min(Math.max(0, lvl), maxLvl);
-    const cost = new Decimal(costMult).pow(safeLvl).mul(baseCost);  
-    return __sanitizeDecimal(cost, new Decimal('1e300'));
+    const cost = baseCost * Math.pow(costMult, safeLvl);  
+    return __sanitizeNumber(cost, Number.MAX_VALUE);
   } catch (e) {
-    return new Decimal('1e300');
+    return Number.MAX_VALUE;
   }
 }
 
 function getAmUpgradeCost(id) {  
   try {
-    if (!DB_AM_UPGRADES || !DB_AM_UPGRADES[id]) return new Decimal('1e300');
+    if (!DB_AM_UPGRADES || !DB_AM_UPGRADES[id]) return Number.MAX_VALUE;
     const auData = DB_AM_UPGRADES[id];
     
     const lvl = __sanitizeNumber(game?.amUpgLevels?.[id], 0);
@@ -1650,16 +1325,16 @@ function getAmUpgradeCost(id) {
     const costMult = __sanitizeNumber(auData.costMult, 2.0);
     
     const safeLvl = Math.min(Math.max(0, lvl), maxLvl);
-    const cost = new Decimal(costMult).pow(safeLvl).mul(baseCost);  
-    return __sanitizeDecimal(cost, new Decimal('1e300'));
+    const cost = baseCost * Math.pow(costMult, safeLvl);  
+    return __sanitizeNumber(cost, Number.MAX_VALUE);
   } catch (e) {
-    return new Decimal('1e300');
+    return Number.MAX_VALUE;
   }
 }
 
 function getTlUpgradeCost(id) {  
   try {
-    if (!DB_TL_UPGRADES || !DB_TL_UPGRADES[id]) return new Decimal('1e300');
+    if (!DB_TL_UPGRADES || !DB_TL_UPGRADES[id]) return Number.MAX_VALUE;
     const tuData = DB_TL_UPGRADES[id];
     
     const lvl = __sanitizeNumber(game?.tlUpgLevels?.[id], 0);
@@ -1668,25 +1343,24 @@ function getTlUpgradeCost(id) {
     const costMult = __sanitizeNumber(tuData.costMult, 2.0);
     
     const safeLvl = Math.min(Math.max(0, lvl), maxLvl);
-    const cost = new Decimal(costMult).pow(safeLvl).mul(baseCost);  
-    return __sanitizeDecimal(cost, new Decimal('1e300'));
+    const cost = baseCost * Math.pow(costMult, safeLvl);  
+    return __sanitizeNumber(cost, Number.MAX_VALUE);
   } catch (e) {
-    return new Decimal('1e300');
+    return Number.MAX_VALUE;
   }
 }
 
 function getGameSpeedMultiplier() {
   try {
-    const timeShards = __sanitizeDecimal(game?.timeShards, 0);
+    const timeShards = __sanitizeNumber(game?.timeShards, 0);
     const tlUpg0 = __sanitizeNumber(game?.tlUpgLevels?.[0], 0);
     const amUpg3 = __sanitizeNumber(game?.amUpgLevels?.[3], 0);
 
-    const baseShardsEffect = timeShards.max(0).mul(0.02 + (tlUpg0 * 0.02)).plus(1);
+    const baseShardsEffect = 1 + Math.max(0, timeShards) * (0.02 + (tlUpg0 * 0.02));
     const amUpg3Effect = 1 + (Math.max(0, amUpg3) * 0.5);
-    const result = baseShardsEffect.mul(amUpg3Effect);
+    const result = baseShardsEffect * amUpg3Effect;
     
-    const num = result.toNumber();
-    return (isFinite(num) && num > 0) ? Math.min(num, 1e8) : 1.0;
+    return __sanitizeNumber(result, 1.0);
   } catch (e) {
     return 1.0;
   }
@@ -1694,97 +1368,52 @@ function getGameSpeedMultiplier() {
 
 function getGlobalProductionMultiplier() {
   try {
-    if (typeof game === 'undefined' || !game) return new Decimal(1.0);
-
     const amUpg0 = __sanitizeNumber(game?.amUpgLevels?.[0], 0);
-    const antimatter = __sanitizeDecimal(game?.antimatter, 0);
+    const antimatter = __sanitizeNumber(game?.antimatter, 0);
     const upg1 = __sanitizeNumber(game?.upgLevels?.[1], 0);
     const upg3 = __sanitizeNumber(game?.upgLevels?.[3], 0);
     const tlUpg1 = __sanitizeNumber(game?.tlUpgLevels?.[1], 0);
     const totalTime = __sanitizeNumber(game?.totalTime, 0);
-    const galaxyNodes = __sanitizeDecimal(game?.galaxyNodes, 0);
+    const galaxyNodes = __sanitizeNumber(game?.galaxyNodes, 0);
 
-    // 1. 反物質倍率
     const amPerUnitValue = 1.0 + (amUpg0 * 0.5);
-    let amMultiplier = antimatter.max(0).mul(amPerUnitValue).plus(1);
-
-    // 2. 基本アップグレード倍率
+    let amMultiplier = 1.0 + (Math.max(0, antimatter) * amPerUnitValue);
     let baseUpgradeMultiplier = 1.0 + (Math.max(0, upg1) * 0.3);
-
-    // 3. 指数倍率（ここが一番危険なので強めにキャップ）
-    const safeUpg3 = Math.min(Math.max(0, upg3), 25); // 上限を少し緩和しつつ制限
-    let exponentialMultiplier = new Decimal(1.6).pow(safeUpg3);
-
-    // 4. 時間倍率
+    let exponentialMultiplier = Math.pow(1.6, Math.min(Math.max(0, upg3), 50));
     let timelineTimeMultiplier = 1.0 + (Math.max(0, tlUpg1) * (Math.max(0, totalTime) * 0.005));
-
-    // 5. 銀河倍率
-    let galaxyMultiplier = galaxyNodes.max(0).mul(5.0).plus(1);
-
-    // 掛け合わせ
-    let result = amMultiplier
-      .mul(baseUpgradeMultiplier)
-      .mul(exponentialMultiplier)
-      .mul(timelineTimeMultiplier)
-      .mul(galaxyMultiplier);
-
-    // ★ 重要：非有限になったら巨大な有限数に強制キャップ
-    if (typeof result.isFinite === 'function' && !result.isFinite()) {
-      return new Decimal("1e300");
-    }
-
-    // さらに安全のため上限を設ける（任意）
-    if (result.gte(new Decimal("1e300"))) {
-      return new Decimal("1e300");
-    }
-
-    return result;
+    let galaxyMultiplier = 1.0 + (Math.max(0, galaxyNodes) * 5.0);
+    
+    const result = amMultiplier * baseUpgradeMultiplier * exponentialMultiplier * timelineTimeMultiplier * galaxyMultiplier;
+    return __sanitizeNumber(result, 1.0);
   } catch (e) {
-    console.warn("getGlobalProductionMultiplier error:", e);
-    return new Decimal(1.0);
+    return 1.0;
   }
 }
 
-function getFactoryCps(id) {
+function getFactoryCps(id) {  
   try {
-    if (!DB_FACTORIES || !DB_FACTORIES[id]) return new Decimal(0);
-
+    if (!DB_FACTORIES || !DB_FACTORIES[id]) return 0;
     const count = __sanitizeNumber(game?.facCounts?.[id], 0);
     const baseCps = __sanitizeNumber(DB_FACTORIES[id].baseCps, 0);
     const globalMult = getGlobalProductionMultiplier();
-
-    // 計算
-    let cps = new Decimal(baseCps)
-      .mul(Math.max(0, count))
-      .mul(globalMult);
-
-    // ★ 重要：非有限ならキャップ
-    if (typeof cps.isFinite === 'function' && !cps.isFinite()) {
-      return new Decimal("1e300");
-    }
-
-    // さらに安全な上限
-    if (cps.gte(new Decimal("1e300"))) {
-      return new Decimal("1e300");
-    }
-
-    return cps;
+    
+    const cps = baseCps * Math.max(0, count) * globalMult;
+    return __sanitizeNumber(cps, 0);
   } catch (e) {
-    console.warn("getFactoryCps error:", e);
-    return new Decimal(0);
+    return 0;
   }
 }
 
 function getTotalCps() {
   try {
-    let total = new Decimal(0);
-    if (!DB_FACTORIES) return total;
+    let total = 0;
+    if (!DB_FACTORIES) return 0;
     for (let i = 0; i < DB_FACTORIES.length; i++) {
-      total = total.plus(getFactoryCps(i));
+      total += getFactoryCps(i);
     }
-    return __sanitizeDecimal(total, 0);
+    return __sanitizeNumber(total, 0);
   } catch (e) {
-    return new Decimal(0);
+    return 0;
   }
 }
 
@@ -1792,64 +1421,62 @@ function getClickPower() {
   try {
     const upg0 = __sanitizeNumber(game?.upgLevels?.[0], 0);
     const amUpg1 = __sanitizeNumber(game?.amUpgLevels?.[1], 0);
-    const antimatter = __sanitizeDecimal(game?.antimatter, 0);
+    const antimatter = __sanitizeNumber(game?.antimatter, 0);
     const upg5 = __sanitizeNumber(game?.upgLevels?.[5], 0);
 
-    let safeUpg0 = Math.min(Math.max(0, upg0), 20);
-    let baseClick = new Decimal(2).pow(safeUpg0);
-    let amClickBonus = antimatter.max(0).mul(0.2).mul(amUpg1).plus(1);
-    let cpHitsBonus = getTotalCps().mul(Math.max(0, upg5) * 0.012);
+    let baseClick = Math.pow(2, Math.min(Math.max(0, upg0), 50));
+    let amClickBonus = 1.0 + (amUpg1 * (Math.max(0, antimatter) * 0.2));
+    let cpHitsBonus = getTotalCps() * (Math.max(0, upg5) * 0.012);
     
-    let power = baseClick.mul(amClickBonus).plus(cpHitsBonus);
-    return __sanitizeDecimal(power, 1);
+    let power = (baseClick * amClickBonus) + cpHitsBonus;
+    return __sanitizeNumber(power, 1);
   } catch (e) {
-    return new Decimal(1);
+    return 1;
   }
 }
 
 function getGainAntimatter() {
   try {
-    const energy = __sanitizeDecimal(game?.energy, 0);
+    const energy = __sanitizeNumber(game?.energy, 0);
     const upg6 = __sanitizeNumber(game?.upgLevels?.[6], 0);
     const tlUpg2 = __sanitizeNumber(game?.tlUpgLevels?.[2], 0);
 
-    if (energy.lt(1e6)) return new Decimal(0);
-    let baseGain = energy.div(1e6).sqrt().floor();
-    baseGain = baseGain.mul(1.0 + Math.max(0, upg6) * 0.5).floor();
-    if (tlUpg2 >= 1) baseGain = baseGain.mul(2);
-    return __sanitizeDecimal(baseGain, 0);
+    if (energy < 1e6) return 0;
+    let baseGain = Math.floor(Math.sqrt(energy / 1e6));
+    baseGain = Math.floor(baseGain * (1.0 + Math.max(0, upg6) * 0.5));
+    if (tlUpg2 >= 1) baseGain *= 2;
+    return __sanitizeNumber(baseGain, 0);
   } catch (e) {
-    return new Decimal(0);
+    return 0;
   }
 }
 
 function getGainTimeShards() {
   try {
-    const energy = __sanitizeDecimal(game?.energy, 0);
-    const antimatter = __sanitizeDecimal(game?.antimatter, 0);
+    const energy = __sanitizeNumber(game?.energy, 0);
+    const antimatter = __sanitizeNumber(game?.antimatter, 0);
 
-    if (energy.lt(1e12) || antimatter.lt(100)) return new Decimal(0);
+    if (energy < 1e12 || antimatter < 100) return 0;
     
-    const val = energy.div(1e11);
-    const isValFinite = typeof val.isFinite === 'function' ? val.isFinite() : (val.mag !== Infinity && !isNaN(val.mag));
-    if (val.lte(0) || !isValFinite) return new Decimal(0);
+    const val = energy / 1e11;
+    if (val <= 0 || isNaN(val) || !isFinite(val)) return 0;
 
-    let gain = new Decimal(Math.floor(val.log10())).mul(1 + Math.floor(antimatter.div(400).toNumber())).floor();
-    return __sanitizeDecimal(gain.max(0), 0);
+    let gain = Math.floor(Math.log10(val) * (1 + Math.floor(antimatter / 400)));
+    return __sanitizeNumber(gain, 0);
   } catch (e) {
-    return new Decimal(0);
+    return 0;
   }
 }
 
 function getGainGalaxyNodes() {
   try {
-    const energy = __sanitizeDecimal(game?.energy, 0);
-    const timeShards = __sanitizeDecimal(game?.timeShards, 0);
+    const energy = __sanitizeNumber(game?.energy, 0);
+    const timeShards = __sanitizeNumber(game?.timeShards, 0);
 
-    if (energy.lt(1e24) || timeShards.lt(50)) return new Decimal(0);
-    return new Decimal(1);
+    if (energy < 1e24 || timeShards < 50) return 0;
+    return 1;
   } catch (e) {
-    return new Decimal(0);
+    return 0;
   }
 }
 /**
@@ -1860,7 +1487,7 @@ function getGainGalaxyNodes() {
 function exportSaveData() {
   try {
     if (typeof saveGameManual === "function") {
-      saveGameManual(); 
+      saveGameManual(); // 最新の状態を保存
     }
 
     const rawData = localStorage.getItem(STORAGE_KEY);
@@ -1870,6 +1497,7 @@ function exportSaveData() {
       return;
     }
 
+    // UTF-8に対応した安全なBase64エンコード
     const utf8Bytes = new TextEncoder().encode(rawData);
     let binaryString = "";
     for (let i = 0; i < utf8Bytes.length; i++) {
@@ -1921,91 +1549,6 @@ function importSaveData(encodedData) {
     createToast("インポートエラー", "無効なセーブデータ文字列です。");
   }
 }
-  /**
- =========================================================================
- * 🛠️ コア計算・無限大クラッシュ完全防止パッチ（自動上書き）
- =========================================================================
- */
-(function fixCoreCalculationEngine() {
-  console.warn("🛡️ コア計算エンジンの完全保護パッチを適用中...");
-
-  // 1. グローバル生産倍率の安全化（Infinityを絶対に防ぐ）
-  window.getGlobalProductionMultiplier = function() {
-    try {
-      if (typeof game === 'undefined' || !game) return new Decimal(1.0);
-      
-      const amUpg0 = Number(game?.amUpgLevels?.[0]) || 0;
-      const antimatter = __sanitizeDecimal(game?.antimatter, 0);
-      const upg1 = Number(game?.upgLevels?.[1]) || 0;
-      const upg3 = Number(game?.upgLevels?.[3]) || 0;
-      const tlUpg1 = Number(game?.tlUpgLevels?.[1]) || 0;
-      const totalTime = Number(game?.totalTime) || 0;
-      const galaxyNodes = __sanitizeDecimal(game?.galaxyNodes, 0);
-
-      const amPerUnitValue = 1.0 + (amUpg0 * 0.5);
-      let amMultiplier = antimatter.max(0).mul(amPerUnitValue).plus(1);
-      let baseUpgradeMultiplier = 1.0 + (Math.max(0, upg1) * 0.3);
-      
-      // べき乗が大きくなりすぎてInfinityになるのを防ぐため cap（上限）を設ける
-      const safeUpg3 = Math.min(Math.max(0, upg3), 30);
-      let exponentialMultiplier = new Decimal(1.6).pow(safeUpg3);
-      
-      let timelineTimeMultiplier = 1.0 + (Math.max(0, tlUpg1) * (Math.max(0, totalTime) * 0.005));
-      let galaxyMultiplier = galaxyNodes.max(0).mul(5.0).plus(1);
-      
-      let result = amMultiplier.mul(baseUpgradeMultiplier).mul(exponentialMultiplier).mul(timelineTimeMultiplier).mul(galaxyMultiplier);
-      
-      // 無限大になっていたら強制的に安全な最大値に丸める
-      const isFin = typeof result.isFinite === 'function' ? result.isFinite() : (result.mag !== Infinity && !isNaN(result.mag));
-      if (!isFin) {
-        return new Decimal('1e300');
-      }
-      return result;
-    } catch (e) {
-      return new Decimal(1.0);
-    }
-  };
-
-  // 2. ゲームスピード倍率の安全化
-  window.getGameSpeedMultiplier = function() {
-    try {
-      const timeShards = __sanitizeDecimal(game?.timeShards, 0);
-      const tlUpg0 = Number(game?.tlUpgLevels?.[0]) || 0;
-      const amUpg3 = Number(game?.amUpgLevels?.[3]) || 0;
-
-      const baseShardsEffect = timeShards.max(0).mul(0.02 + (tlUpg0 * 0.02)).plus(1);
-      const amUpg3Effect = 1 + (Math.max(0, amUpg3) * 0.5);
-      const result = baseShardsEffect.mul(amUpg3Effect);
-      
-      return Math.min(result.toNumber() || 1.0, 1e10);
-    } catch (e) {
-      return 1.0;
-    }
-  };
-
-  // 3. クリックパワーの安全化
-  window.getClickPower = function() {
-    try {
-      const upg0 = Number(game?.upgLevels?.[0]) || 0;
-      const amUpg1 = Number(game?.amUpgLevels?.[1]) || 0;
-      const antimatter = __sanitizeDecimal(game?.antimatter, 0);
-      const upg5 = Number(game?.upgLevels?.[5]) || 0;
-
-      let baseClick = new Decimal(2).pow(Math.min(Math.max(0, upg0), 30));
-      let amClickBonus = antimatter.max(0).mul(0.2).mul(amUpg1).plus(1);
-      
-      let totalCpsFunc = window.getTotalCps || function() { return new Decimal(0); };
-      let cpHitsBonus = totalCpsFunc().mul(Math.max(0, upg5) * 0.012);
-      
-      let power = baseClick.mul(amClickBonus).plus(cpHitsBonus);
-      return power.isFinite && !power.isFinite() ? new Decimal('1e300') : power;
-    } catch (e) {
-      return new Decimal(1);
-    }
-  };
-
-  console.log("✨ コア計算の安全化パッチの適用が完了しました。");
-})();
 /**
  * =========================================================================
  * Dynamic DOM Architecture Compilers (修正済み)
@@ -2141,166 +1684,116 @@ function buildGameDOM() {
 }
 /**
  * =========================================================================
- * 物質施設・アップグレードの安全な購入処理システム（Decimal対応・完全修復版）
+ * Transaction Purchase Controllers
  * =========================================================================
  */
-
-// 1. 物質施設の購入処理
 function executeBuyFactory(id) {
-  try {
-    sanitizeGameData();
-    
-    if (!DB_FACTORIES || !DB_FACTORIES[id]) return;
-    const cost = getFactoryCost(id); // Decimal型
-    
-    if (game.energy.gte(cost)) {
-      game.energy = game.energy.sub(cost);
-      if (!Array.isArray(game.facCounts)) game.facCounts = [];
-      
-      let currentQty = __sanitizeNumber(game.facCounts[id], 0);
-      game.facCounts[id] = currentQty + 1;
-      
-      SoundManager.playBuy();
-      
-      refreshUI();
-      pushLog(`🏭 施設購入：${DB_FACTORIES[id].name} を増設しました（所持数: ${game.facCounts[id]}）`, "var(--color-energy)");
-      
-      if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onBuyFactory) {
-        window.ModAPI.hooks.onBuyFactory.forEach(cb => { try { cb({id, count: game.facCounts[id]}); } catch(e){} });
-      }
-    } else {
-      createToast("エネルギー不足", "この施設を購入するためのエネルギーが足りません。");
-    }
-  } catch (err) {
-    console.error("Factory purchase error:", err);
+  const cost = getFactoryCost(id);
+  if (game.energy >= cost) {
+    game.energy -= cost;
+    game.facCounts[id]++;
+    SoundManager.playBuy();
+    pushLog(`施設 [${DB_FACTORIES[id].name}] を製造しました。`, "var(--color-energy)");
+    window.ModAPI.hooks.onBuyFactory.forEach(cb => { try { cb({id: id, cost: cost}); } catch(e){} });
+    refreshUI();
   }
 }
+function refreshUI() {
+  // 例: レベルやコストの更新部分
+  DB_UPGRADES.forEach(u => {
+    const labelCost = document.getElementById(`dom-upg-cost-${u.id}`);
+    const labelLv = document.getElementById(`dom-upg-lv-${u.id}`);
+    
+    // ★要素が存在する場合のみ値を代入する（nullエラーを防ぐ）
+    if (labelCost) labelCost.textContent = `${formatValue(getUpgradeCost(u.id))} E`;
+    if (labelLv) labelLv.textContent = `${game.upgLevels[u.id]} / ${u.max}`;
+  });
 
-// 2. 通常アップグレードの購入処理
+  // 施設や他のUI更新部分も同様に、取得した要素が null でないか確認するコードに修正してください
+}
 function executeBuyUpgrade(id) {
-  try {
-    sanitizeGameData();
-    if (!DB_UPGRADES || !DB_UPGRADES[id]) return;
-    
-    const uData = DB_UPGRADES[id];
-    if (!Array.isArray(game.upgLevels)) game.upgLevels = [];
-    
-    let currentLvl = __sanitizeNumber(game.upgLevels[id], 0);
-    if (currentLvl >= uData.max) return;
-    
-    const cost = getUpgradeCost(id); // Decimal型
-    if (game.energy.gte(cost)) {
-      game.energy = game.energy.sub(cost);
-      game.upgLevels[id] = currentLvl + 1;
-      
-      SoundManager.playBuy();
-      
-      refreshUI();
-      pushLog(`💡 改良成功：${uData.name} (Lv.${game.upgLevels[id]})`, "var(--color-upgrade)");
-      
-      if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onBuyUpgrade) {
-        window.ModAPI.hooks.onBuyUpgrade.forEach(cb => { try { cb({id, level: game.upgLevels[id]}); } catch(e){} });
-      }
-    } else {
-      createToast("エネルギー不足", "アップグレードに必要なエネルギーが足りません。");
-    }
-  } catch (err) {
-    console.error("Upgrade purchase error:", err);
+  if (game.upgLevels[id] >= DB_UPGRADES[id].max) return;
+  const cost = getUpgradeCost(id);
+  if (game.energy >= cost) {
+    game.energy -= cost;
+    game.upgLevels[id]++;
+    SoundManager.playBuy();
+    pushLog(`概念改良 [${DB_UPGRADES[id].name}] Lv.${game.upgLevels[id]} 適用。`, "var(--color-upgrade)");
+    window.ModAPI.hooks.onBuyUpgrade.forEach(cb => { try { cb({id: id, type: 'normal', cost: cost}); } catch(e){} });
+    refreshUI();
   }
 }
 
-// 3. 反物質アップグレードの購入処理
 function executeBuyAmUpgrade(id) {
-  try {
-    sanitizeGameData();
-    if (!DB_AM_UPGRADES || !DB_AM_UPGRADES[id]) return;
-    
-    const auData = DB_AM_UPGRADES[id];
-    if (!Array.isArray(game.amUpgLevels)) game.amUpgLevels = [];
-    
-    let currentLvl = __sanitizeNumber(game.amUpgLevels[id], 0);
-    if (currentLvl >= auData.max) return;
-    
-    const cost = getAmUpgradeCost(id); // Decimal型
-    if (game.antimatter.gte(cost)) {
-      game.antimatter = game.antimatter.sub(cost);
-      game.amUpgLevels[id] = currentLvl + 1;
-      
-      SoundManager.playBuy();
-      
-      refreshUI();
-      pushLog(`⚛️ 反物質改良：${auData.name} (Lv.${game.amUpgLevels[id]})`, "var(--color-antimatter)");
-    } else {
-      createToast("反物質不足", "反物質アップグレードに必要なAMが足りません。");
-    }
-  } catch (err) {
-    console.error("AM Upgrade error:", err);
+  if (game.amUpgLevels[id] >= DB_AM_UPGRADES[id].max) return;
+  const cost = getAmUpgradeCost(id);
+  if (game.antimatter >= cost) {
+    game.antimatter -= cost;
+    game.amUpgLevels[id]++;
+    SoundManager.playBuy(); // ★ 反物質アップグレード購入音を追加
+    pushLog(`反物質改良 [${DB_AM_UPGRADES[id].name}] を適用。`, "var(--color-antimatter)");
+    refreshUI();
   }
 }
 
-// 4. タイムラインアップグレードの購入処理
 function executeBuyTlUpgrade(id) {
-  try {
-    sanitizeGameData();
-    if (!DB_TL_UPGRADES || !DB_TL_UPGRADES[id]) return;
-    
-    const tuData = DB_TL_UPGRADES[id];
-    if (!Array.isArray(game.tlUpgLevels)) game.tlUpgLevels = [];
-    
-    let currentLvl = __sanitizeNumber(game.tlUpgLevels[id], 0);
-    if (currentLvl >= tuData.max) return;
-    
-    const cost = getTlUpgradeCost(id); // Decimal型
-    if (game.timeShards.gte(cost)) {
-      game.timeShards = game.timeShards.sub(cost);
-      game.tlUpgLevels[id] = currentLvl + 1;
-      
-      SoundManager.playBuy();
-      
-      refreshUI();
-      pushLog(`⏳ 時間律改良：${tuData.name} (Lv.${game.tlUpgLevels[id]})`, "var(--color-timeline)");
-    } else {
-      createToast("時間律の破片不足", "タイムラインアップグレードに必要なTSが足りません。");
-    }
-  } catch (err) {
-    console.error("TL Upgrade error:", err);
+  if (game.tlUpgLevels[id] >= DB_TL_UPGRADES[id].max) return;
+  const cost = getTlUpgradeCost(id);
+  if (game.timeShards >= cost) {
+    game.timeShards -= cost;
+    game.tlUpgLevels[id]++;
+    SoundManager.playBuy(); // ★ 時間律アップグレード購入音を追加
+    pushLog(`時間律改良 [${DB_TL_UPGRADES[id].name}] を定着。`, "var(--color-timeline)");
+    refreshUI();
   }
+}
+function toggleAuto(type) {
+  if (type === 'fac') game.autoFacEnabled = document.getElementById("chk-auto-fac").checked;
+  if (type === 'upg') game.autoUpgEnabled = document.getElementById("chk-auto-upg").checked;
+  if (type === 'am') game.autoAmEnabled = document.getElementById("chk-auto-am").checked;
+  if (type === 'pam') game.autoPrestigeAmEnabled = document.getElementById("chk-auto-pam").checked;
 }
 
 /**
  * =========================================================================
- * Multi-Tier Layer Prestige Subroutines (Decimal対応版)
+ * Multi-Tier Layer Prestige Subroutines
  * =========================================================================
  */
 document.getElementById("btnResetAm").addEventListener("click", () => {
-  const gain = getGainAntimatter(); // Decimal型
-  if (gain.lte(0)) return;
-  if (confirm(`現在の世界線のエネルギーと全施設を破棄し、新たに ${formatValue(gain)} AM を引き継いで反物質空間へ転生しますか？`)) {
+  const gain = getGainAntimatter();
+  if (gain <= 0) return;
+  if (confirm(`現在の世界線のエネルギーと全施設を破棄し、新たに ${gain} AM を引き継いで反物質空間へ転生しますか？`)) {
     executePrestigeAm(gain);
   }
 });
 
 function executePrestigeAm(forcedGain) {
-  const safeGain = __sanitizeDecimal(forcedGain, 0);
-  game.antimatter = __sanitizeDecimal(game.antimatter, 0).plus(safeGain);
+  // ゲイン値の安全化
+  const safeGain = Number(forcedGain);
+  game.antimatter = (isNaN(game.antimatter) ? 0 : game.antimatter) + (isNaN(safeGain) ? 0 : safeGain);
   game.prestigeAmCount = (isNaN(game.prestigeAmCount) ? 0 : game.prestigeAmCount) + 1;
 
-  let carryOverEnergy = new Decimal(0);
+  let carryOverEnergy = 0;
   const amUpg2 = game.amUpgLevels && !isNaN(game.amUpgLevels[2]) ? game.amUpgLevels[2] : 0;
-  const currentEnergy = __sanitizeDecimal(game.energy, 0);
+  const currentEnergy = !isNaN(game.energy) ? game.energy : 0;
 
   if (amUpg2 >= 1) {
-    carryOverEnergy = currentEnergy.mul(amUpg2 * 0.05);
+    carryOverEnergy = currentEnergy * (amUpg2 * 0.05);
   }
 
-  game.energy = carryOverEnergy;
+  // 万が一 carryOverEnergy が NaN になったら 0 にする
+  game.energy = isNaN(carryOverEnergy) ? 0 : carryOverEnergy;
+  
+  // 各種リソースの初期化（NaNガード付き）
   game.facCounts = [0, 0, 0, 0, 0];
   
+  // インデックス 7 のみが引き継がれる実装の確認
   const keepUpg7 = (game.upgLevels && !isNaN(game.upgLevels[7])) ? game.upgLevels[7] : 0;
   game.upgLevels = [0, 0, 0, 0, 0, 0, 0, keepUpg7];
+  
   game.sessionTime = 0;
   
-  pushLog(`★ 反物質転生が実行されました（+${formatValue(safeGain)} AM）`, "var(--color-antimatter)");
+  pushLog(`★ 反物質転生が実行されました（+${safeGain} AM）`, "var(--color-antimatter)");
   createToast("世界線反物質化", `粒子が対消滅し、${formatValue(safeGain)} AM を回収しました。`);
   
   if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onPrestigeAm) {
@@ -2309,90 +1802,50 @@ function executePrestigeAm(forcedGain) {
   
   refreshUI();
 }
-
 document.getElementById("btnResetTl").addEventListener("click", () => {
-  const gain = getGainTimeShards(); // Decimal型
-  if (gain.lte(0)) return;
-  if (confirm(`下位の全構造をリセットし、時間律の破片 ${formatValue(gain)} TS を獲得しますか？`)) {
-    game.timeShards = __sanitizeDecimal(game.timeShards, 0).plus(gain);
+  const gain = getGainTimeShards();
+  if (gain <= 0) return;
+  if (confirm(`下位の全構造をリセットし、時間律の破片 ${gain} TS を獲得しますか？`)) {
+    game.timeShards += gain;
     game.prestigeTlCount++;
-    game.energy = new Decimal(0);
-    game.antimatter = new Decimal(0);
+    game.energy = 0; game.antimatter = 0;
     game.facCounts = [0, 0, 0, 0, 0];
     game.upgLevels = [0, 0, 0, 0, 0, 0, 0, 0];
     game.amUpgLevels = [0, 0, 0, 0];
     game.sessionTime = 0;
-    pushLog(`⏳ 時空の切断に成功（+${formatValue(gain)} TS 獲得）`, "var(--color-timeline)");
-    if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onPrestigeTl) {
-      window.ModAPI.hooks.onPrestigeTl.forEach(cb => { try { cb({gain: gain}); } catch(e){} });
-    }
+    pushLog(`⏳ 時空の切断に成功（+${gain} TS 獲得）`, "var(--color-timeline)");
+    window.ModAPI.hooks.onPrestigeTl.forEach(cb => { try { cb({gain: gain}); } catch(e){} });
     refreshUI();
   }
 });
 
 document.getElementById("btnResetGx").addEventListener("click", () => {
-  const gain = getGainGalaxyNodes(); // Decimal型
-  if (gain.lte(0)) return;
+  const gain = getGainGalaxyNodes();
+  if (gain <= 0) return;
   if (confirm(`究極の統合：時間と物質のすべてを捧げ、銀河系統合ノードを1つ固定化します。全リソースがリセットされますが、全生産効率が永久に5倍になります。`)) {
-    game.galaxyNodes = __sanitizeDecimal(game.galaxyNodes, 0).plus(gain);
+    game.galaxyNodes += gain;
     game.prestigeGxCount++;
-    game.energy = new Decimal(0);
-    game.antimatter = new Decimal(0);
-    game.timeShards = new Decimal(0);
+    game.energy = 0; game.antimatter = 0; game.timeShards = 0;
     game.facCounts = [0, 0, 0, 0, 0];
     game.upgLevels = [0, 0, 0, 0, 0, 0, 0, 0];
-    game.amUpgLevels = [0, 0, 0, 0];
-    game.tlUpgLevels = [0, 0, 0, 0];
+    game.amUpgLevels = [0, 0, 0, 0]; game.tlUpgLevels = [0, 0, 0, 0];
     game.sessionTime = 0;
     pushLog(`🌌 銀河収束完了。大宇宙の定数が書き換わりました。`, "var(--color-galaxy)");
-    if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onPrestigeGx) {
-      window.ModAPI.hooks.onPrestigeGx.forEach(cb => { try { cb({gain: gain}); } catch(e){} });
-    }
+    window.ModAPI.hooks.onPrestigeGx.forEach(cb => { try { cb({gain: gain}); } catch(e){} });
     refreshUI();
   }
 });
-  /**
- * =========================================================================
- * 🚨 ハードリセット（完全初期化）処理
- * =========================================================================
- */
-function hardResetGame() {
-  if (confirm("本当にすべての進行状況を削除して完全にリセットしますか？この操作は取り消せません。")) {
-    try {
-      // ローカルストレージのセーブデータを削除
-      localStorage.removeItem("INFINITY_MATRIX_OMEGA_SAVE_DATA");
-      localStorage.removeItem("your_game_save_key");
-      localStorage.clear();
 
-      // ModAPI のフックがあれば発火（任意）
-      if (window.ModAPI && typeof window.ModAPI.executeHardResetWipe === "function") {
-        window.ModAPI.executeHardResetWipe();
-      }
-
-      // ページをリロードして初期状態に戻す
-      location.reload();
-    } catch (e) {
-      console.error("ハードリセット中にエラーが発生しました:", e);
-    }
-  }
-}
 /**
  * =========================================================================
- * Core Impulse Click Procedures (Decimal完全対応版)
+ * Core Impulse Click Procedures
  * =========================================================================
  */
 function handleCoreClick(e) {
-  const power = getClickPower(); // Decimal型
-  
-  // Decimalのメソッドを使って加算
-  game.energy = game.energy.plus(power);
-  
-  // totalClicksもDecimal化されているため、plus(1)を使用
-  if (game.totalClicks === undefined) game.totalClicks = new Decimal(0);
-  game.totalClicks = game.totalClicks.plus(1);
-  
-  SoundManager.playClick();
-  
+  const power = getClickPower();
+  game.energy += power;
+  game.totalClicks++;
+  SoundManager.playClick()
   const clickX = e ? e.clientX : window.innerWidth / 4;
   const clickY = e ? e.clientY : window.innerHeight / 2;
   
@@ -2405,15 +1858,9 @@ function handleCoreClick(e) {
   document.body.appendChild(floater);
   
   setTimeout(() => floater.remove(), 400);
-  
-  // フックの安全性確保
-  if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onCoreClick) {
-    window.ModAPI.hooks.onCoreClick.forEach(cb => { try { cb({power: power}); } catch(e){} });
-  }
-  
+  window.ModAPI.hooks.onCoreClick.forEach(cb => { try { cb({power: power}); } catch(e){} });
   refreshUI();
 }
-
 document.getElementById("coreTrigger").addEventListener("click", handleCoreClick);
 
 // === 統合版 SoundManager (効果音 & 超壮大オーケストラBGMエンジン) ===
@@ -2743,185 +2190,149 @@ function toggleBGM() {
 }
 /**
  * =========================================================================
- * Viewport Refresher & State Synchronization Interface (Decimal対応版)
+ * Viewport Refresher & State Synchronization Interface
  * =========================================================================
  */
 function refreshUI() {
-  const energy = __sanitizeDecimal(game.energy, 0);
-  const antimatter = __sanitizeDecimal(game.antimatter, 0);
-  const timeShards = __sanitizeDecimal(game.timeShards, 0);
-  const galaxyNodes = __sanitizeDecimal(game.galaxyNodes, 0);
-
-  document.getElementById("v-energy").textContent = formatValue(energy);
+  document.getElementById("v-energy").textContent = formatValue(game.energy);
   document.getElementById("v-total-cps").textContent = formatValue(getTotalCps());
   document.getElementById("v-click-power").textContent = "+" + formatValue(getClickPower());
   
-  if (antimatter.gt(0) || (game.prestigeAmCount || 0) > 0) {
+  if (game.antimatter > 0 || game.prestigeAmCount > 0) {
     document.getElementById("group-am").style.display = "block";
-    document.getElementById("v-antimatter").textContent = formatValue(antimatter);
+    document.getElementById("v-antimatter").textContent = game.antimatter.toLocaleString();
   }
-  if (timeShards.gt(0) || (game.prestigeTlCount || 0) > 0) {
+  if (game.timeShards > 0 || game.prestigeTlCount > 0) {
     document.getElementById("group-tl").style.display = "block";
-    document.getElementById("v-timeshards").textContent = formatValue(timeShards);
+    document.getElementById("v-timeshards").textContent = game.timeShards.toLocaleString();
   }
 
-  const gainAm = getGainAntimatter(); // Decimal型
-  document.getElementById("v-gain-am").textContent = `+${formatValue(gainAm)} AM`;
-  document.getElementById("btnResetAm").disabled = gainAm.lte(0);
+  const gainAm = getGainAntimatter();
+  document.getElementById("v-gain-am").textContent = `+${gainAm.toLocaleString()} AM`;
+  document.getElementById("btnResetAm").disabled = gainAm <= 0;
 
-  const gainTl = getGainTimeShards(); // Decimal型
-  document.getElementById("v-gain-tl").textContent = `+${formatValue(gainTl)} TS`;
-  document.getElementById("btnResetTl").disabled = gainTl.lte(0);
+  const gainTl = getGainTimeShards();
+  document.getElementById("v-gain-tl").textContent = `+${gainTl.toLocaleString()} TS`;
+  document.getElementById("btnResetTl").disabled = gainTl <= 0;
 
-  const gainGx = getGainGalaxyNodes(); // Decimal型
-  document.getElementById("v-gain-gx").textContent = `+${formatValue(gainGx)} GN`;
-  document.getElementById("btnResetGx").disabled = gainGx.lte(0);
+  const gainGx = getGainGalaxyNodes();
+  document.getElementById("v-gain-gx").textContent = `+${gainGx} GN`;
+  document.getElementById("btnResetGx").disabled = gainGx <= 0;
 
   DB_FACTORIES.forEach(f => {
-    const costElem = document.getElementById(`dom-fac-cost-${f.id}`);
-    const countElem = document.getElementById(`dom-fac-count-${f.id}`);
-    const cpsElem = document.getElementById(`dom-fac-cps-${f.id}`);
-    const card = document.getElementById(`dom-fac-${f.id}`);
-
     const cost = getFactoryCost(f.id);
-    if (costElem) costElem.textContent = formatValue(cost);
-    if (countElem) countElem.textContent = game.facCounts[f.id] || 0;
-    if (cpsElem) cpsElem.textContent = formatValue(getFactoryCps(f.id));
+    document.getElementById(`dom-fac-cost-${f.id}`).textContent = formatValue(cost);
+    document.getElementById(`dom-fac-count-${f.id}`).textContent = game.facCounts[f.id];
+    document.getElementById(`dom-fac-cps-${f.id}`).textContent = formatValue(getFactoryCps(f.id));
     
-    if (card) {
-      if (energy.gte(cost)) card.classList.remove("state-disabled");
-      else card.classList.add("state-disabled");
-    }
+    const card = document.getElementById(`dom-fac-${f.id}`);
+    if (game.energy >= cost) card.classList.remove("state-disabled");
+    else card.classList.add("state-disabled");
   });
 
   DB_UPGRADES.forEach(u => {
-    const lv = game.upgLevels[u.id] || 0;
-    // コスト計算を正しいロジックに修正
-    const cost = new Decimal(u.baseCost).times(Decimal.pow(u.costScale, lv));
+    const lv = game.upgLevels[u.id];
+    const cost = getUpgradeCost(u.id);
     const card = document.getElementById(`dom-upg-${u.id}`);
     const labelCost = document.getElementById(`dom-upg-cost-${u.id}`);
     const labelLv = document.getElementById(`dom-upg-lv-${u.id}`);
 
-    if (labelLv) labelLv.textContent = `${lv} / ${u.max}`;
-    if (card) {
-      if (lv >= u.max) {
-        card.className = "card-upgrade-node state-maxed";
-        if (labelCost) labelCost.textContent = "MAX定着";
-      } else {
-        card.className = "card-upgrade-node";
-        if (labelCost) labelCost.textContent = `${formatValue(cost)} E`;
-        // energy を game.energy に修正
-        if (game.energy.gte(cost)) card.classList.remove("state-disabled");
-        else card.classList.add("state-disabled");
-      }
+    labelLv.textContent = `${lv} / ${u.max}`;
+    if (lv >= u.max) {
+      card.className = "card-upgrade-node state-maxed";
+      labelCost.textContent = "MAX定着";
+    } else {
+      card.className = "card-upgrade-node";
+      labelCost.textContent = `${formatValue(cost)} E`;
+      if (game.energy >= cost) card.classList.remove("state-disabled");
+      else card.classList.add("state-disabled");
     }
   });
 
   DB_AM_UPGRADES.forEach(au => {
-  const lv = game.amUpgLevels[au.id] || 0;
-  const cost = getAmUpgradeCost(au.id);
-  const card = document.getElementById(`dom-amupg-${au.id}`);
-  const labelCost = document.getElementById(`dom-amupg-cost-${au.id}`);
-  const labelLv = document.getElementById(`dom-amupg-lv-${au.id}`);
+    const lv = game.amUpgLevels[au.id];
+    const cost = getAmUpgradeCost(au.id);
+    const card = document.getElementById(`dom-amupg-${au.id}`);
+    const labelCost = document.getElementById(`dom-amupg-cost-${au.id}`);
+    const labelLv = document.getElementById(`dom-amupg-lv-${au.id}`);
 
-  if (labelLv) labelLv.textContent = `${lv} / ${au.max}`;
-  if (card) {
+    labelLv.textContent = `${lv} / ${au.max}`;
     if (lv >= au.max) {
       card.className = "card-upgrade-node state-maxed";
-      if (labelCost) labelCost.textContent = "結合最大";
+      labelCost.textContent = "結合最大";
     } else {
       card.className = "card-upgrade-node";
-      if (labelCost) labelCost.textContent = `${formatValue(cost)} AM`;
-      if (antimatter.gte(cost)) card.classList.remove("state-disabled");
+      labelCost.textContent = `${cost} AM`;
+      if (game.antimatter >= cost) card.classList.remove("state-disabled");
       else card.classList.add("state-disabled");
     }
-  }
-});
+  });
 
-DB_TL_UPGRADES.forEach(tu => {
-  const lv = game.tlUpgLevels[tu.id] || 0;
-  const cost = getTlUpgradeCost(tu.id);
-  const card = document.getElementById(`dom-tlupg-${tu.id}`);
-  const labelCost = document.getElementById(`dom-tlupg-cost-${tu.id}`);
-  const labelLv = document.getElementById(`dom-tlupg-lv-${tu.id}`);
+  DB_TL_UPGRADES.forEach(tu => {
+    const lv = game.tlUpgLevels[tu.id];
+    const cost = getTlUpgradeCost(tu.id);
+    const card = document.getElementById(`dom-tlupg-${tu.id}`);
+    const labelCost = document.getElementById(`dom-tlupg-cost-${tu.id}`);
+    const labelLv = document.getElementById(`dom-tlupg-lv-${tu.id}`);
 
-  if (labelLv) labelLv.textContent = `${lv} / ${tu.max}`;
-  if (card) {
+    labelLv.textContent = `${lv} / ${tu.max}`;
     if (lv >= tu.max) {
       card.className = "card-upgrade-node state-maxed";
-      if (labelCost) labelCost.textContent = "超越完了";
+      labelCost.textContent = "超越完了";
     } else {
       card.className = "card-upgrade-node";
-      if (labelCost) labelCost.textContent = `${formatValue(cost)} TS`;
-      if (timeShards.gte(cost)) card.classList.remove("state-disabled");
+      labelCost.textContent = `${cost} TS`;
+      if (game.timeShards >= cost) card.classList.remove("state-disabled");
       else card.classList.add("state-disabled");
     }
+  });
+
+  if (game.upgLevels[7] >= 1) {
+    document.getElementById("auto-locked-msg").style.display = "none";
+    document.getElementById("auto-unlocked-grid").style.display = "block";
+    if (game.tlUpgLevels[3] >= 1) {
+      document.getElementById("row-auto-prestige-am").style.display = "flex";
+    }
   }
-});
-  document.getElementById("s-run-time").textContent = (game.sessionTime || 0).toFixed(1) + "s";
-  document.getElementById("s-total-time").textContent = (game.totalTime || 0).toFixed(1) + "s";
-  document.getElementById("s-clicks").textContent = formatValue(game.totalClicks || 0);
-  document.getElementById("s-p-am").textContent = game.prestigeAmCount || 0;
-  document.getElementById("s-p-tl").textContent = game.prestigeTlCount || 0;
-  document.getElementById("s-galaxy-nodes").textContent = formatValue(galaxyNodes);
+
+  document.getElementById("s-run-time").textContent = game.sessionTime.toFixed(1) + "s";
+  document.getElementById("s-total-time").textContent = game.totalTime.toFixed(1) + "s";
+  document.getElementById("s-clicks").textContent = game.totalClicks.toLocaleString();
+  document.getElementById("s-p-am").textContent = game.prestigeAmCount;
+  document.getElementById("s-p-tl").textContent = game.prestigeTlCount;
+  document.getElementById("s-galaxy-nodes").textContent = game.galaxyNodes;
   
-  const amPerUnit = 100 + ((game.amUpgLevels?.[0] || 0) * 50);
-  const amMultiplierBonus = antimatter.mul(amPerUnit);
-  document.getElementById("s-mult-am").textContent = `+${formatValue(amMultiplierBonus)}%`;
+  const amPerUnit = 100 + (game.amUpgLevels[0] * 50);
+  document.getElementById("s-mult-am").textContent = `+${(game.antimatter * amPerUnit).toLocaleString()}%`;
   
   const totalSpeedPercentage = (getGameSpeedMultiplier() * 100) - 100;
   document.getElementById("s-mult-time").textContent = `+${totalSpeedPercentage.toFixed(1)}%`;
-  
-  const galaxyMultiplier = new Decimal(1.0).plus(galaxyNodes.mul(5.0));
-  document.getElementById("s-mult-galaxy").textContent = `${formatValue(galaxyMultiplier)}x`;
+  document.getElementById("s-mult-galaxy").textContent = `${(1.0 + game.galaxyNodes * 5.0).toFixed(1)}x`;
 
   DB_ACHIEVEMENTS.forEach(ach => {
     if (!game.achievements.includes(ach.id) && ach.req()) {
       game.achievements.push(ach.id);
       createToast(`🏆 実績解除: ${ach.text}`, ach.desc);
       pushLog(`【実績獲得】 ${ach.text} - ${ach.desc}`, "var(--color-upgrade)");
-      if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onAchievement) {
-        window.ModAPI.hooks.onAchievement.forEach(cb => { try { cb({id: ach.id, text: ach.text}); } catch(e){} });
-      }
+      window.ModAPI.hooks.onAchievement.forEach(cb => { try { cb({id: ach.id, text: ach.text}); } catch(e){} });
     }
   });
 }
-function switchMainTab(tabId) {
-  // すべてのタブを非表示
-  document.querySelectorAll('.tab-pane').forEach(pane => {
-    pane.classList.remove('active');
-  });
-  // すべてのタブボタンからactiveを外す
-  document.querySelectorAll('.tab-trigger-button').forEach(btn => {
-    btn.classList.remove('active');
-  });
-
-  // 指定されたタブを表示
-  const targetPane = document.getElementById(tabId);
-  if (targetPane) {
-    targetPane.classList.add('active');
-  }
-
-  // クリックされたボタンをactiveにする
-  const clickedBtn = document.querySelector(`.tab-trigger-button[onclick*="${tabId}"]`);
-  if (clickedBtn) {
-    clickedBtn.classList.add('active');
-  }
-}
 function loadGame() {
-  const savedData = localStorage.getItem('your_game_save_key');
+  const savedData = localStorage.getItem('your_game_save_key'); // プロジェクトのセーブキーに合わせて変更してください
   if (!savedData) return;
   
   try {
     const parsed = JSON.parse(savedData);
     
-    game.energy = new Decimal(parsed.energy ?? 0);
-    game.totalClicks = new Decimal(parsed.totalClicks ?? 0);
-    game.antimatter = new Decimal(parsed.antimatter ?? 0);
+    // 基本パラメータのロード
+    game.energy = parsed.energy ?? 0;
+    game.totalClicks = parsed.totalClicks ?? 0;
+    game.antimatter = parsed.antimatter ?? 0;
     game.prestigeAmCount = parsed.prestigeAmCount ?? 0;
-    game.timeShards = new Decimal(parsed.timeShards ?? 0);
+    game.timeShards = parsed.timeShards ?? 0;
     game.prestigeTlCount = parsed.prestigeTlCount ?? 0;
-    game.galaxyNodes = new Decimal(parsed.galaxyNodes ?? 0);
+    game.galaxyNodes = parsed.galaxyNodes ?? 0;
     game.prestigeGxCount = parsed.prestigeGxCount ?? 0;
     game.sessionTime = parsed.sessionTime ?? 0;
     game.totalTime = parsed.totalTime ?? 0;
@@ -2931,6 +2342,7 @@ function loadGame() {
     game.autoPrestigeAmEnabled = parsed.autoPrestigeAmEnabled ?? false;
     game.achievements = parsed.achievements ?? [];
 
+    // 各配列のロード ＋ データベース数に満たない場合は 0 で自動パディング（NaN完全防止）
     game.facCounts = DB_FACTORIES.map((_, i) => parsed.facCounts?.[i] ?? 0);
     game.upgLevels = DB_UPGRADES.map((_, i) => parsed.upgLevels?.[i] ?? 0);
     game.amUpgLevels = DB_AM_UPGRADES.map((_, i) => parsed.amUpgLevels?.[i] ?? 0);
@@ -2942,182 +2354,71 @@ function loadGame() {
 }
 /**
  * =========================================================================
- * 🛡️ 堅牢なセーブデータ・永続化管理インターフェース (Decimal保護・修正版)
+ * LocalStorage Persistent Serialization Interface
  * =========================================================================
  */
 const STORAGE_KEY = "INFINITY_MATRIX_OMEGA_SAVE_DATA";
 
-/**
- * 補助関数：安全にDecimal値を解析・生成する（InfinityやNaNの汚染を完全排除）
- */
-function __safeDecimalParse(val, fallback = 0) {
-  if (val === null || val === undefined) return new Decimal(fallback);
-  if (val === Infinity || val === "Infinity") return new Decimal("1e308"); // 0にしない
-  if (val === -Infinity || val === "-Infinity") return new Decimal(0);
-  try {
-    const d = new Decimal(val);
-    return d; // isFiniteチェックで0に落とさない
-  } catch (e) {
-    return new Decimal(fallback);
-  }
-}
 function saveGameManual() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(game));
     createToast("セーブ完了", "宇宙パラメータがLocalStoreへ永続保存されました。");
     pushLog("📁 システム：手動セーブが正常に書き込まれました。", "var(--color-energy)");
-    if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onSave) {
-      window.ModAPI.hooks.onSave.forEach(cb => { try { cb({success: true}); } catch(e){} });
+    window.ModAPI.hooks.onSave.forEach(cb => { try { cb({success: true}); } catch(e){} });
+  } catch (e) { console.error(e); }
+}
+
+function loadGameOnLaunch() {
+  try {
+    const rawData = localStorage.getItem(STORAGE_KEY);
+    if (rawData) {
+      game = Object.assign({}, game, JSON.parse(rawData));
+      if (game.upgLevels[7] >= 1) {
+        document.getElementById("chk-auto-fac").checked = game.autoFacEnabled;
+        document.getElementById("chk-auto-upg").checked = game.autoUpgEnabled;
+        document.getElementById("chk-auto-am").checked = game.autoAmEnabled;
+        if (document.getElementById("chk-auto-pam")) document.getElementById("chk-auto-pam").checked = game.autoPrestigeAmEnabled;
+      }
+      pushLog("📂 復元完了：前回の世界線データが完全に同期されました。", "var(--color-upgrade)");
     }
   } catch (e) { console.error(e); }
 }
 
-/**
- * =========================================================================
- * 🛡️ 完全防壁型セーブデータ・ロードインターフェース (確定修正版)
- * =========================================================================
- */
-function loadGameOnLaunch() {
-  try {
-    const rawData = localStorage.getItem(STORAGE_KEY);
-    if (!rawData) return;
-
- 
-   const parsed = JSON.parse(rawData);
-    if (!parsed || typeof parsed !== 'object') return;
-
-    // ⚠️ 危険な外部関数 deserializeGameData による汚染を防ぐため、ここでは直接呼び出さない
-
-    // すべて __safeDecimalParse を経由させて安全に復元
-    game.energy = __safeDecimalParse(parsed.energy, 0);
-    game.totalClicks = __safeDecimalParse(parsed.totalClicks, 0);
-    game.antimatter = __safeDecimalParse(parsed.antimatter, 0);
-    game.timeShards = __safeDecimalParse(parsed.timeShards, 0);
-    game.galaxyNodes = __safeDecimalParse(parsed.galaxyNodes, 0);
-
-    game.prestigeAmCount = Number.isFinite(Number(parsed.prestigeAmCount)) ? Number(parsed.prestigeAmCount) : 0;
-    game.prestigeTlCount = Number.isFinite(Number(parsed.prestigeTlCount)) ? Number(parsed.prestigeTlCount) : 0;
-    game.prestigeGxCount = Number.isFinite(Number(parsed.prestigeGxCount)) ? Number(parsed.prestigeGxCount) : 0;
-    game.sessionTime = Number.isFinite(Number(parsed.sessionTime)) ? Number(parsed.sessionTime) : 0;
-    game.totalTime = Number.isFinite(Number(parsed.totalTime)) ? Number(parsed.totalTime) : 0;
-
-    game.autoFacEnabled = !!parsed.autoFacEnabled;
-    game.autoUpgEnabled = !!parsed.autoUpgEnabled;
-    game.autoAmEnabled = !!parsed.autoAmEnabled;
-    game.autoPrestigeAmEnabled = !!parsed.autoPrestigeAmEnabled;
-    
-    game.achievements = Array.isArray(parsed.achievements) ? parsed.achievements : [];
-    game.unlockedAchievements = (parsed.unlockedAchievements && typeof parsed.unlockedAchievements === 'object') ? parsed.unlockedAchievements : {};
-
-    // 配列の安全なマッピング（Infinityの混入を各要素ごとに完全に弾く）
-    game.facCounts = DB_FACTORIES.map((_, i) => {
-      const v = Number(parsed.facCounts?.[i]);
-      return Number.isFinite(v) && v >= 0 ? v : 0;
-    });
-
-    game.upgLevels = DB_UPGRADES.map((_, i) => {
-      const v = Number(parsed.upgLevels?.[i]);
-      return Number.isFinite(v) && v >= 0 ? v : 0;
-    });
-
-    game.amUpgLevels = DB_AM_UPGRADES.map((_, i) => {
-      const v = Number(parsed.amUpgLevels?.[i]);
-      return Number.isFinite(v) && v >= 0 ? v : 0;
-    });
-
-    game.tlUpgLevels = DB_TL_UPGRADES.map((_, i) => {
-      const v = Number(parsed.tlUpgLevels?.[i]);
-      return Number.isFinite(v) && v >= 0 ? v : 0;
-    });
-
-// 最終防壁：オブジェクトの型を問わず安全に Infinity/NaN を判定して 0 にリセットする
- 
-
-   
-
-    const upg7 = game.upgLevels && Array.isArray(game.upgLevels) ? (game.upgLevels[7] || 0) : 0;
-    if (upg7 >= 1) {
-      if (document.getElementById("chk-auto-fac")) document.getElementById("chk-auto-fac").checked = !!game.autoFacEnabled;
-      if (document.getElementById("chk-auto-upg")) document.getElementById("chk-auto-upg").checked = !!game.autoUpgEnabled;
-      if (document.getElementById("chk-auto-am")) document.getElementById("chk-auto-am").checked = !!game.autoAmEnabled;
-      if (document.getElementById("chk-auto-pam")) document.getElementById("chk-auto-pam").checked = !!game.autoPrestigeAmEnabled;
-    }
-
-    pushLog("📂 復元完了：前回の世界線データが完全に同期されました。", "var(--color-upgrade)");
-  } catch (e) {
-    console.error("セーブデータのロード中にエラーが発生しました:", e);
+function hardResetGame() {
+  if (confirm("🚨 全データを完全に削除して初期化しますか？")) {
     localStorage.removeItem(STORAGE_KEY);
+    game = JSON.parse(DEFAULT_GAME_STATE);
+    location.reload();
   }
 }
 
-
-// 起動時の強制クリーンアップ
-window.addEventListener("DOMContentLoaded", () => {
-  try {
-    console.log("=== ゲーム初期化開始 ===");
-
-    if (typeof initGameEnvironment === "function") initGameEnvironment();
-    if (typeof buildGameDOM === "function") buildGameDOM();
-    if (typeof loadGameOnLaunch === "function") loadGameOnLaunch();
-    if (typeof refreshUI === "function") refreshUI();
-
-    // ★ これが無いと永遠に数が増えない
-    requestAnimationFrame(executeCoreGameTick);
-
-    console.log("=== ゲームループ起動完了 ===");
-  } catch (e) {
-    console.error("初期化に失敗しました:", e);
-  }
-});
 /**
  * =========================================================================
- * High-Performance Primary Clock Loop & Dynamic Visuals (完全修復版)
+ * High-Performance Primary Clock Loop & Dynamic Visuals
  * =========================================================================
  */
 let cronosPreviousTimestamp = performance.now();
 let lastAutosaveTime = 0;
+let achievementCheckTimer = 0;
 
 function executeCoreGameTick(currentTimestamp) {
-  let baseDeltaTime = (currentTimestamp - cronosPreviousTimestamp) / 1000;
+  const baseDeltaTime = (currentTimestamp - cronosPreviousTimestamp) / 1000;
+  const dimensionalDeltaTime = baseDeltaTime * getGameSpeedMultiplier();
   cronosPreviousTimestamp = currentTimestamp;
 
-  // デルタタイムの異常爆発を防止
-  if (!Number.isFinite(baseDeltaTime) || baseDeltaTime < 0) baseDeltaTime = 0;
-  baseDeltaTime = Math.min(baseDeltaTime, 0.1);
+  game.sessionTime += dimensionalDeltaTime;
+  game.totalTime += dimensionalDeltaTime;
+  game.energy += getTotalCps() * dimensionalDeltaTime;
 
-  const gameSpeed = (typeof getGameSpeedMultiplier === "function") ? getGameSpeedMultiplier() : 1;
-  const dimensionalDeltaTime = baseDeltaTime * Math.max(0, gameSpeed);
+  runInternalAutomation();
 
-  game.sessionTime = (game.sessionTime || 0) + dimensionalDeltaTime;
-  game.totalTime = (game.totalTime || 0) + dimensionalDeltaTime;
-  
-  const totalCpsVal = (typeof getTotalCps === "function") ? getTotalCps() : new Decimal(0);
-  const cpsDecimal = __safeDecimalParse(totalCpsVal, 0);
-  
-  // 安全な加算処理
-  const energyAdd = cpsDecimal.mul(dimensionalDeltaTime);
-  const currentEnergy = __safeDecimalParse(game.energy, 0);
-  game.energy = currentEnergy.plus(energyAdd);
-
-  if (typeof runInternalAutomation === "function") {
-    runInternalAutomation();
-  }
-
+  // 実績判定を毎フレームまたは適宜実行（負荷軽減のためタイマーまたは毎フレーム処理）
   if (typeof checkAchievements === "function") {
     checkAchievements();
   }
 
-  // 動的ビジュアル演出の安全な数値変換（1e308などの危険なフォールバックを廃止）
-  let visualEnergyNum = 0;
-  try {
-    visualEnergyNum = game.energy.toNumber();
-    if (!Number.isFinite(visualEnergyNum) || visualEnergyNum > 1e308) {
-      visualEnergyNum = 1e307; // 描画上限内に安全に収める
-    }
-  } catch(e) {
-    visualEnergyNum = 0;
-  }
-  updateDynamicCoreAndResourceVisuals(visualEnergyNum);
+  // エネルギー量・進行度に応じた動的ビジュアル演出の更新
+  updateDynamicCoreAndResourceVisuals(game.energy);
 
   if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onTick) {
     window.ModAPI.hooks.onTick.forEach(cb => { try { cb(dimensionalDeltaTime); } catch(e){} });
@@ -3138,12 +2439,47 @@ function executeCoreGameTick(currentTimestamp) {
 
   requestAnimationFrame(executeCoreGameTick);
 }
+
+
+
+function switchMainTab(targetId) {
+  const panes = document.getElementsByClassName("tab-pane");
+  for (let i = 0; i < panes.length; i++) panes[i].classList.remove("active");
+  const buttons = document.getElementsByClassName("tab-trigger-button");
+  for (let i = 0; i < buttons.length; i++) buttons[i].classList.remove("active");
+  
+  const targetPane = document.getElementById(targetId);
+  if (targetPane) targetPane.classList.add("active");
+  if (event && event.target) event.target.classList.add("active");
+}
+
+let stateSpaceKeyGuard = false;
+document.addEventListener("keydown", e => {
+  if (e.code === "Space") {
+    e.preventDefault();
+    if (!stateSpaceKeyGuard) { stateSpaceKeyGuard = true; if (typeof handleCoreClick === "function") handleCoreClick(null); }
+  }
+});
+document.addEventListener("keyup", e => { if (e.code === "Space") stateSpaceKeyGuard = false; });
+
+window.addEventListener("DOMContentLoaded", () => {
+  if (typeof buildGameDOM === "function") buildGameDOM();
+  if (typeof loadGameOnLaunch === "function") loadGameOnLaunch();
+  cronosPreviousTimestamp = performance.now();
+  requestAnimationFrame(executeCoreGameTick);
+});
 /**
  =========================================================================
  * 🌈 フルスペクトル・ダイナミック演出 & 粒子パーティクルシステム
+ * （決定論的カラー割当・文字色とコア色を常に同じ・同一段階中は不変）
+ * 使い方：既存の関連スクリプトをこのファイルで完全に置き換えてください
  =========================================================================
  */
+
 (function() {
+  /* -------------------------
+     基本CSS（1回だけ追加）
+     ------------------------- */
   if (!document.getElementById('deterministic-visuals-style')) {
     const s = document.createElement('style');
     s.id = 'deterministic-visuals-style';
@@ -3155,54 +2491,102 @@ function executeCoreGameTick(currentTimestamp) {
     document.head.appendChild(s);
   }
 
+  /* -------------------------
+     ヘルパー
+     ------------------------- */
   function hsl(h, s, l) { return `hsl(${Math.round((h + 360) % 360)}, ${Math.round(s)}%, ${Math.round(l)}%)`; }
   function hslaFromHsl(hslStr, a = 0.08) { return hslStr.replace(/^hsl\(/, 'hsla(').replace(/\)$/, `, ${a})`); }
 
+  // 決定論的に stage -> hue を返す（ランダム無し）
+  // Golden angle を使って均等分布。stage が同じなら常に同じ hue。
   function hueForStage(stage) {
-    const GOLDEN_ANGLE = 137.508;
-    const startHue = 190;
+    const GOLDEN_ANGLE = 137.508; // degrees
+    const startHue = 190; // 水色寄りの基準
     return (startHue + stage * GOLDEN_ANGLE) % 360;
   }
 
-  const lastState = new WeakMap();
+  // 要素に色を強制適用（通常要素 / SVG 対応）
+  function applyColorToElement(el, color, glow = '0 0 18px rgba(0,0,0,0.18)') {
+    if (!el) return;
+    try {
+      el.style.setProperty('border-color', color, 'important');
+      el.style.setProperty('border-style', 'solid', 'important');
+      el.style.setProperty('border-width', '3px', 'important');
+      el.style.setProperty('box-shadow', glow, 'important');
+      el.style.setProperty('outline', `2px solid ${color}`, 'important');
+      el.style.setProperty('outline-offset', '2px', 'important');
+      el.style.setProperty('background-color', hslaFromHsl(color, 0.06), 'important');
+      el.style.setProperty('color', color, 'important');
+    } catch (e) {}
+    try {
+      if (el instanceof SVGElement || (el.tagName && el.tagName.toLowerCase() === 'svg')) {
+        el.style.setProperty('stroke', color, 'important');
+        el.style.setProperty('fill', color, 'important');
+        el.setAttribute('stroke', color);
+        el.setAttribute('fill', color);
+        const children = el.querySelectorAll && el.querySelectorAll('path, circle, rect, polygon, g');
+        if (children && children.length) {
+          children.forEach(ch => {
+            try {
+              ch.style.setProperty('stroke', color, 'important');
+              ch.style.setProperty('fill', color, 'important');
+              ch.setAttribute('stroke', color);
+              ch.setAttribute('fill', color);
+            } catch (e) {}
+          });
+        }
+      }
+    } catch (e) {}
+  }
 
- window.updateDynamicCoreAndResourceVisuals = function(currentEnergy) {
+  /* -------------------------
+     状態保持（同一段階中は色を変えない）
+     ------------------------- */
+  const lastState = new WeakMap(); // key: coreBtn element -> { stage, hue }
+
+  /* -------------------------
+     メイン：updateDynamicCoreAndResourceVisuals
+     - stage は e1~e10 => 1, e11~e20 => 2, ... 最大1000
+     - 文字色とコア色は同じ（決定論的）
+     - 同一段階中は再適用しない（ちらつき防止）
+     ------------------------- */
+  window.updateDynamicCoreAndResourceVisuals = function(currentEnergy) {
     const coreBtn = document.getElementById('coreTrigger');
     const energyValElem = document.getElementById('v-energy');
     if (!coreBtn || !energyValElem) return;
 
     const productButtons = document.querySelectorAll('.shop-item-btn, .product-btn, .upg-btn, button[id*=shop], button[id*=buy]');
 
-    // Decimal や各種形式に対応した堅牢な指数計算
-    let exponent = 0;
-    try {
-      if (currentEnergy && typeof currentEnergy.log10 === 'function') {
-        const logVal = currentEnergy.log10();
-        exponent = (logVal.isFinite && logVal.isFinite()) ? logVal.toNumber() : 0;
-      } else {
-        const num = Number(currentEnergy);
-        exponent = (isFinite(num) && num > 0) ? Math.log10(num) : 0;
-      }
-    } catch(e) {
-      exponent = 0;
-    }
-    exponent = Math.max(0, Math.min(10000, exponent));
+    // currentEnergy を数値化して対数を取る
+    const energyNum = (typeof currentEnergy === 'number') ? currentEnergy : Number(currentEnergy);
+    const exponent = (isFinite(energyNum) && energyNum > 0) ? Math.max(0, Math.min(10000, Math.log10(energyNum))) : 0;
 
+    // stage 計算（e1~e10 => stage=1, e11~e20 => stage=2, ...）
     let stage = 1;
     if (exponent >= 1) stage = Math.floor((exponent - 1) / 10) + 1;
     stage = Math.max(1, Math.min(1000, stage));
 
+    // 前回 state を取得
     const prev = lastState.get(coreBtn) || { stage: null, hue: null };
+
+    // 同一段階中は何もしない（虹域 e10000 以上は例外で常に適用）
     if (prev.stage === stage && exponent < 10000) return;
 
+    // 決定論的に hue を決定（stage のみで決まる）
     let hue = hueForStage(stage);
+
+    // 明度・彩度（stage に応じて変化）
     const t = (stage - 1) / 999;
-    const lightness = 75 - (t * 40);
-    const saturation = 70 + (t * 20);
+    const lightness = 75 - (t * 40); // 75 -> 35
+    const saturation = 70 + (t * 20); // 70 -> 90
+
+    // 文字色（単色）とコア色は同じ
     const textColor = hsl(hue, saturation, lightness);
 
+    // 保存（次回比較用）
     lastState.set(coreBtn, { stage: stage, hue: hue });
 
+    // e10000 以上（虹域）処理（例外）
     if (exponent >= 10000) {
       const rainbow = 'linear-gradient(90deg, #00f2fe, #4facfe, #00ffcc, #ffea00, #ff0055, #9d4edd, #00f2fe)';
       energyValElem.style.setProperty('background', rainbow, 'important');
@@ -3220,10 +2604,20 @@ function executeCoreGameTick(currentTimestamp) {
       coreBtn.style.setProperty('animation', 'rainbowFadeIn 0.8s ease-in-out, rainbowFlowRightToLeft 3s linear infinite', 'important');
       coreBtn.style.setProperty('box-shadow', '0 0 36px rgba(255,255,255,0.9)', 'important');
       coreBtn.style.setProperty('border-width', '6px', 'important');
+
+      productButtons.forEach(btn => {
+        try {
+          btn.style.setProperty('border-color', '#00f2fe', 'important');
+          btn.style.setProperty('box-shadow', '0 0 10px rgba(0,242,254,0.2)', 'important');
+          btn.style.setProperty('background-color', 'rgba(0,242,254,0.08)', 'important');
+        } catch (e) {}
+      });
       return;
     }
 
+    // stage < 250: 単色運用（文字とコアを同色に）
     if (stage < 250) {
+      // 文字（単色）
       energyValElem.style.setProperty('animation', 'none', 'important');
       energyValElem.style.setProperty('background', 'none', 'important');
       energyValElem.style.removeProperty('background-clip');
@@ -3232,17 +2626,183 @@ function executeCoreGameTick(currentTimestamp) {
       energyValElem.style.setProperty('-webkit-text-fill-color', 'initial', 'important');
       energyValElem.style.setProperty('text-shadow', `0 0 18px ${hslaFromHsl(textColor, 0.45)}`, 'important');
 
+      // コアを文字と同じ色にする（ボーダー・グローも同色で統一）
       try {
         coreBtn.style.setProperty('background', 'none', 'important');
         coreBtn.style.setProperty('border-color', textColor, 'important');
         coreBtn.style.setProperty('box-shadow', `0 0 26px ${hslaFromHsl(textColor, 0.65)}`, 'important');
         coreBtn.style.setProperty('border-width', '4px', 'important');
         coreBtn.style.setProperty('animation', 'none', 'important');
+        // SVG 内部がある場合は内部パスにも同色を適用
+        const coreSvg = coreBtn.querySelector && coreBtn.querySelector('svg');
+        if (coreSvg) {
+          const paths = coreSvg.querySelectorAll('path, circle, rect');
+          paths.forEach(p => {
+            try { p.style.setProperty('fill', textColor, 'important'); p.style.setProperty('stroke', textColor, 'important'); } catch (e) {}
+          });
+        }
       } catch (e) {}
+
+      // 商品ボタン群も同色で統一
+      productButtons.forEach(btn => {
+        try {
+          btn.style.setProperty('border-color', textColor, 'important');
+          btn.style.setProperty('box-shadow', `0 0 12px ${hslaFromHsl(textColor, 0.45)}`, 'important');
+          btn.style.setProperty('background-color', hslaFromHsl(textColor, 0.06), 'important');
+        } catch (e) {}
+      });
+
+      return;
+    }
+
+    // stage >= 250: 文字は単色維持、コアは文字色を基準に控えめなグラデーションを許可
+    {
+      // 文字は単色
+      energyValElem.style.setProperty('animation', 'none', 'important');
+      energyValElem.style.setProperty('background', 'none', 'important');
+      energyValElem.style.removeProperty('background-clip');
+      energyValElem.style.removeProperty('-webkit-background-clip');
+      energyValElem.style.setProperty('color', textColor, 'important');
+      energyValElem.style.setProperty('-webkit-text-fill-color', 'initial', 'important');
+      energyValElem.style.setProperty('text-shadow', `0 0 20px rgba(0,0,0,0.06)`, 'important');
+
+      // コアは文字色を基準に枠線・グローを合わせ、内部に控えめなグラデーションを入れる
+      const accent1 = hsl((hue + 60) % 360, Math.max(50, saturation - 5), Math.max(35, lightness - 8));
+      const accent2 = hsl((hue + 180) % 360, Math.max(50, saturation - 10), Math.max(30, lightness - 12));
+      try {
+        const coreGrad = `linear-gradient(135deg, ${textColor} 0%, ${accent1} 45%, ${accent2} 100%)`;
+        coreBtn.style.setProperty('background', coreGrad, 'important');
+        coreBtn.style.setProperty('border-color', textColor, 'important'); // 枠線は文字色に合わせる
+        coreBtn.style.setProperty('box-shadow', `0 0 36px ${hslaFromHsl(textColor, 0.55)}`, 'important');
+        coreBtn.style.setProperty('border-width', '5px', 'important');
+        coreBtn.style.setProperty('animation', 'corePulse 1.2s ease-in-out infinite', 'important');
+      } catch (e) {}
+
+      // SVG 内部がある場合は内部パスに main/textColor を優先して適用（交互に）
+      const coreSvg = coreBtn.querySelector && coreBtn.querySelector('svg');
+      if (coreSvg) {
+        try {
+          const paths = coreSvg.querySelectorAll('path, circle, rect');
+          paths.forEach((p, i) => {
+            const c = (i % 3 === 0) ? textColor : (i % 3 === 1) ? accent1 : accent2;
+            try { p.style.setProperty('fill', c, 'important'); p.style.setProperty('stroke', c, 'important'); } catch (e) {}
+          });
+        } catch (e) {}
+      }
+
+      // 商品ボタン群は文字色を基準にアクセントを混ぜるが、主要色は文字色に合わせる
+      productButtons.forEach((btn, i) => {
+        const c = (i % 3 === 0) ? textColor : (i % 3 === 1) ? accent1 : accent2;
+        try {
+          btn.style.setProperty('border-color', textColor, 'important');
+          btn.style.setProperty('box-shadow', `0 0 14px ${hslaFromHsl(c, 0.45)}`, 'important');
+          btn.style.setProperty('background-color', hslaFromHsl(c, 0.12), 'important');
+        } catch (e) {}
+      });
     }
   };
+
+  /* -------------------------
+     パーティクル（既存機能）
+     ------------------------- */
+  window.spawnParticleEffect = function(type = "fireworks", originX = window.innerWidth / 2, originY = window.innerHeight / 2) {
+    const container = document.body;
+    const particleCount = type === "fireworks" ? 28 : 20;
+    const colorPool = ["#00f2fe","#4facfe","#00ffcc","#a8ff00","#ffea00","#ff758c","#ff0055","#9d4edd","#ffd166","#06d6a0","#118ab2","#073b4c","#f72585","#b5179e","#7209b7","#3a0ca3","#ffb4a2","#e5989b","#6a4c93","#2b2d42","#8ecae6","#219ebc","#ffb703","#fb8500"];
+    for (let i=0;i<particleCount;i++){
+      const el = document.createElement("div");
+      el.className = "floating-particle-unit";
+      let content = "";
+      if (type === "fireworks") content = ["✨","✦","✺","✶"][Math.floor(Math.random()*4)];
+      else if (type === "petals") content = ["🌸","🌺","❀"][Math.floor(Math.random()*3)];
+      else content = ["🎉","🎊","📎","🔷"][Math.floor(Math.random()*4)];
+      const chosenColor = colorPool[Math.floor(Math.random()*colorPool.length)];
+      el.innerHTML = content;
+      el.style.position = "fixed";
+      el.style.left = originX + (Math.random()*12 - 6) + "px";
+      el.style.top = originY + (Math.random()*12 - 6) + "px";
+      el.style.fontSize = (Math.random()*18 + 10) + "px";
+      el.style.color = chosenColor;
+      el.style.zIndex = "999999";
+      el.style.pointerEvents = "none";
+      el.style.textShadow = `0 0 8px ${hslaFromHsl(hslFromHexOrHsl(chosenColor), 0.6)}`;
+      container.appendChild(el);
+      const angle = Math.random()*Math.PI*2;
+      const distance = Math.random()*220 + 80;
+      const targetX = Math.cos(angle)*distance;
+      const targetY = Math.sin(angle)*distance - (type === "petals" ? -120 : 60);
+      const animation = el.animate([
+        { transform: 'translate(0,0) scale(0.3) rotate(0deg)', opacity: 1 },
+        { transform: `translate(${targetX}px, ${targetY}px) scale(${1 + Math.random()*0.8}) rotate(${Math.random()*720}deg)`, opacity: 0 }
+      ], { duration: Math.random()*1000 + 800, easing: 'cubic-bezier(0.22,1,0.36,1)' });
+      animation.onfinish = () => el.remove();
+    }
+    function hslFromHexOrHsl(col){
+      if (!col) return 'hsl(0,0%,100%)';
+      if (col.startsWith('hsl')) return col;
+      try {
+        let h = col.replace('#','');
+        if (h.length===3) h = h.split('').map(c=>c+c).join('');
+        const r = parseInt(h.substring(0,2),16), g = parseInt(h.substring(2,4),16), b = parseInt(h.substring(4,6),16);
+        const rf=r/255, gf=g/255, bf=b/255;
+        const max=Math.max(rf,gf,bf), min=Math.min(rf,gf,bf);
+        let hh=0, ss=0, ll=(max+min)/2;
+        if (max!==min){
+          const d=max-min;
+          ss = ll>0.5 ? d/(2-max-min) : d/(max+min);
+          switch(max){
+            case rf: hh = (gf-bf)/d + (gf<bf?6:0); break;
+            case gf: hh = (bf-rf)/d + 2; break;
+            case bf: hh = (rf-gf)/d + 4; break;
+          }
+          hh *= 60;
+        }
+        return `hsl(${Math.round(hh)}, ${Math.round(ss*100)}%, ${Math.round(ll*100)}%)`;
+      } catch(e){ return 'hsl(0,0%,100%)'; }
+    }
+  };
+
+  /* -------------------------
+     実績トーストフック（存在すれば差し替え）
+     ------------------------- */
+  try {
+    if (typeof createToast === 'function') {
+      const originalCreateToast = window.createToast;
+      window.createToast = function(title, desc) {
+        try { originalCreateToast(title, desc); } catch(e) {}
+        try { window.spawnParticleEffect('fireworks', window.innerWidth - 150, 80); } catch(e) {}
+        try { window.spawnParticleEffect('confetti', window.innerWidth - 200, 100); } catch(e) {}
+      };
+    }
+  } catch(e) {}
+
+  /* -------------------------
+     コアクリック時のパーティクルバインド
+     ------------------------- */
+  try {
+    const coreBtnElem = document.getElementById('coreTrigger');
+    if (coreBtnElem && !coreBtnElem.__visuals_click_bound) {
+      coreBtnElem.addEventListener('click', (e) => {
+        if (Math.random() < 0.75) window.spawnParticleEffect('fireworks', e.clientX, e.clientY);
+      });
+      coreBtnElem.__visuals_click_bound = true;
+    }
+  } catch(e) {}
+
+  /* -------------------------
+     自動ポーリング（任意）
+     ------------------------- */
+  if (!window.__visualsEnergyPoller) {
+    window.__visualsEnergyPoller = setInterval(() => {
+      try {
+        const energy = (typeof game !== 'undefined' && typeof game.energy !== 'undefined') ? game.energy : null;
+        if (energy !== null) window.updateDynamicCoreAndResourceVisuals(energy);
+      } catch(e) {}
+    }, 250);
+  }
+
 })();
-  /**
+/**
  * =========================================================================
  * 実績達成判定システムの組み込み
  * =========================================================================
