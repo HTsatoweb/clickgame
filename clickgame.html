@@ -2866,35 +2866,30 @@ function loadGameOnLaunch() {
       }
       const parsed = JSON.parse(rawData);
       
-      // 直接の Object.assign による Infinity 汚染を防ぐため、一度数値をサニタイズ
-      if (parsed.energy === Infinity || parsed.energy === "Infinity") parsed.energy = 0;
-      
-      game = Object.assign({}, game, parsed);
-      
-      // Decimal 型の復元保証（安全なパース関数を通す）
+      // Object.assign による型汚染を完全排除し、すべて Decimal 型として安全に復元する
       game.energy = __safeDecimalParse(parsed.energy, 0);
       game.totalClicks = __safeDecimalParse(parsed.totalClicks, 0);
       game.antimatter = __safeDecimalParse(parsed.antimatter, 0);
       game.timeShards = __safeDecimalParse(parsed.timeShards, 0);
       game.galaxyNodes = __safeDecimalParse(parsed.galaxyNodes, 0);
+      
+      game.prestigeAmCount = parsed.prestigeAmCount ?? 0;
+      game.prestigeTlCount = parsed.prestigeTlCount ?? 0;
+      game.prestigeGxCount = parsed.prestigeGxCount ?? 0;
+      game.sessionTime = parsed.sessionTime ?? 0;
+      game.totalTime = parsed.totalTime ?? 0;
+      game.autoFacEnabled = parsed.autoFacEnabled ?? false;
+      game.autoUpgEnabled = parsed.autoUpgEnabled ?? false;
+      game.autoAmEnabled = parsed.autoAmEnabled ?? false;
+      game.autoPrestigeAmEnabled = parsed.autoPrestigeAmEnabled ?? false;
+      game.achievements = parsed.achievements ?? [];
+      game.unlockedAchievements = parsed.unlockedAchievements ?? {};
 
       // 配列データの安全性確保
-      game.facCounts = DB_FACTORIES.map((_, i) => {
-        const v = parsed.facCounts?.[i];
-        return (typeof v === 'number' && isFinite(v)) ? v : 0;
-      });
-      game.upgLevels = DB_UPGRADES.map((_, i) => {
-        const v = parsed.upgLevels?.[i];
-        return (typeof v === 'number' && isFinite(v)) ? v : 0;
-      });
-      game.amUpgLevels = DB_AM_UPGRADES.map((_, i) => {
-        const v = parsed.amUpgLevels?.[i];
-        return (typeof v === 'number' && isFinite(v)) ? v : 0;
-      });
-      game.tlUpgLevels = DB_TL_UPGRADES.map((_, i) => {
-        const v = parsed.tlUpgLevels?.[i];
-        return (typeof v === 'number' && isFinite(v)) ? v : 0;
-      });
+      game.facCounts = DB_FACTORIES.map((_, i) => parsed.facCounts?.[i] ?? 0);
+      game.upgLevels = DB_UPGRADES.map((_, i) => parsed.upgLevels?.[i] ?? 0);
+      game.amUpgLevels = DB_AM_UPGRADES.map((_, i) => parsed.amUpgLevels?.[i] ?? 0);
+      game.tlUpgLevels = DB_TL_UPGRADES.map((_, i) => parsed.tlUpgLevels?.[i] ?? 0);
 
       const upg7 = game.upgLevels && Array.isArray(game.upgLevels) ? (game.upgLevels[7] || 0) : 0;
       if (upg7 >= 1) {
@@ -3061,22 +3056,33 @@ window.addEventListener("DOMContentLoaded", () => {
 
   const lastState = new WeakMap();
 
-  window.updateDynamicCoreAndResourceVisuals = function(currentEnergy) {
+ window.updateDynamicCoreAndResourceVisuals = function(currentEnergy) {
     const coreBtn = document.getElementById('coreTrigger');
     const energyValElem = document.getElementById('v-energy');
     if (!coreBtn || !energyValElem) return;
 
     const productButtons = document.querySelectorAll('.shop-item-btn, .product-btn, .upg-btn, button[id*=shop], button[id*=buy]');
 
-    const energyNum = (typeof currentEnergy === 'number') ? currentEnergy : Number(currentEnergy);
-    const exponent = (isFinite(energyNum) && energyNum > 0) ? Math.max(0, Math.min(10000, Math.log10(energyNum))) : 0;
+    // Decimal や各種形式に対応した堅牢な指数計算
+    let exponent = 0;
+    try {
+      if (currentEnergy && typeof currentEnergy.log10 === 'function') {
+        const logVal = currentEnergy.log10();
+        exponent = (logVal.isFinite && logVal.isFinite()) ? logVal.toNumber() : 0;
+      } else {
+        const num = Number(currentEnergy);
+        exponent = (isFinite(num) && num > 0) ? Math.log10(num) : 0;
+      }
+    } catch(e) {
+      exponent = 0;
+    }
+    exponent = Math.max(0, Math.min(10000, exponent));
 
     let stage = 1;
     if (exponent >= 1) stage = Math.floor((exponent - 1) / 10) + 1;
     stage = Math.max(1, Math.min(1000, stage));
 
     const prev = lastState.get(coreBtn) || { stage: null, hue: null };
-
     if (prev.stage === stage && exponent < 10000) return;
 
     let hue = hueForStage(stage);
@@ -3104,14 +3110,6 @@ window.addEventListener("DOMContentLoaded", () => {
       coreBtn.style.setProperty('animation', 'rainbowFadeIn 0.8s ease-in-out, rainbowFlowRightToLeft 3s linear infinite', 'important');
       coreBtn.style.setProperty('box-shadow', '0 0 36px rgba(255,255,255,0.9)', 'important');
       coreBtn.style.setProperty('border-width', '6px', 'important');
-
-      productButtons.forEach(btn => {
-        try {
-          btn.style.setProperty('border-color', '#00f2fe', 'important');
-          btn.style.setProperty('box-shadow', '0 0 10px rgba(0,242,254,0.2)', 'important');
-          btn.style.setProperty('background-color', 'rgba(0,242,254,0.08)', 'important');
-        } catch (e) {}
-      });
       return;
     }
 
@@ -3130,22 +3128,7 @@ window.addEventListener("DOMContentLoaded", () => {
         coreBtn.style.setProperty('box-shadow', `0 0 26px ${hslaFromHsl(textColor, 0.65)}`, 'important');
         coreBtn.style.setProperty('border-width', '4px', 'important');
         coreBtn.style.setProperty('animation', 'none', 'important');
-        const coreSvg = coreBtn.querySelector && coreBtn.querySelector('svg');
-        if (coreSvg) {
-          const paths = coreSvg.querySelectorAll('path, circle, rect');
-          paths.forEach(p => {
-            try { p.style.setProperty('fill', textColor, 'important'); p.style.setProperty('stroke', textColor, 'important'); } catch (e) {}
-          });
-        }
       } catch (e) {}
-
-      productButtons.forEach(btn => {
-        try {
-          btn.style.setProperty('border-color', textColor, 'important');
-          btn.style.setProperty('box-shadow', `0 0 12px ${hslaFromHsl(textColor, 0.45)}`, 'important');
-          btn.style.setProperty('background-color', hslaFromHsl(textColor, 0.06), 'important');
-        } catch (e) {}
-      });
     }
   };
 })();
