@@ -1449,7 +1449,32 @@ function loadModFromFile(event) {
   };
   reader.readAsText(file);
 }
+// ==========================================
+// 🛡️ 安全なDecimal計算ヘルパー（プロトタイプを汚染しない方式）
+// ==========================================
+function safeAdd(a, b) {
+  try {
+    const da = __safeDecimalParse(a);
+    const db = __safeDecimalParse(b);
+    const res = da.plus(db);
+    if (!res.isFinite() || res.isNaN()) return new Decimal(0);
+    return res;
+  } catch (e) {
+    return new Decimal(0);
+  }
+}
 
+function safeMul(a, b) {
+  try {
+    const da = __safeDecimalParse(a);
+    const db = __safeDecimalParse(b);
+    const res = da.mul(db);
+    if (!res.isFinite() || res.isNaN()) return new Decimal(0);
+    return res;
+  } catch (e) {
+    return new Decimal(0);
+  }
+}
 /**
  =========================================================================
  * 🛡️ 完全堅牢版・高精度科学表記フォーマッター (Decimal完全対応)
@@ -2882,52 +2907,88 @@ function saveGameManual() {
   } catch (e) { console.error(e); }
 }
 
+/**
+ * =========================================================================
+ * 🛡️ 完全防壁型セーブデータ・ロードインターフェース (確定修正版)
+ * =========================================================================
+ */
 function loadGameOnLaunch() {
   try {
     const rawData = localStorage.getItem(STORAGE_KEY);
-    if (rawData) {
-      if (typeof deserializeGameData === "function") {
-        deserializeGameData(rawData);
-      }
-      const parsed = JSON.parse(rawData);
-      
-      // Object.assign による型汚染を完全排除し、すべて Decimal 型として安全に復元する
-      game.energy = __safeDecimalParse(parsed.energy, 0);
-      game.totalClicks = __safeDecimalParse(parsed.totalClicks, 0);
-      game.antimatter = __safeDecimalParse(parsed.antimatter, 0);
-      game.timeShards = __safeDecimalParse(parsed.timeShards, 0);
-      game.galaxyNodes = __safeDecimalParse(parsed.galaxyNodes, 0);
-      
-      game.prestigeAmCount = parsed.prestigeAmCount ?? 0;
-      game.prestigeTlCount = parsed.prestigeTlCount ?? 0;
-      game.prestigeGxCount = parsed.prestigeGxCount ?? 0;
-      game.sessionTime = parsed.sessionTime ?? 0;
-      game.totalTime = parsed.totalTime ?? 0;
-      game.autoFacEnabled = parsed.autoFacEnabled ?? false;
-      game.autoUpgEnabled = parsed.autoUpgEnabled ?? false;
-      game.autoAmEnabled = parsed.autoAmEnabled ?? false;
-      game.autoPrestigeAmEnabled = parsed.autoPrestigeAmEnabled ?? false;
-      game.achievements = parsed.achievements ?? [];
-      game.unlockedAchievements = parsed.unlockedAchievements ?? {};
+    if (!rawData) return;
 
-      // 配列データの安全性確保
-      game.facCounts = DB_FACTORIES.map((_, i) => parsed.facCounts?.[i] ?? 0);
-      game.upgLevels = DB_UPGRADES.map((_, i) => parsed.upgLevels?.[i] ?? 0);
-      game.amUpgLevels = DB_AM_UPGRADES.map((_, i) => parsed.amUpgLevels?.[i] ?? 0);
-      game.tlUpgLevels = DB_TL_UPGRADES.map((_, i) => parsed.tlUpgLevels?.[i] ?? 0);
-
-      const upg7 = game.upgLevels && Array.isArray(game.upgLevels) ? (game.upgLevels[7] || 0) : 0;
-      if (upg7 >= 1) {
-        if (document.getElementById("chk-auto-fac")) document.getElementById("chk-auto-fac").checked = !!game.autoFacEnabled;
-        if (document.getElementById("chk-auto-upg")) document.getElementById("chk-auto-upg").checked = !!game.autoUpgEnabled;
-        if (document.getElementById("chk-auto-am")) document.getElementById("chk-auto-am").checked = !!game.autoAmEnabled;
-        if (document.getElementById("chk-auto-pam")) document.getElementById("chk-auto-pam").checked = !!game.autoPrestigeAmEnabled;
-      }
-      pushLog("📂 復元完了：前回の世界線データが完全に同期されました。", "var(--color-upgrade)");
+    // 文字列ベースで明らかな異常値が入っている場合は即座にパージ
+    if (rawData.includes("Infinity") || rawData.includes("NaN") || rawData.includes("null")) {
+      console.warn("⚠️ 異常なデータ表現を検出しました。セーブデータを自動初期化します。");
+      localStorage.removeItem(STORAGE_KEY);
+      return;
     }
-  } catch (e) { console.error(e); }
-}
 
+    const parsed = JSON.parse(rawData);
+    if (!parsed || typeof parsed !== 'object') return;
+
+    // ⚠️ 危険な外部関数 deserializeGameData による汚染を防ぐため、ここでは直接呼び出さない
+
+    // すべて __safeDecimalParse を経由させて安全に復元
+    game.energy = __safeDecimalParse(parsed.energy, 0);
+    game.totalClicks = __safeDecimalParse(parsed.totalClicks, 0);
+    game.antimatter = __safeDecimalParse(parsed.antimatter, 0);
+    game.timeShards = __safeDecimalParse(parsed.timeShards, 0);
+    game.galaxyNodes = __safeDecimalParse(parsed.galaxyNodes, 0);
+
+    game.prestigeAmCount = Number.isFinite(Number(parsed.prestigeAmCount)) ? Number(parsed.prestigeAmCount) : 0;
+    game.prestigeTlCount = Number.isFinite(Number(parsed.prestigeTlCount)) ? Number(parsed.prestigeTlCount) : 0;
+    game.prestigeGxCount = Number.isFinite(Number(parsed.prestigeGxCount)) ? Number(parsed.prestigeGxCount) : 0;
+    game.sessionTime = Number.isFinite(Number(parsed.sessionTime)) ? Number(parsed.sessionTime) : 0;
+    game.totalTime = Number.isFinite(Number(parsed.totalTime)) ? Number(parsed.totalTime) : 0;
+
+    game.autoFacEnabled = !!parsed.autoFacEnabled;
+    game.autoUpgEnabled = !!parsed.autoUpgEnabled;
+    game.autoAmEnabled = !!parsed.autoAmEnabled;
+    game.autoPrestigeAmEnabled = !!parsed.autoPrestigeAmEnabled;
+    
+    game.achievements = Array.isArray(parsed.achievements) ? parsed.achievements : [];
+    game.unlockedAchievements = (parsed.unlockedAchievements && typeof parsed.unlockedAchievements === 'object') ? parsed.unlockedAchievements : {};
+
+    // 配列の安全なマッピング（Infinityの混入を各要素ごとに完全に弾く）
+    game.facCounts = DB_FACTORIES.map((_, i) => {
+      const v = Number(parsed.facCounts?.[i]);
+      return Number.isFinite(v) && v >= 0 ? v : 0;
+    });
+
+    game.upgLevels = DB_UPGRADES.map((_, i) => {
+      const v = Number(parsed.upgLevels?.[i]);
+      return Number.isFinite(v) && v >= 0 ? v : 0;
+    });
+
+    game.amUpgLevels = DB_AM_UPGRADES.map((_, i) => {
+      const v = Number(parsed.amUpgLevels?.[i]);
+      return Number.isFinite(v) && v >= 0 ? v : 0;
+    });
+
+    game.tlUpgLevels = DB_TL_UPGRADES.map((_, i) => {
+      const v = Number(parsed.tlUpgLevels?.[i]);
+      return Number.isFinite(v) && v >= 0 ? v : 0;
+    });
+
+    // 最終防壁：もしロード結果がなぜか Infinity になっていたら強制的に0にする
+    if (!game.energy.isFinite() || game.energy.isNaN()) game.energy = new Decimal(0);
+    if (!game.antimatter.isFinite() || game.antimatter.isNaN()) game.antimatter = new Decimal(0);
+
+    const upg7 = game.upgLevels && Array.isArray(game.upgLevels) ? (game.upgLevels[7] || 0) : 0;
+    if (upg7 >= 1) {
+      if (document.getElementById("chk-auto-fac")) document.getElementById("chk-auto-fac").checked = !!game.autoFacEnabled;
+      if (document.getElementById("chk-auto-upg")) document.getElementById("chk-auto-upg").checked = !!game.autoUpgEnabled;
+      if (document.getElementById("chk-auto-am")) document.getElementById("chk-auto-am").checked = !!game.autoAmEnabled;
+      if (document.getElementById("chk-auto-pam")) document.getElementById("chk-auto-pam").checked = !!game.autoPrestigeAmEnabled;
+    }
+
+    pushLog("📂 復元完了：前回の世界線データが完全に同期されました。", "var(--color-upgrade)");
+  } catch (e) {
+    console.error("セーブデータのロード中にエラーが発生しました:", e);
+    localStorage.removeItem(STORAGE_KEY);
+  }
+}
 // ==========================================
 // 🛡️ 正しい数値崩壊防壁パッチ（修正版）
 // ==========================================
