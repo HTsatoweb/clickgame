@@ -2122,7 +2122,16 @@ const SoundManager = {
       osc.stop(now + 0.08);
     }
   },
-
+const btnResetOp = document.getElementById("btnResetOp");
+if (btnResetOp) {
+  btnResetOp.addEventListener("click", () => {
+    const gain = getGainOmegaPoints();
+    if (gain.lte(0)) return;
+    if (confirm(`Ω転生を実行しますか？\n+${formatValue(gain)} OP を獲得し、下位リソースをリセットします。`)) {
+      executePrestigeOmega(gain);
+    }
+  });
+}
   playPart5_LeadMelody(now, t, section, track) {
     const scalesByTrack = [
       [110.00, 146.83, 164.81, 220.00, 293.66, 329.63, 440.00, 587.33],
@@ -2274,7 +2283,22 @@ function refreshUI() {
     if (game.energy >= cost) card.classList.remove("state-disabled");
     else card.classList.add("state-disabled");
   });
+// Ωポイント関連
+const gainOp = getGainOmegaPoints();
+const gainOpElem = document.getElementById("v-gain-op");
+if (gainOpElem) {
+  gainOpElem.textContent = `+${formatValue(gainOp)} OP`;
+}
+const btnOp = document.getElementById("btnResetOp");
+if (btnOp) {
+  btnOp.disabled = gainOp.lte(0);
+}
 
+// 現在のOP表示（どこかに表示したい場合）
+const opDisplay = document.getElementById("v-omega-points");
+if (opDisplay) {
+  opDisplay.textContent = formatValue(game.omegaPoints || 0);
+}
   DB_UPGRADES.forEach(u => {
     const lv = game.upgLevels[u.id];
     const cost = getUpgradeCost(u.id);
@@ -2422,8 +2446,10 @@ function loadGameOnLaunch() {
         document.getElementById("chk-auto-fac").checked = game.autoFacEnabled;
         document.getElementById("chk-auto-upg").checked = game.autoUpgEnabled;
         document.getElementById("chk-auto-am").checked = game.autoAmEnabled;
-        if (document.getElementById("chk-auto-pam")) document.getElementById("chk-auto-pam").checked = game.autoPrestigeAmEnabled;
-      }
+     game.omegaPoints = __safeDecimalParse(parsed.omegaPoints, 0);
+game.prestigeOpCount = Number(parsed.prestigeOpCount) || 0;
+        if (document.getElementById("chk-auto-pam")) document.getElementById("chk-auto-pam").checked = game.autoPrestigeAmEnabled;  
+    }
       pushLog("📂 復元完了：前回の世界線データが完全に同期されました。", "var(--color-upgrade)");
     }
   } catch (e) { console.error(e); }
