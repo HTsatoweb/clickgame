@@ -2963,15 +2963,15 @@ window.addEventListener("DOMContentLoaded", () => {
       });
     }
   };
-})();
+
   /* -------------------------
-     パーティクル（既存機能）
+     パーティクルシステム
      ------------------------- */
   window.spawnParticleEffect = function(type = "fireworks", originX = window.innerWidth / 2, originY = window.innerHeight / 2) {
     const container = document.body;
     const particleCount = type === "fireworks" ? 28 : 20;
     const colorPool = ["#00f2fe","#4facfe","#00ffcc","#a8ff00","#ffea00","#ff758c","#ff0055","#9d4edd","#ffd166","#06d6a0","#118ab2","#073b4c","#f72585","#b5179e","#7209b7","#3a0ca3","#ffb4a2","#e5989b","#6a4c93","#2b2d42","#8ecae6","#219ebc","#ffb703","#fb8500"];
-    for (let i=0;i<particleCount;i++){
+    for (let i=0; i<particleCount; i++){
       const el = document.createElement("div");
       el.className = "floating-particle-unit";
       let content = "";
@@ -2999,33 +2999,34 @@ window.addEventListener("DOMContentLoaded", () => {
       ], { duration: Math.random()*1000 + 800, easing: 'cubic-bezier(0.22,1,0.36,1)' });
       animation.onfinish = () => el.remove();
     }
-    function hslFromHexOrHsl(col){
-      if (!col) return 'hsl(0,0%,100%)';
-      if (col.startsWith('hsl')) return col;
-      try {
-        let h = col.replace('#','');
-        if (h.length===3) h = h.split('').map(c=>c+c).join('');
-        const r = parseInt(h.substring(0,2),16), g = parseInt(h.substring(2,4),16), b = parseInt(h.substring(4,6),16);
-        const rf=r/255, gf=g/255, bf=b/255;
-        const max=Math.max(rf,gf,bf), min=Math.min(rf,gf,bf);
-        let hh=0, ss=0, ll=(max+min)/2;
-        if (max!==min){
-          const d=max-min;
-          ss = ll>0.5 ? d/(2-max-min) : d/(max+min);
-          switch(max){
-            case rf: hh = (gf-bf)/d + (gf<bf?6:0); break;
-            case gf: hh = (bf-rf)/d + 2; break;
-            case bf: hh = (rf-gf)/d + 4; break;
-          }
-          hh *= 60;
-        }
-        return `hsl(${Math.round(hh)}, ${Math.round(ss*100)}%, ${Math.round(ll*100)}%)`;
-      } catch(e){ return 'hsl(0,0%,100%)'; }
-    }
   };
 
+  function hslFromHexOrHsl(col){
+    if (!col) return 'hsl(0,0%,100%)';
+    if (col.startsWith('hsl')) return col;
+    try {
+      let h = col.replace('#','');
+      if (h.length===3) h = h.split('').map(c=>c+c).join('');
+      const r = parseInt(h.substring(0,2),16), g = parseInt(h.substring(2,4),16), b = parseInt(h.substring(4,6),16);
+      const rf=r/255, gf=g/255, bf=b/255;
+      const max=Math.max(rf,gf,bf), min=Math.min(rf,gf,bf);
+      let hh=0, ss=0, ll=(max+min)/2;
+      if (max!==min){
+        const d=max-min;
+        ss = ll>0.5 ? d/(2-max-min) : d/(max+min);
+        switch(max){
+          case rf: hh = (gf-bf)/d + (gf<bf?6:0); break;
+          case gf: hh = (bf-rf)/d + 2; break;
+          case bf: hh = (rf-gf)/d + 4; break;
+        }
+        hh *= 60;
+      }
+      return `hsl(${Math.round(hh)}, ${Math.round(ss*100)}%, ${Math.round(ll*100)}%)`;
+    } catch(e){ return 'hsl(0,0%,100%)'; }
+  }
+
   /* -------------------------
-     実績トーストフック（存在すれば差し替え）
+     実績トーストフック
      ------------------------- */
   try {
     if (typeof createToast === 'function') {
@@ -3052,7 +3053,7 @@ window.addEventListener("DOMContentLoaded", () => {
   } catch(e) {}
 
   /* -------------------------
-     自動ポーリング（任意）
+     自動ポーリング
      ------------------------- */
   if (!window.__visualsEnergyPoller) {
     window.__visualsEnergyPoller = setInterval(() => {
