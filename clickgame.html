@@ -1888,7 +1888,7 @@ function buildGameDOM() {
 }
 /**
  * =========================================================================
- * 物質施設・アップグレードの安全な購入処理システム
+ * 物質施設・アップグレードの安全な購入処理システム（サウンド対応版）
  * =========================================================================
  */
 
@@ -1907,6 +1907,9 @@ function executeBuyFactory(id) {
       // undefinedやNaNだった場合は0にしてから加算
       let currentQty = __sanitizeNumber(game.facCounts[id], 0);
       game.facCounts[id] = currentQty + 1;
+      
+      // 購入成功時に効果音を再生
+      SoundManager.playBuy();
       
       refreshUI();
       pushLog(`🏭 施設購入：${DB_FACTORIES[id].name} を増設しました（所持数: ${game.facCounts[id]}）`, "var(--color-energy)");
@@ -1940,6 +1943,9 @@ function executeBuyUpgrade(id) {
       game.energy -= cost;
       game.upgLevels[id] = currentLvl + 1;
       
+      // 購入成功時に効果音を再生
+      SoundManager.playBuy();
+      
       refreshUI();
       pushLog(`💡 改良成功：${uData.name} (Lv.${game.upgLevels[id]})`, "var(--color-upgrade)");
       
@@ -1971,6 +1977,9 @@ function executeBuyAmUpgrade(id) {
       game.antimatter -= cost;
       game.amUpgLevels[id] = currentLvl + 1;
       
+      // 購入成功時に効果音を再生
+      SoundManager.playBuy();
+      
       refreshUI();
       pushLog(`⚛️ 反物質改良：${auData.name} (Lv.${game.amUpgLevels[id]})`, "var(--color-antimatter)");
     } else {
@@ -1997,6 +2006,9 @@ function executeBuyTlUpgrade(id) {
     if (game.timeShards >= cost) {
       game.timeShards -= cost;
       game.tlUpgLevels[id] = currentLvl + 1;
+      
+      // 購入成功時に効果音を再生
+      SoundManager.playBuy();
       
       refreshUI();
       pushLog(`⏳ 時間律改良：${tuData.name} (Lv.${game.tlUpgLevels[id]})`, "var(--color-timeline)");
