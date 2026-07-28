@@ -748,6 +748,100 @@ button, .btn-action-prestige, .click-core-btn, .card-upgrade-node, .factory-line
 </div>
 
 <script>
+  // ==========================================
+// break_infinity.js が無い環境用のフォールバック
+// ==========================================
+if (typeof Decimal === 'undefined') {
+  console.warn("break_infinity.js が読み込めませんでした。簡易Decimalで動作します（1e308まで）");
+
+  class SimpleDecimal {
+    constructor(value = 0) {
+      this.value = Number(value) || 0;
+      if (!isFinite(this.value)) this.value = 0;
+    }
+
+    plus(v) {
+      const n = (v instanceof SimpleDecimal) ? v.value : Number(v) || 0;
+      return new SimpleDecimal(this.value + n);
+    }
+    sub(v) {
+      const n = (v instanceof SimpleDecimal) ? v.value : Number(v) || 0;
+      return new SimpleDecimal(Math.max(0, this.value - n));
+    }
+    mul(v) {
+      const n = (v instanceof SimpleDecimal) ? v.value : Number(v) || 0;
+      return new SimpleDecimal(this.value * n);
+    }
+    div(v) {
+      const n = (v instanceof SimpleDecimal) ? v.value : Number(v) || 0;
+      return new SimpleDecimal(n === 0 ? 0 : this.value / n);
+    }
+    pow(v) {
+      const n = (v instanceof SimpleDecimal) ? v.value : Number(v) || 0;
+      return new SimpleDecimal(Math.pow(this.value, n));
+    }
+    log10() {
+      return new SimpleDecimal(this.value <= 0 ? 0 : Math.log10(this.value));
+    }
+    floor() {
+      return new SimpleDecimal(Math.floor(this.value));
+    }
+    max(v) {
+      const n = (v instanceof SimpleDecimal) ? v.value : Number(v) || 0;
+      return new SimpleDecimal(Math.max(this.value, n));
+    }
+    min(v) {
+      const n = (v instanceof SimpleDecimal) ? v.value : Number(v) || 0;
+      return new SimpleDecimal(Math.min(this.value, n));
+    }
+    gte(v) {
+      const n = (v instanceof SimpleDecimal) ? v.value : Number(v) || 0;
+      return this.value >= n;
+    }
+    gt(v) {
+      const n = (v instanceof SimpleDecimal) ? v.value : Number(v) || 0;
+      return this.value > n;
+    }
+    lte(v) {
+      const n = (v instanceof SimpleDecimal) ? v.value : Number(v) || 0;
+      return this.value <= n;
+    }
+    lt(v) {
+      const n = (v instanceof SimpleDecimal) ? v.value : Number(v) || 0;
+      return this.value < n;
+    }
+    eq(v) {
+      const n = (v instanceof SimpleDecimal) ? v.value : Number(v) || 0;
+      return this.value === n;
+    }
+    toNumber() {
+      return this.value;
+    }
+    toString() {
+      return String(this.value);
+    }
+    isFinite() {
+      return Number.isFinite(this.value);
+    }
+    isNaN() {
+      return Number.isNaN(this.value);
+    }
+  }
+
+  // 静的メソッドも最低限用意
+  SimpleDecimal.max = function(a, b) {
+    const na = (a instanceof SimpleDecimal) ? a.value : Number(a) || 0;
+    const nb = (b instanceof SimpleDecimal) ? b.value : Number(b) || 0;
+    return new SimpleDecimal(Math.max(na, nb));
+  };
+
+  window.Decimal = SimpleDecimal;
+}
+/**
+ * =========================================================================
+ * Extended Configuration Database Ecosystem (DEEP MASSIVE ARRAY ENHANCEMENT)
+ * =========================================================================
+ */
 const DB_FACTORIES = [
   { id: 0, name: 'パルス・レプリケーター', baseCost: 15, costMultiplier: 1.15, baseCps: 0.1, desc: '量子パルスを複製して極微小の電界を形成。空間を均質な低極振動状態に維持して無限の出力を担保する基本基礎ラインの基盤セクター。' },
   { id: 1, name: '熱原子抽出インジェクター', baseCost: 150, costMultiplier: 1.19, baseCps: 1.5, desc: '周囲の原子の熱運動を強制停止し電荷に置換。絶対零度へ至る過程の莫大なエネルギー落差を完全に回収し定着させる熱力学の破壊的装置。' },
