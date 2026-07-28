@@ -1409,17 +1409,18 @@ function loadModFromFile(event) {
 }
 
 /**
- * =========================================================================
+ =========================================================================
  * 修正済み高精度科学表記フォーマッター (Decimal完全対応版)
- * =========================================================================
+ =========================================================================
  */
 function formatValue(n) {
   if (n === null || n === undefined) return "0.0";
   
-  // Decimal オブジェクトの場合の処理
   let dec = (n instanceof Decimal) ? n : new Decimal(n);
   
-  if (!dec.isFinite()) return "無限宇宙 (Infinity)";
+  // Decimalの有限チェック（ライブラリ仕様に合わせて安全に判定）
+  const isDecFinite = typeof dec.isFinite === 'function' ? dec.isFinite() : (dec.mag !== Infinity && !dec.isNaN());
+  if (!isDecFinite) return "無限宇宙 (Infinity)";
   if (dec.eq(0)) return "0.0";
   
   // 1e6未満の場合
@@ -1427,15 +1428,16 @@ function formatValue(n) {
     return dec.toNumber().toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   }
   
-  // 巨大数の場合の科学表記
-  const exponent = dec.e;
-  const mantissa = dec.mantissa;
-  return `${mantissa.toFixed(2)}e${exponent}`;
+  // 巨大数の場合の科学表記（exponent と mantissa の安全な取得）
+  const exponent = dec.exponent || dec.e || 0;
+  const mantissa = dec.mantissa || (dec.div(new Decimal(10).pow(exponent))).toNumber();
+  return `${Number(mantissa).toFixed(2)}e${exponent}`;
 }
+
 /**
- * =========================================================================
+ =========================================================================
  * 統合ゲームエンジン拡張セーフティ・完全修復モジュール (Decimal完全対応版)
- * =========================================================================
+ =========================================================================
  */
 
 // 1. セーブデータの自動初期化・整合性修復
@@ -1476,9 +1478,9 @@ function updateGameLoopSafetyWrapper() {
 }
 
 /**
- * =========================================================================
+ =========================================================================
  * Internal Mathematical Calculation Engine (Decimal Complete Support)
- * =========================================================================
+ =========================================================================
  */
 
 // 汎用数値サニタイザー（通常の数値用）
@@ -1489,13 +1491,13 @@ function __sanitizeNumber(val, fallback = 0) {
   return val;
 }
 
-// Decimal 用サニタイザー
+// Decimal 用サニタイザー（安全な判定に変更）
 function __sanitizeDecimal(val, fallback = 0) {
   if (val === null || val === undefined) return new Decimal(fallback);
-  if (val instanceof Decimal) return val.isFinite() ? val : new Decimal(fallback);
   try {
-    const d = new Decimal(val);
-    return d.isFinite() ? d : new Decimal(fallback);
+    const d = (val instanceof Decimal) ? val : new Decimal(val);
+    const checkFinite = typeof d.isFinite === 'function' ? d.isFinite() : (d.mag !== Infinity && !d.isNaN());
+    return checkFinite ? d : new Decimal(fallback);
   } catch (e) {
     return new Decimal(fallback);
   }
@@ -1557,8 +1559,7 @@ function getAmUpgradeCost(id) {
     return new Decimal(Number.MAX_VALUE);
   }
 }
-
-function getTlUpgradeCost(id) {  
+  function getTlUpgradeCost(id) {  
   try {
     if (!DB_TL_UPGRADES || !DB_TL_UPGRADES[id]) return new Decimal(Number.MAX_VALUE);
     const tuData = DB_TL_UPGRADES[id];
