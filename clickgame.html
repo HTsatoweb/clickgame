@@ -3054,16 +3054,19 @@ function loadGameOnLaunch() {
 // 起動時の強制クリーンアップ
 window.addEventListener("DOMContentLoaded", () => {
   try {
+    console.log("=== ゲーム初期化開始 ===");
+
     if (typeof initGameEnvironment === "function") initGameEnvironment();
     if (typeof buildGameDOM === "function") buildGameDOM();
     if (typeof loadGameOnLaunch === "function") loadGameOnLaunch();
     if (typeof refreshUI === "function") refreshUI();
 
-    // ★ これを必ず追加する（ゲームループの最初の起動）
+    // ★ これが無いと永遠に数が増えない
     requestAnimationFrame(executeCoreGameTick);
 
-  } catch(e) {
-    console.error("初期化エラー:", e);
+    console.log("=== ゲームループ起動完了 ===");
+  } catch (e) {
+    console.error("初期化に失敗しました:", e);
   }
 });
 /**
