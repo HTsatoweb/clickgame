@@ -3037,26 +3037,42 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 /**
  * =========================================================================
- * High-Performance Primary Clock Loop & Dynamic Visuals (Decimal対応版)
+ * High-Performance Primary Clock Loop & Dynamic Visuals (完全修復版)
  * =========================================================================
  */
 let cronosPreviousTimestamp = performance.now();
 let lastAutosaveTime = 0;
 
 function executeCoreGameTick(currentTimestamp) {
-  const baseDeltaTime = (currentTimestamp - cronosPreviousTimestamp) / 1000;
-  const dimensionalDeltaTime = baseDeltaTime * getGameSpeedMultiplier();
+  let baseDeltaTime = (currentTimestamp - cronosPreviousTimestamp) / 1000;
   cronosPreviousTimestamp = currentTimestamp;
+
+  // デルタタイムの異常爆発を防止
+  if (!Number.isFinite(baseDeltaTime) || baseDeltaTime < 0) baseDeltaTime = 0;
+  baseDeltaTime = Math.min(baseDeltaTime, 0.1);
+
+  const gameSpeed = (typeof getGameSpeedMultiplier === "function") ? getGameSpeedMultiplier() : 1;
+  const dimensionalDeltaTime = baseDeltaTime * Math.max(0, gameSpeed);
 
   game.sessionTime = (game.sessionTime || 0) + dimensionalDeltaTime;
   game.totalTime = (game.totalTime || 0) + dimensionalDeltaTime;
   
   const totalCpsVal = (typeof getTotalCps === "function") ? getTotalCps() : new Decimal(0);
-  const cpsDecimal = __sanitizeDecimal(totalCpsVal, 0);
+  const cpsDecimal = __safeDecimalParse(totalCpsVal, 0);
   
-  // Decimal の加算処理
+  // 安全な加算処理
   const energyAdd = cpsDecimal.mul(dimensionalDeltaTime);
-  game.energy = __sanitizeDecimal(game.energy, 0).plus(energyAdd);
+  const currentEnergy = __safeDecimalParse(game.energy, 0);
+  game.energy = currentEnergy.plus(energyAdd);
+
+  // 最終防壁：万が一ここで energy が Infinity になったら強制的に 0 に戻す
+  try {
+    if (typeof game.energy.isFinite === 'function' && !game.energy.isFinite()) {
+      game.energy = new Decimal(0);
+    }
+  } catch (e) {
+    game.energy = new Decimal(0);
+  }
 
   if (typeof runInternalAutomation === "function") {
     runInternalAutomation();
@@ -3066,12 +3082,15 @@ function executeCoreGameTick(currentTimestamp) {
     checkAchievements();
   }
 
-  // 動的ビジュアル演出の更新（Decimalの大きさを考慮した安全な数値変換）
+  // 動的ビジュアル演出の安全な数値変換（1e308などの危険なフォールバックを廃止）
   let visualEnergyNum = 0;
   try {
-    visualEnergyNum = game.energy.isFinite() ? game.energy.toNumber() : 1e308;
+    visualEnergyNum = game.energy.toNumber();
+    if (!Number.isFinite(visualEnergyNum) || visualEnergyNum > 1e308) {
+      visualEnergyNum = 1e307; // 描画上限内に安全に収める
+    }
   } catch(e) {
-    visualEnergyNum = 1e308;
+    visualEnergyNum = 0;
   }
   updateDynamicCoreAndResourceVisuals(visualEnergyNum);
 
@@ -3094,37 +3113,6 @@ function executeCoreGameTick(currentTimestamp) {
 
   requestAnimationFrame(executeCoreGameTick);
 }
-
-function switchMainTab(targetId) {
-  const panes = document.getElementsByClassName("tab-pane");
-  for (let i = 0; i < panes.length; i++) panes[i].classList.remove("active");
-  const buttons = document.getElementsByClassName("tab-trigger-button");
-  for (let i = 0; i < buttons.length; i++) buttons[i].classList.remove("active");
-  
-  const targetPane = document.getElementById(targetId);
-  if (targetPane) targetPane.classList.add("active");
-  if (event && event.target) event.target.classList.add("active");
-}
-
-let stateSpaceKeyGuard = false;
-document.addEventListener("keydown", e => {
-  if (e.code === "Space") {
-    e.preventDefault();
-    if (!stateSpaceKeyGuard) { 
-      stateSpaceKeyGuard = true; 
-      if (typeof handleCoreClick === "function") handleCoreClick(null); 
-    }
-  }
-});
-document.addEventListener("keyup", e => { if (e.code === "Space") stateSpaceKeyGuard = false; });
-
-window.addEventListener("DOMContentLoaded", () => {
-  if (typeof buildGameDOM === "function") buildGameDOM();
-  if (typeof loadGameOnLaunch === "function") loadGameOnLaunch();
-  cronosPreviousTimestamp = performance.now();
-  requestAnimationFrame(executeCoreGameTick);
-});
-
 /**
  =========================================================================
  * 🌈 フルスペクトル・ダイナミック演出 & 粒子パーティクルシステム
