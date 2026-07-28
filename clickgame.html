@@ -1442,46 +1442,7 @@ function formatValue(n) {
 
 /**
  =========================================================================
- * 🛡️ 統合ゲームエンジン拡張セーフティ・完全修復モジュール
- =========================================================================
- */
-function sanitizeGameData() {
-  if (typeof game === 'undefined' || !game) return;
-
-  const arraysToSanitize = [
-    { target: 'facCounts', db: typeof DB_FACTORIES !== 'undefined' ? DB_FACTORIES : [] },
-    { target: 'upgLevels', db: typeof DB_UPGRADES !== 'undefined' ? DB_UPGRADES : [] },
-    { target: 'amUpgLevels', db: typeof DB_AM_UPGRADES !== 'undefined' ? DB_AM_UPGRADES : [] },
-    { target: 'tlUpgLevels', db: typeof DB_TL_UPGRADES !== 'undefined' ? DB_TL_UPGRADES : [] }
-  ];
-
-  arraysToSanitize.forEach(item => {
-    if (!Array.isArray(game[item.target])) game[item.target] = [];
-    for (let i = 0; i < item.db.length; i++) {
-      if (game[item.target][i] === undefined || isNaN(game[item.target][i]) || !isFinite(game[item.target][i])) {
-        game[item.target][i] = 0;
-      }
-    }
-  });
-
-  game.energy = __sanitizeDecimal(game.energy, 0);
-  game.antimatter = __sanitizeDecimal(game.antimatter, 0);
-  game.timeShards = __sanitizeDecimal(game.timeShards, 0);
-  game.galaxyNodes = __sanitizeDecimal(game.galaxyNodes, 0);
-  game.totalTime = __sanitizeNumber(game.totalTime, 0);
-}
-
-function updateGameLoopSafetyWrapper() {
-  try {
-    sanitizeGameData();
-  } catch (e) {
-    console.warn("Safety wrapper caught an exception in game loop:", e);
-  }
-}
-
-/**
- =========================================================================
- * 🛡️ 堅牢な数値・Decimal サニタイザー
+ * 🛡️ 汚染セーブデータを強制リセット・自動修復するサニタイザ
  =========================================================================
  */
 function __sanitizeNumber(val, fallback = 0) {
@@ -1494,18 +1455,63 @@ function __sanitizeNumber(val, fallback = 0) {
 function __sanitizeDecimal(val, fallback = 0) {
   if (val === null || val === undefined) return new Decimal(fallback);
   try {
+    // すでにInfinityや文字列のInfinityになっている場合は即座にフォールバック（0）を返す
+    if (val === Infinity || val === "Infinity" || val === "-Infinity") return new Decimal(fallback);
+    
     const d = (val instanceof Decimal) ? val : new Decimal(val);
     const checkFinite = typeof d.isFinite === 'function' ? d.isFinite() : (d.mag !== Infinity && !isNaN(d.mag) && d.mag < 1e308);
     const checkNaN = typeof d.isNaN === 'function' ? d.isNaN() : isNaN(d.mag);
+    
     return (checkFinite && !checkNaN) ? d : new Decimal(fallback);
   } catch (e) {
     return new Decimal(fallback);
   }
 }
 
+function sanitizeGameData() {
+  if (typeof game === 'undefined' || !game) return;
+
+  // 各種リソースの強制サニタイズ（Infinityなら0にリセット）
+  game.energy = __sanitizeDecimal(game.energy, 0);
+  game.antimatter = __sanitizeDecimal(game.antimatter, 0);
+  game.timeShards = __sanitizeDecimal(game.timeShards, 0);
+  game.galaxyNodes = __sanitizeDecimal(game.galaxyNodes, 0);
+  game.totalTime = __sanitizeNumber(game.totalTime, 0);
+
+  const arraysToSanitize = [
+    { target: 'facCounts', db: typeof DB_FACTORIES !== 'undefined' ? DB_FACTORIES : [] },
+    { target: 'upgLevels', db: typeof DB_UPGRADES !== 'undefined' ? DB_UPGRADES : [] },
+    { target: 'amUpgLevels', db: typeof DB_AM_UPGRADES !== 'undefined' ? DB_AM_UPGRADES : [] },
+    { target: 'tlUpgLevels', db: typeof DB_TL_UPGRADES !== 'undefined' ? DB_TL_UPGRADES : [] }
+  ];
+
+  arraysToSanitize.forEach(item => {
+    if (!Array.isArray(game[item.target])) game[item.target] = [];
+    for (let i = 0; i < item.db.length; i++) {
+      let val = game[item.target][i];
+      if (val === undefined || isNaN(val) || !isFinite(val) || val === Infinity) {
+        game[item.target][i] = 0;
+      }
+    }
+  });
+}
+
+function updateGameLoopSafetyWrapper() {
+  try {
+    sanitizeGameData();
+  } catch (e) {
+    console.warn("Safety wrapper caught an exception in game loop:", e);
+  }
+}
+
+/**
+ =========================================================================
+ * 🛡️ 破綻不能なコスト・倍率計算エンジン
+ =========================================================================
+ */
 function getFactoryCost(id) {
   try {
-    if (!DB_FACTORIES || !DB_FACTORIES[id]) return new Decimal(Number.MAX_VALUE);
+    if (!DB_FACTORIES || !DB_FACTORIES[id]) return new Decimal('1e300');
     const fData = DB_FACTORIES[id];
     
     const count = __sanitizeNumber(game?.facCounts?.[id], 0);
@@ -1518,15 +1524,15 @@ function getFactoryCost(id) {
     const safeMultiplier = Math.max(1.001, mitigatedMultiplier);
     
     const cost = new Decimal(safeMultiplier).pow(safeCount).mul(baseCost);
-    return __sanitizeDecimal(cost, Number.MAX_VALUE);
+    return __sanitizeDecimal(cost, new Decimal('1e300'));
   } catch (e) {
-    return new Decimal(Number.MAX_VALUE);
+    return new Decimal('1e300');
   }
 }
 
 function getUpgradeCost(id) {  
   try {
-    if (!DB_UPGRADES || !DB_UPGRADES[id]) return new Decimal(Number.MAX_VALUE);
+    if (!DB_UPGRADES || !DB_UPGRADES[id]) return new Decimal('1e300');
     const uData = DB_UPGRADES[id];
     
     const lvl = __sanitizeNumber(game?.upgLevels?.[id], 0);
@@ -1536,15 +1542,15 @@ function getUpgradeCost(id) {
     
     const safeLvl = Math.min(Math.max(0, lvl), maxLvl);
     const cost = new Decimal(costMult).pow(safeLvl).mul(baseCost);  
-    return __sanitizeDecimal(cost, Number.MAX_VALUE);
+    return __sanitizeDecimal(cost, new Decimal('1e300'));
   } catch (e) {
-    return new Decimal(Number.MAX_VALUE);
+    return new Decimal('1e300');
   }
 }
 
 function getAmUpgradeCost(id) {  
   try {
-    if (!DB_AM_UPGRADES || !DB_AM_UPGRADES[id]) return new Decimal(Number.MAX_VALUE);
+    if (!DB_AM_UPGRADES || !DB_AM_UPGRADES[id]) return new Decimal('1e300');
     const auData = DB_AM_UPGRADES[id];
     
     const lvl = __sanitizeNumber(game?.amUpgLevels?.[id], 0);
@@ -1554,15 +1560,15 @@ function getAmUpgradeCost(id) {
     
     const safeLvl = Math.min(Math.max(0, lvl), maxLvl);
     const cost = new Decimal(costMult).pow(safeLvl).mul(baseCost);  
-    return __sanitizeDecimal(cost, Number.MAX_VALUE);
+    return __sanitizeDecimal(cost, new Decimal('1e300'));
   } catch (e) {
-    return new Decimal(Number.MAX_VALUE);
+    return new Decimal('1e300');
   }
 }
 
 function getTlUpgradeCost(id) {  
   try {
-    if (!DB_TL_UPGRADES || !DB_TL_UPGRADES[id]) return new Decimal(Number.MAX_VALUE);
+    if (!DB_TL_UPGRADES || !DB_TL_UPGRADES[id]) return new Decimal('1e300');
     const tuData = DB_TL_UPGRADES[id];
     
     const lvl = __sanitizeNumber(game?.tlUpgLevels?.[id], 0);
@@ -1572,9 +1578,9 @@ function getTlUpgradeCost(id) {
     
     const safeLvl = Math.min(Math.max(0, lvl), maxLvl);
     const cost = new Decimal(costMult).pow(safeLvl).mul(baseCost);  
-    return __sanitizeDecimal(cost, Number.MAX_VALUE);
+    return __sanitizeDecimal(cost, new Decimal('1e300'));
   } catch (e) {
-    return new Decimal(Number.MAX_VALUE);
+    return new Decimal('1e300');
   }
 }
 
@@ -1589,7 +1595,7 @@ function getGameSpeedMultiplier() {
     const result = baseShardsEffect.mul(amUpg3Effect);
     
     const num = result.toNumber();
-    return (isFinite(num) && num > 0) ? Math.min(num, 1e10) : 1.0;
+    return (isFinite(num) && num > 0) ? Math.min(num, 1e8) : 1.0;
   } catch (e) {
     return 1.0;
   }
