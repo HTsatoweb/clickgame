@@ -2894,17 +2894,18 @@ const STORAGE_KEY = "INFINITY_MATRIX_OMEGA_SAVE_DATA";
  */
 function __safeDecimalParse(val, fallback = 0) {
   if (val === null || val === undefined) return new Decimal(fallback);
-  if (val === Infinity || val === "Infinity" || val === -Infinity || val === "-Infinity") return new Decimal(fallback);
+  // Infinityを0に落とさず、そのまま扱う（または大きな値にする）
+  if (val === Infinity || val === "Infinity") return new Decimal("1e308"); // または new Decimal(1e308)
+  if (val === -Infinity || val === "-Infinity") return new Decimal(0);
   try {
     const d = new Decimal(val);
-    // break_infinity.js に合わせた安全判定
-    if (typeof d.mag === 'number' && (!Number.isFinite(d.mag) || d.mag === Infinity)) return new Decimal(fallback);
+    // magがInfinityでも強制的に0にしない
+    // if (typeof d.mag === 'number' && (!Number.isFinite(d.mag) || d.mag === Infinity)) return new Decimal(fallback);
     return d;
   } catch (e) {
     return new Decimal(fallback);
   }
 }
-
 function saveGameManual() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(game));
@@ -2926,14 +2927,8 @@ function loadGameOnLaunch() {
     const rawData = localStorage.getItem(STORAGE_KEY);
     if (!rawData) return;
 
-    // 文字列ベースで明らかな異常値が入っている場合は即座にパージ
-    if (rawData.includes("Infinity") || rawData.includes("NaN") || rawData.includes("null")) {
-      console.warn("⚠️ 異常なデータ表現を検出しました。セーブデータを自動初期化します。");
-      localStorage.removeItem(STORAGE_KEY);
-      return;
-    }
-
-    const parsed = JSON.parse(rawData);
+ 
+   const parsed = JSON.parse(rawData);
     if (!parsed || typeof parsed !== 'object') return;
 
     // ⚠️ 危険な外部関数 deserializeGameData による汚染を防ぐため、ここでは直接呼び出さない
@@ -3038,10 +3033,6 @@ window.addEventListener("DOMContentLoaded", () => {
   try {
     // セーブデータにInfinityが混ざっていたら強制リセットする
     const raw = localStorage.getItem("INFINITY_MATRIX_OMEGA_SAVE_DATA");
-    if (raw && (raw.includes("Infinity") || raw.includes("null"))) {
-      console.warn("⚠️ セーブデータ内の異常値を検出しました。強制修復します。");
-      localStorage.removeItem("INFINITY_MATRIX_OMEGA_SAVE_DATA");
-    }
   } catch(e) {}
 });
 /**
@@ -3073,15 +3064,6 @@ function executeCoreGameTick(currentTimestamp) {
   const energyAdd = cpsDecimal.mul(dimensionalDeltaTime);
   const currentEnergy = __safeDecimalParse(game.energy, 0);
   game.energy = currentEnergy.plus(energyAdd);
-
-  // 最終防壁：万が一ここで energy が Infinity になったら強制的に 0 に戻す
-  try {
-    if (typeof game.energy.isFinite === 'function' && !game.energy.isFinite()) {
-      game.energy = new Decimal(0);
-    }
-  } catch (e) {
-    game.energy = new Decimal(0);
-  }
 
   if (typeof runInternalAutomation === "function") {
     runInternalAutomation();
