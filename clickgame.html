@@ -2758,10 +2758,27 @@ function loadGame() {
 }
 /**
  * =========================================================================
- * LocalStorage Persistent Serialization Interface
+ * 🛡️ 堅牢なセーブデータ・永続化管理インターフェース (Decimal保護・修正版)
  * =========================================================================
  */
 const STORAGE_KEY = "INFINITY_MATRIX_OMEGA_SAVE_DATA";
+
+/**
+ * 補助関数：安全にDecimal値を解析・生成する（InfinityやNaNの汚染を完全排除）
+ */
+function __safeDecimalParse(val, fallback = 0) {
+  if (val === null || val === undefined) return new Decimal(fallback);
+  if (val === Infinity || val === "Infinity" || val === -Infinity || val === "-Infinity") return new Decimal(fallback);
+  try {
+    const d = new Decimal(val);
+    if (typeof d.isFinite === 'function' && !d.isFinite()) return new Decimal(fallback);
+    if (typeof d.isNaN === 'function' && d.isNaN()) return new Decimal(fallback);
+    if (isNaN(d.mag) || d.mag === Infinity) return new Decimal(fallback);
+    return d;
+  } catch (e) {
+    return new Decimal(fallback);
+  }
+}
 
 function saveGameManual() {
   try {
@@ -2782,21 +2799,43 @@ function loadGameOnLaunch() {
         deserializeGameData(rawData);
       }
       const parsed = JSON.parse(rawData);
+      
+      // 直接の Object.assign による Infinity 汚染を防ぐため、一度数値をサニタイズ
+      if (parsed.energy === Infinity || parsed.energy === "Infinity") parsed.energy = 0;
+      
       game = Object.assign({}, game, parsed);
       
-      // Decimal 型の復元保証
-      game.energy = new Decimal(parsed.energy ?? 0);
-      game.totalClicks = new Decimal(parsed.totalClicks ?? 0);
-      game.antimatter = new Decimal(parsed.antimatter ?? 0);
-      game.timeShards = new Decimal(parsed.timeShards ?? 0);
-      game.galaxyNodes = new Decimal(parsed.galaxyNodes ?? 0);
+      // Decimal 型の復元保証（安全なパース関数を通す）
+      game.energy = __safeDecimalParse(parsed.energy, 0);
+      game.totalClicks = __safeDecimalParse(parsed.totalClicks, 0);
+      game.antimatter = __safeDecimalParse(parsed.antimatter, 0);
+      game.timeShards = __safeDecimalParse(parsed.timeShards, 0);
+      game.galaxyNodes = __safeDecimalParse(parsed.galaxyNodes, 0);
+
+      // 配列データの安全性確保
+      game.facCounts = DB_FACTORIES.map((_, i) => {
+        const v = parsed.facCounts?.[i];
+        return (typeof v === 'number' && isFinite(v)) ? v : 0;
+      });
+      game.upgLevels = DB_UPGRADES.map((_, i) => {
+        const v = parsed.upgLevels?.[i];
+        return (typeof v === 'number' && isFinite(v)) ? v : 0;
+      });
+      game.amUpgLevels = DB_AM_UPGRADES.map((_, i) => {
+        const v = parsed.amUpgLevels?.[i];
+        return (typeof v === 'number' && isFinite(v)) ? v : 0;
+      });
+      game.tlUpgLevels = DB_TL_UPGRADES.map((_, i) => {
+        const v = parsed.tlUpgLevels?.[i];
+        return (typeof v === 'number' && isFinite(v)) ? v : 0;
+      });
 
       const upg7 = game.upgLevels && Array.isArray(game.upgLevels) ? (game.upgLevels[7] || 0) : 0;
       if (upg7 >= 1) {
-        if (document.getElementById("chk-auto-fac")) document.getElementById("chk-auto-fac").checked = game.autoFacEnabled;
-        if (document.getElementById("chk-auto-upg")) document.getElementById("chk-auto-upg").checked = game.autoUpgEnabled;
-        if (document.getElementById("chk-auto-am")) document.getElementById("chk-auto-am").checked = game.autoAmEnabled;
-        if (document.getElementById("chk-auto-pam")) document.getElementById("chk-auto-pam").checked = game.autoPrestigeAmEnabled;
+        if (document.getElementById("chk-auto-fac")) document.getElementById("chk-auto-fac").checked = !!game.autoFacEnabled;
+        if (document.getElementById("chk-auto-upg")) document.getElementById("chk-auto-upg").checked = !!game.autoUpgEnabled;
+        if (document.getElementById("chk-auto-am")) document.getElementById("chk-auto-am").checked = !!game.autoAmEnabled;
+        if (document.getElementById("chk-auto-pam")) document.getElementById("chk-auto-pam").checked = !!game.autoPrestigeAmEnabled;
       }
       pushLog("📂 復元完了：前回の世界線データが完全に同期されました。", "var(--color-upgrade)");
     }
@@ -3016,152 +3055,8 @@ window.addEventListener("DOMContentLoaded", () => {
           btn.style.setProperty('background-color', hslaFromHsl(textColor, 0.06), 'important');
         } catch (e) {}
       });
-
-      return;
-    }
-
-    {
-      energyValElem.style.setProperty('animation', 'none', 'important');
-      energyValElem.style.setProperty('background', 'none', 'important');
-      energyValElem.style.removeProperty('background-clip');
-      energyValElem.style.removeProperty('-webkit-background-clip');
-      energyValElem.style.setProperty('color', textColor, 'important');
-      energyValElem.style.setProperty('-webkit-text-fill-color', 'initial', 'important');
-      energyValElem.style.setProperty('text-shadow', `0 0 20px rgba(0,0,0,0.06)`, 'important');
-
-      const accent1 = hsl((hue + 60) % 360, Math.max(50, saturation - 5), Math.max(35, lightness - 8));
-      const accent2 = hsl((hue + 180) % 360, Math.max(50, saturation - 10), Math.max(30, lightness - 12));
-      try {
-        const coreGrad = `linear-gradient(135deg, ${textColor} 0%, ${accent1} 45%, ${accent2} 100%)`;
-        coreBtn.style.setProperty('background', coreGrad, 'important');
-        coreBtn.style.setProperty('border-color', textColor, 'important');
-        coreBtn.style.setProperty('box-shadow', `0 0 36px ${hslaFromHsl(textColor, 0.55)}`, 'important');
-        coreBtn.style.setProperty('border-width', '5px', 'important');
-        coreBtn.style.setProperty('animation', 'corePulse 1.2s ease-in-out infinite', 'important');
-      } catch (e) {}
-
-      const coreSvg = coreBtn.querySelector && coreBtn.querySelector('svg');
-      if (coreSvg) {
-        try {
-          const paths = coreSvg.querySelectorAll('path, circle, rect');
-          paths.forEach((p, i) => {
-            const c = (i % 3 === 0) ? textColor : (i % 3 === 1) ? accent1 : accent2;
-            try { p.style.setProperty('fill', c, 'important'); p.style.setProperty('stroke', c, 'important'); } catch (e) {}
-          });
-        } catch (e) {}
-      }
-
-      productButtons.forEach((btn, i) => {
-        const c = (i % 3 === 0) ? textColor : (i % 3 === 1) ? accent1 : accent2;
-        try {
-          btn.style.setProperty('border-color', textColor, 'important');
-          btn.style.setProperty('box-shadow', `0 0 14px ${hslaFromHsl(c, 0.45)}`, 'important');
-          btn.style.setProperty('background-color', hslaFromHsl(c, 0.12), 'important');
-        } catch (e) {}
-      });
     }
   };
-
-  /* -------------------------
-     パーティクルシステム
-     ------------------------- */
-  window.spawnParticleEffect = function(type = "fireworks", originX = window.innerWidth / 2, originY = window.innerHeight / 2) {
-    const container = document.body;
-    const particleCount = type === "fireworks" ? 28 : 20;
-    const colorPool = ["#00f2fe","#4facfe","#00ffcc","#a8ff00","#ffea00","#ff758c","#ff0055","#9d4edd","#ffd166","#06d6a0","#118ab2","#073b4c","#f72585","#b5179e","#7209b7","#3a0ca3","#ffb4a2","#e5989b","#6a4c93","#2b2d42","#8ecae6","#219ebc","#ffb703","#fb8500"];
-    for (let i=0; i<particleCount; i++){
-      const el = document.createElement("div");
-      el.className = "floating-particle-unit";
-      let content = "";
-      if (type === "fireworks") content = ["✨","✦","✺","✶"][Math.floor(Math.random()*4)];
-      else if (type === "petals") content = ["🌸","🌺","❀"][Math.floor(Math.random()*3)];
-      else content = ["🎉","🎊","📎","🔷"][Math.floor(Math.random()*4)];
-      const chosenColor = colorPool[Math.floor(Math.random()*colorPool.length)];
-      el.innerHTML = content;
-      el.style.position = "fixed";
-      el.style.left = originX + (Math.random()*12 - 6) + "px";
-      el.style.top = originY + (Math.random()*12 - 6) + "px";
-      el.style.fontSize = (Math.random()*18 + 10) + "px";
-      el.style.color = chosenColor;
-      el.style.zIndex = "999999";
-      el.style.pointerEvents = "none";
-      el.style.textShadow = `0 0 8px ${hslaFromHsl(hslFromHexOrHsl(chosenColor), 0.6)}`;
-      container.appendChild(el);
-      const angle = Math.random()*Math.PI*2;
-      const distance = Math.random()*220 + 80;
-      const targetX = Math.cos(angle)*distance;
-      const targetY = Math.sin(angle)*distance - (type === "petals" ? -120 : 60);
-      const animation = el.animate([
-        { transform: 'translate(0,0) scale(0.3) rotate(0deg)', opacity: 1 },
-        { transform: `translate(${targetX}px, ${targetY}px) scale(${1 + Math.random()*0.8}) rotate(${Math.random()*720}deg)`, opacity: 0 }
-      ], { duration: Math.random()*1000 + 800, easing: 'cubic-bezier(0.22,1,0.36,1)' });
-      animation.onfinish = () => el.remove();
-    }
-  };
-
-  function hslFromHexOrHsl(col){
-    if (!col) return 'hsl(0,0%,100%)';
-    if (col.startsWith('hsl')) return col;
-    try {
-      let h = col.replace('#','');
-      if (h.length===3) h = h.split('').map(c=>c+c).join('');
-      const r = parseInt(h.substring(0,2),16), g = parseInt(h.substring(2,4),16), b = parseInt(h.substring(4,6),16);
-      const rf=r/255, gf=g/255, bf=b/255;
-      const max=Math.max(rf,gf,bf), min=Math.min(rf,gf,bf);
-      let hh=0, ss=0, ll=(max+min)/2;
-      if (max!==min){
-        const d=max-min;
-        ss = ll>0.5 ? d/(2-max-min) : d/(max+min);
-        switch(max){
-          case rf: hh = (gf-bf)/d + (gf<bf?6:0); break;
-          case gf: hh = (bf-rf)/d + 2; break;
-          case bf: hh = (rf-gf)/d + 4; break;
-        }
-        hh *= 60;
-      }
-      return `hsl(${Math.round(hh)}, ${Math.round(ss*100)}%, ${Math.round(ll*100)}%)`;
-    } catch(e){ return 'hsl(0,0%,100%)'; }
-  }
-
-  /* -------------------------
-     実績トーストフック
-     ------------------------- */
-  try {
-    if (typeof createToast === 'function') {
-      const originalCreateToast = window.createToast;
-      window.createToast = function(title, desc) {
-        try { originalCreateToast(title, desc); } catch(e) {}
-        try { window.spawnParticleEffect('fireworks', window.innerWidth - 150, 80); } catch(e) {}
-        try { window.spawnParticleEffect('confetti', window.innerWidth - 200, 100); } catch(e) {}
-      };
-    }
-  } catch(e) {}
-
-  /* -------------------------
-     コアクリック時のパーティクルバインド
-     ------------------------- */
-  try {
-    const coreBtnElem = document.getElementById('coreTrigger');
-    if (coreBtnElem && !coreBtnElem.__visuals_click_bound) {
-      coreBtnElem.addEventListener('click', (e) => {
-        if (Math.random() < 0.75) window.spawnParticleEffect('fireworks', e.clientX, e.clientY);
-      });
-      coreBtnElem.__visuals_click_bound = true;
-    }
-  } catch(e) {}
-
-  /* -------------------------
-     自動ポーリング
-     ------------------------- */
-  if (!window.__visualsEnergyPoller) {
-    window.__visualsEnergyPoller = setInterval(() => {
-      try {
-        const energy = (typeof game !== 'undefined' && typeof game.energy !== 'undefined') ? game.energy : null;
-        if (energy !== null) window.updateDynamicCoreAndResourceVisuals(energy);
-      } catch(e) {}
-    }, 250);
-  }
-
 })();
   /**
  * =========================================================================
