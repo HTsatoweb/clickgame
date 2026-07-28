@@ -1419,18 +1419,18 @@ function formatValue(n) {
   let dec = (n instanceof Decimal) ? n : new Decimal(n);
   
   // Decimalの有限チェック（ライブラリ仕様に合わせて安全に判定）
-  const isDecFinite = typeof dec.isFinite === 'function' ? dec.isFinite() : (dec.mag !== Infinity && !dec.isNaN());
+  const isDecFinite = typeof dec.isFinite === 'function' ? dec.isFinite() : (dec.mag !== Infinity && !isNaN(dec.mag));
   if (!isDecFinite) return "無限宇宙 (Infinity)";
-  if (dec.eq(0)) return "0.0";
+  if (typeof dec.eq === 'function' && dec.eq(0)) return "0.0";
   
   // 1e6未満の場合
-  if (dec.lt(1e6)) {
+  if (typeof dec.lt === 'function' && dec.lt(1e6)) {
     return dec.toNumber().toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   }
   
   // 巨大数の場合の科学表記（exponent と mantissa の安全な取得）
   const exponent = dec.exponent || dec.e || 0;
-  const mantissa = dec.mantissa || (dec.div(new Decimal(10).pow(exponent))).toNumber();
+  const mantissa = dec.mantissa || (typeof dec.div === 'function' ? dec.div(new Decimal(10).pow(exponent)).toNumber() : 1);
   return `${Number(mantissa).toFixed(2)}e${exponent}`;
 }
 
@@ -1496,7 +1496,7 @@ function __sanitizeDecimal(val, fallback = 0) {
   if (val === null || val === undefined) return new Decimal(fallback);
   try {
     const d = (val instanceof Decimal) ? val : new Decimal(val);
-    const checkFinite = typeof d.isFinite === 'function' ? d.isFinite() : (d.mag !== Infinity && !d.isNaN());
+    const checkFinite = typeof d.isFinite === 'function' ? d.isFinite() : (d.mag !== Infinity && !isNaN(d.mag));
     return checkFinite ? d : new Decimal(fallback);
   } catch (e) {
     return new Decimal(fallback);
@@ -1559,7 +1559,8 @@ function getAmUpgradeCost(id) {
     return new Decimal(Number.MAX_VALUE);
   }
 }
-  function getTlUpgradeCost(id) {  
+
+function getTlUpgradeCost(id) {  
   try {
     if (!DB_TL_UPGRADES || !DB_TL_UPGRADES[id]) return new Decimal(Number.MAX_VALUE);
     const tuData = DB_TL_UPGRADES[id];
@@ -1611,7 +1612,7 @@ function getGlobalProductionMultiplier() {
     let galaxyMultiplier = galaxyNodes.max(0).mul(5.0).plus(1);
     
     const result = amMultiplier.mul(baseUpgradeMultiplier).mul(exponentialMultiplier).mul(timelineTimeMultiplier).mul(galaxyMultiplier);
-    return result; // Decimalのまま返すことでインフレに対応
+    return result; 
   } catch (e) {
     return new Decimal(1.0);
   }
@@ -1686,7 +1687,8 @@ function getGainTimeShards() {
     if (energy.lt(1e12) || antimatter.lt(100)) return new Decimal(0);
     
     const val = energy.div(1e11);
-    if (val.lte(0) || !val.isFinite()) return new Decimal(0);
+    const isValFinite = typeof val.isFinite === 'function' ? val.isFinite() : (val.mag !== Infinity && !isNaN(val.mag));
+    if (val.lte(0) || !isValFinite) return new Decimal(0);
 
     let gain = new Decimal(Math.floor(val.log10())).mul(1 + Math.floor(antimatter.div(400).toNumber())).floor();
     return gain.max(0);
@@ -1706,6 +1708,7 @@ function getGainGalaxyNodes() {
     return new Decimal(0);
   }
 }
+
 /**
  * =========================================================================
  * セーブデータのエクスポート（クリップボードへコピー）
@@ -1714,7 +1717,7 @@ function getGainGalaxyNodes() {
 function exportSaveData() {
   try {
     if (typeof saveGameManual === "function") {
-      saveGameManual(); // 最新の状態を保存
+      saveGameManual(); 
     }
 
     const rawData = localStorage.getItem(STORAGE_KEY);
@@ -1724,7 +1727,6 @@ function exportSaveData() {
       return;
     }
 
-    // UTF-8に対応した安全なBase64エンコード
     const utf8Bytes = new TextEncoder().encode(rawData);
     let binaryString = "";
     for (let i = 0; i < utf8Bytes.length; i++) {
