@@ -3005,26 +3005,25 @@ window.addEventListener("DOMContentLoaded", () => {
     if (!col) return 'hsl(0,0%,100%)';
     if (col.startsWith('hsl')) return col;
     try {
-     try {
-    let h = col.replace('#','');
-    if (h.length===3) h = h.split('').map(c=>c+c).join('');
-    const r = parseInt(h.substring(0,2),16), g = parseInt(h.substring(2,4),16), b = parseInt(h.substring(4,6),16);
-    const rf=r/255, gf=g/255, bf=b/255;
-    const max=Math.max(rf,gf,bf), min=Math.min(rf,gf,bf);
-    let hh=0, ss=0, ll=(max+min)/2;
-    if (max!==min){
-      const d=max-min;
-      ss = ll>0.5 ? d/(2-max-min) : d/(max+min);
-      switch(max){
-        case rf: hh = (gf-bf)/d + (gf<bf?6:0); break;
-        case gf: hh = (bf-rf)/d + 2; break;
-        case bf: hh = (rf-gf)/d + 4; break;
+      let h = col.replace('#','');
+      if (h.length===3) h = h.split('').map(c=>c+c).join('');
+      const r = parseInt(h.substring(0,2),16), g = parseInt(h.substring(2,4),16), b = parseInt(h.substring(4,6),16);
+      const rf=r/255, gf=g/255, bf=b/255;
+      const max=Math.max(rf,gf,bf), min=Math.min(rf,gf,bf);
+      let hh=0, ss=0, ll=(max+min)/2;
+      if (max!==min){
+        const d=max-min;
+        ss = ll>0.5 ? d/(2-max-min) : d/(max+min);
+        switch(max){
+          case rf: hh = (gf-bf)/d + (gf<bf?6:0); break;
+          case gf: hh = (bf-rf)/d + 2; break;
+          case bf: hh = (rf-gf)/d + 4; break;
+        }
+        hh *= 60;
       }
-      hh *= 60;
-    }
-    return `hsl(${Math.round(hh)}, ${Math.round(ss*100)}%, ${Math.round(ll*100)}%)`;
-  } catch(e){ return 'hsl(0,0%,100%)'; }
-} // ← ここで上の関数を閉じるカッコを追加しました
+      return `hsl(${Math.round(hh)}, ${Math.round(ss*100)}%, ${Math.round(ll*100)}%)`;
+    } catch(e){ return 'hsl(0,0%,100%)'; }
+  }
 
   /* -------------------------
      実績トーストフック
@@ -3065,8 +3064,8 @@ window.addEventListener("DOMContentLoaded", () => {
     }, 250);
   }
 
-})(); // ← ファイル先頭の (function() { ... を閉じるための記述が足りていなかったので追加しました
-/**
+})();
+  /**
  * =========================================================================
  * 実績達成判定システムの組み込み
  * =========================================================================
