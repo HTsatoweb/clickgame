@@ -2736,14 +2736,20 @@ function refreshUI() {
   document.getElementById("btnResetGx").disabled = gainGx.lte(0);
 
   DB_FACTORIES.forEach(f => {
-    const cost = getFactoryCost(f.id); // Decimal型
-    document.getElementById(`dom-fac-cost-${f.id}`).textContent = formatValue(cost);
-    document.getElementById(`dom-fac-count-${f.id}`).textContent = game.facCounts[f.id] || 0;
-    document.getElementById(`dom-fac-cps-${f.id}`).textContent = formatValue(getFactoryCps(f.id));
-    
+    const costElem = document.getElementById(`dom-fac-cost-${f.id}`);
+    const countElem = document.getElementById(`dom-fac-count-${f.id}`);
+    const cpsElem = document.getElementById(`dom-fac-cps-${f.id}`);
     const card = document.getElementById(`dom-fac-${f.id}`);
-    if (energy.gte(cost)) card.classList.remove("state-disabled");
-    else card.classList.add("state-disabled");
+
+    const cost = getFactoryCost(f.id);
+    if (costElem) costElem.textContent = formatValue(cost);
+    if (countElem) countElem.textContent = game.facCounts[f.id] || 0;
+    if (cpsElem) cpsElem.textContent = formatValue(getFactoryCps(f.id));
+    
+    if (card) {
+      if (energy.gte(cost)) card.classList.remove("state-disabled");
+      else card.classList.add("state-disabled");
+    }
   });
 
   DB_UPGRADES.forEach(u => {
@@ -2887,9 +2893,8 @@ function __safeDecimalParse(val, fallback = 0) {
   if (val === Infinity || val === "Infinity" || val === -Infinity || val === "-Infinity") return new Decimal(fallback);
   try {
     const d = new Decimal(val);
-    if (typeof d.isFinite === 'function' && !d.isFinite()) return new Decimal(fallback);
-    if (typeof d.isNaN === 'function' && d.isNaN()) return new Decimal(fallback);
-    if (isNaN(d.mag) || d.mag === Infinity) return new Decimal(fallback);
+    // break_infinity.js に合わせた安全判定
+    if (typeof d.mag === 'number' && (!Number.isFinite(d.mag) || d.mag === Infinity)) return new Decimal(fallback);
     return d;
   } catch (e) {
     return new Decimal(fallback);
