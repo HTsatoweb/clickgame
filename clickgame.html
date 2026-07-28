@@ -2917,7 +2917,24 @@ function hardResetGame() {
     location.reload();
   }
 }
+function gameLoop(timestamp) {
+  // 1. 前回の時間からの差分（dt）を計算する処理のあたり
+  let dt = (timestamp - lastTimestamp) / 1000;
+  
+  // 🚨 起動直後やタブ非アクティブ復帰時の異常な大ジャンプ（爆発）を防ぐ強力なガード
+  if (isNaN(dt) || dt <= 0) {
+    dt = 0.016; // 標準的な1フレーム分（約60fps）に固定するもんな
+  } else if (dt > 1.0) {
+    dt = 1.0;   // どんなに時間が空いても最大1秒までに制限するもんな！
+  }
 
+  lastTimestamp = timestamp;
+
+  // ここから下の通常のティック処理へ続く...
+  executeCoreGameTick(dt);
+  
+  requestAnimationFrame(gameLoop);
+}
 /**
  * =========================================================================
  * High-Performance Primary Clock Loop & Dynamic Visuals (Decimal対応版)
