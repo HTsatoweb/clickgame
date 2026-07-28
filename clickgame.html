@@ -1442,7 +1442,7 @@ function formatValue(n) {
 
 /**
  =========================================================================
- * 🛡️ 汚染セーブデータを強制リセット・自動修復するサニタイザ
+ * 🛡️ 汚染セーブデータを強制リセット・自動修復する完全版サニタイザ
  =========================================================================
  */
 function __sanitizeNumber(val, fallback = 0) {
@@ -1455,7 +1455,6 @@ function __sanitizeNumber(val, fallback = 0) {
 function __sanitizeDecimal(val, fallback = 0) {
   if (val === null || val === undefined) return new Decimal(fallback);
   try {
-    // すでにInfinityや文字列のInfinityになっている場合は即座にフォールバック（0）を返す
     if (val === Infinity || val === "Infinity" || val === "-Infinity") return new Decimal(fallback);
     
     const d = (val instanceof Decimal) ? val : new Decimal(val);
@@ -1471,13 +1470,14 @@ function __sanitizeDecimal(val, fallback = 0) {
 function sanitizeGameData() {
   if (typeof game === 'undefined' || !game) return;
 
-  // 各種リソースの強制サニタイズ（Infinityなら0にリセット）
+  // 各種リソースの強制サニタイズ
   game.energy = __sanitizeDecimal(game.energy, 0);
   game.antimatter = __sanitizeDecimal(game.antimatter, 0);
   game.timeShards = __sanitizeDecimal(game.timeShards, 0);
   game.galaxyNodes = __sanitizeDecimal(game.galaxyNodes, 0);
   game.totalTime = __sanitizeNumber(game.totalTime, 0);
 
+  // 各種DB定義と紐づく配列の定義チェックとパディング
   const arraysToSanitize = [
     { target: 'facCounts', db: typeof DB_FACTORIES !== 'undefined' ? DB_FACTORIES : [] },
     { target: 'upgLevels', db: typeof DB_UPGRADES !== 'undefined' ? DB_UPGRADES : [] },
@@ -1486,24 +1486,48 @@ function sanitizeGameData() {
   ];
 
   arraysToSanitize.forEach(item => {
-    if (!Array.isArray(game[item.target])) game[item.target] = [];
+    if (!Array.isArray(game[item.target])) {
+      game[item.target] = [];
+    }
+    // DBの長さに合わせて不足分を 0 で埋め、不正な値をすべてクレンジングする
     for (let i = 0; i < item.db.length; i++) {
       let val = game[item.target][i];
-      if (val === undefined || isNaN(val) || !isFinite(val) || val === Infinity) {
+      if (val === undefined || val === null || typeof val !== 'number' || isNaN(val) || !isFinite(val) || val === Infinity || val === -Infinity) {
         game[item.target][i] = 0;
       }
+    }
+    // もしDBより配列が長すぎて余計なデータがあれば切り詰める
+    if (game[item.target].length > item.db.length) {
+      game[item.target] = game[item.target].slice(0, item.db.length);
     }
   });
 }
 
-function updateGameLoopSafetyWrapper() {
-  try {
-    sanitizeGameData();
-  } catch (e) {
-    console.warn("Safety wrapper caught an exception in game loop:", e);
+/**
+ =========================================================================
+ * 🚀 ゲーム起動時の安全なブートストラップ（初期化）関数
+ =========================================================================
+ */
+function initGameEnvironment() {
+  if (typeof window.game === 'undefined' || !window.game) {
+    window.game = {
+      energy: new Decimal(0),
+      antimatter: new Decimal(0),
+      timeShards: new Decimal(0),
+      galaxyNodes: new Decimal(0),
+      totalTime: 0,
+      facCounts: [],
+      upgLevels: [],
+      amUpgLevels: [],
+      tlUpgLevels: []
+    };
   }
-}
 
+  // ロード処理があればここで挟む（例: loadGame();）
+
+  // 【最重要】計算や描画の前に必ずサニタイズを強制実行
+  sanitizeGameData();
+}
 /**
  =========================================================================
  * 🛡️ 破綻不能なコスト・倍率計算エンジン
