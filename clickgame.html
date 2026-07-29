@@ -1785,7 +1785,9 @@ function executeBuyFactory(id) {
       // undefinedやNaNだった場合は0にしてから加算
       let currentQty = __sanitizeNumber(game.facCounts[id], 0);
       game.facCounts[id] = currentQty + 1;
-      
+      if (typeof SoundManager !== 'undefined' && SoundManager.playBuy) {
+        SoundManager.playBuy();
+      }
       refreshUI();
       pushLog(`🏭 施設購入：${DB_FACTORIES[id].name} を増設しました（所持数: ${game.facCounts[id]}）`, "var(--color-energy)");
       
@@ -1817,7 +1819,9 @@ function executeBuyUpgrade(id) {
     if (game.energy >= cost) {
       game.energy -= cost;
       game.upgLevels[id] = currentLvl + 1;
-      
+      if (typeof SoundManager !== 'undefined' && SoundManager.playBuy) {
+        SoundManager.playBuy();
+      }
       refreshUI();
       pushLog(`💡 改良成功：${uData.name} (Lv.${game.upgLevels[id]})`, "var(--color-upgrade)");
       
@@ -1848,7 +1852,9 @@ function executeBuyAmUpgrade(id) {
     if (game.antimatter >= cost) {
       game.antimatter -= cost;
       game.amUpgLevels[id] = currentLvl + 1;
-      
+      if (typeof SoundManager !== 'undefined' && SoundManager.playBuy) {
+        SoundManager.playBuy();
+      }
       refreshUI();
       pushLog(`⚛️ 反物質改良：${auData.name} (Lv.${game.amUpgLevels[id]})`, "var(--color-antimatter)");
     } else {
@@ -1875,7 +1881,9 @@ function executeBuyTlUpgrade(id) {
     if (game.timeShards >= cost) {
       game.timeShards -= cost;
       game.tlUpgLevels[id] = currentLvl + 1;
-      
+      if (typeof SoundManager !== 'undefined' && SoundManager.playBuy) {
+        SoundManager.playBuy();
+      }
       refreshUI();
       pushLog(`⏳ 時間律改良：${tuData.name} (Lv.${game.tlUpgLevels[id]})`, "var(--color-timeline)");
     } else {
@@ -1923,7 +1931,10 @@ function executePrestigeAm(forcedGain) {
   game.upgLevels = [0, 0, 0, 0, 0, 0, 0, keepUpg7];
   
   game.sessionTime = 0;
-  
+  // ★ 反物質転生時の効果音
+  if (typeof SoundManager !== 'undefined' && SoundManager.playAchievement) {
+    SoundManager.playAchievement();
+  }
   pushLog(`★ 反物質転生が実行されました（+${safeGain} AM）`, "var(--color-antimatter)");
   createToast("世界線反物質化", `粒子が対消滅し、${formatValue(safeGain)} AM を回収しました。`);
   
@@ -1944,6 +1955,10 @@ document.getElementById("btnResetTl").addEventListener("click", () => {
     game.upgLevels = [0, 0, 0, 0, 0, 0, 0, 0];
     game.amUpgLevels = [0, 0, 0, 0];
     game.sessionTime = 0;
+    // ★ 反物質転生時の効果音
+  if (typeof SoundManager !== 'undefined' && SoundManager.playAchievement) {
+    SoundManager.playAchievement();
+  }
     pushLog(`⏳ 時空の切断に成功（+${gain} TS 獲得）`, "var(--color-timeline)");
     window.ModAPI.hooks.onPrestigeTl.forEach(cb => { try { cb({gain: gain}); } catch(e){} });
     refreshUI();
@@ -1961,6 +1976,10 @@ document.getElementById("btnResetGx").addEventListener("click", () => {
     game.upgLevels = [0, 0, 0, 0, 0, 0, 0, 0];
     game.amUpgLevels = [0, 0, 0, 0]; game.tlUpgLevels = [0, 0, 0, 0];
     game.sessionTime = 0;
+    // ★ 反物質転生時の効果音
+  if (typeof SoundManager !== 'undefined' && SoundManager.playAchievement) {
+    SoundManager.playAchievement();
+  }
     pushLog(`🌌 銀河収束完了。大宇宙の定数が書き換わりました。`, "var(--color-galaxy)");
     window.ModAPI.hooks.onPrestigeGx.forEach(cb => { try { cb({gain: gain}); } catch(e){} });
     refreshUI();
