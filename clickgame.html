@@ -3497,15 +3497,15 @@ function filterLanguages() {
     }
   });
 }
-/**
+  /**
  * =========================================================================
- * 言語決定と高速並行翻訳の実行（動的更新＆リアルタイム監視対応版）
+ * 言語決定と高速並行翻訳の実行（超高速バッチ処理＆軽量リアルタイム監視対応版）
  * =========================================================================
  */
 async function setGameLanguage(langCode, langName) {
   localStorage.setItem("game_lang", langCode);
   
-  toggleLangMenu(); // メニューを閉じる
+  if (typeof toggleLangMenu === "function") toggleLangMenu(); // メニューを閉じる
   
   // 🌐 HTML自体の言語属性を変更（フォント適用のため）
   document.documentElement.lang = langCode;
@@ -3523,7 +3523,7 @@ async function setGameLanguage(langCode, langName) {
   if (typeof playOkSound === "function") playOkSound();
 }
 
-// ページ内のテキストをスキャンし、Windows風ドットアニメーションと高速並行処理で翻訳する関数
+// ページ内のテキストをスキャンし、限界まで並列化して高速翻訳する関数
 async function autoTranslatePageFast(targetLang) {
   const nodesToTranslate = collectTextNodes(document.body);
   const total = nodesToTranslate.length;
@@ -3603,8 +3603,8 @@ async function autoTranslatePageFast(targetLang) {
     return;
   }
 
-  // 高速化：一定数ずつ並行処理
-  const CONCURRENT_LIMIT = 5; 
+  // マルチコア風・高速並行処理（並列数を 12 に引き上げて限界まで高速化）
+  const CONCURRENT_LIMIT = 12; 
   let processedCount = 0;
 
   for (let i = 0; i < total; i += CONCURRENT_LIMIT) {
@@ -3685,12 +3685,13 @@ async function fetchMyTranslation(text, targetLang) {
 }
 
 // =========================================================================
-// 動的追加要素のリアルタイム監視（MutationObserver）
+// 動的追加要素のリアルタイム監視（デバウンス処理による負荷激減版）
 // =========================================================================
 let translationObserver = null;
+let pendingNodesToTranslate = [];
+let observerTimer = null;
 
 function initRealtimeTranslator() {
-  // すでに監視中であれば一度停止
   if (translationObserver) {
     translationObserver.disconnect();
   }
@@ -3698,31 +3699,51 @@ function initRealtimeTranslator() {
   const currentLang = localStorage.getItem("game_lang") || "ja";
   if (currentLang === "ja") return; // 日本語なら監視不要
 
-  translationObserver = new MutationObserver(async (mutations) => {
+  translationObserver = new MutationObserver((mutations) => {
+    let hasNewNodes = false;
+
     for (const mutation of mutations) {
       if (mutation.addedNodes.length > 0) {
         for (const addedNode of mutation.addedNodes) {
-          // 要素ノードの場合、その中にあるテキストノードを回収して翻訳
           if (addedNode.nodeType === Node.ELEMENT_NODE) {
-            // プログレスオーバーレイ自体やスクリプトタグなどは除外
             if (addedNode.id === "translationProgressOverlay") continue;
             
             const newTextNodes = collectTextNodes(addedNode);
             for (const node of newTextNodes) {
-              await translateSingleNode(node, currentLang);
+              pendingNodesToTranslate.push(node);
+              hasNewNodes = true;
             }
-          } 
-          // 直接テキストノードが追加された場合
-          else if (addedNode.nodeType === Node.TEXT_NODE) {
+          } else if (addedNode.nodeType === Node.TEXT_NODE) {
             if (addedNode.nodeValue.trim()) {
               if (!addedNode.originalText) {
                 addedNode.originalText = addedNode.nodeValue;
               }
-              await translateSingleNode(addedNode, currentLang);
+              pendingNodesToTranslate.push(addedNode);
+              hasNewNodes = true;
             }
           }
         }
       }
+    }
+
+    // デバウンス処理: 頻繁なDOM変更が落ち着くのを少し待ってから（50msおきに）まとめて高速処理
+    if (hasNewNodes) {
+      if (observerTimer) clearTimeout(observerTimer);
+      
+      observerTimer = setTimeout(async () => {
+        const nodesBatch = [...pendingNodesToTranslate];
+        pendingNodesToTranslate = []; // キューをクリア
+
+        // 重複を除外
+        const uniqueNodes = [...new Set(nodesBatch)];
+        
+        // バックグラウンドで並行翻訳を実行（UIをカクつかせないよう小分けにする）
+        const BATCH_LIMIT = 6;
+        for (let i = 0; i < uniqueNodes.length; i += BATCH_LIMIT) {
+          const slice = uniqueNodes.slice(i, i + BATCH_LIMIT);
+          await Promise.all(slice.map(node => translateSingleNode(node, currentLang)));
+        }
+      }, 50); // 50msの遅延で、大量の変更を光の速さかつ省エネでまとめ打ち
     }
   });
 
