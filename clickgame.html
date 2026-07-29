@@ -3238,18 +3238,9 @@ window.addEventListener("DOMContentLoaded", () => {
 
 /**
  * =========================================================================
- * 2. 独自言語メニュー制御（完全バックグラウンドAPI翻訳版）
+ * 2. 独自言語メニュー制御（完全自動・バーなし・辞書なしの動的翻訳版）
  * =========================================================================
  */
-// Google翻訳の初期化（非表示のまま準備）
-function googleTranslateElementInit() {
-  new google.translate.TranslateElement({
-    pageLanguage: 'ja',
-    includedLanguages: 'en,ja',
-    autoDisplay: false
-  }, 'google_translate_element');
-}
-
 function toggleLangMenu() {
   const modal = document.getElementById("langModal");
   if (!modal) return;
@@ -3257,26 +3248,78 @@ function toggleLangMenu() {
   const isOpen = (modal.style.display === "flex");
   modal.style.display = isOpen ? "none" : "flex";
   
-  playSettingSound();
+  playSettingSound(); // 🌐 メニュー開閉音を再生
 }
 
-function setGameLanguage(lang) {
+async function setGameLanguage(lang) {
   localStorage.setItem("game_lang", lang);
   
-  // Google翻訳のセレクトボックスを強制的に操作して言語を切り替える
-  const selectField = document.querySelector(".goog-te-combo");
-  if (selectField) {
-    selectField.value = lang;
-    selectField.dispatchEvent(new Event('change'));
-  }
+  // 🌐 画面上の全テキストを自動走査して翻訳・置換（バーは出ません）
+  await autoTranslatePage(lang);
   
   if (typeof pushLog === "function") {
     pushLog(`🌐 Language changed to: ${lang.toUpperCase()}`, "var(--color-upgrade)");
   }
   
-  playOkSound();
+  playOkSound(); // ✔️ 言語決定のOK音を再生
   alert(lang === 'en' ? "Language set to English" : "言語を日本語に設定しました");
   toggleLangMenu();
+}
+
+// ページ内のすべてのテキストノードを自動で探し出して翻訳する関数
+async function autoTranslatePage(targetLang) {
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+    acceptNode: function(node) {
+      // 空白や改行のみのテキストは除外
+      if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+      // スクリプトやスタイルタグの中身は除外
+      const parentTag = node.parentNode.tagName;
+      if (['SCRIPT', 'STYLE', 'NOSCRIPT', 'CODE', 'PRE'].includes(parentTag)) {
+        return NodeFilter.FILTER_REJECT;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+
+  let node;
+  const nodesToTranslate = [];
+  while (node = walker.nextNode()) {
+    // 初回の原文を保持
+    if (!node.originalText) {
+      node.originalText = node.nodeValue;
+    }
+    nodesToTranslate.push(node);
+  }
+
+  // 1つずつ翻訳APIで変換
+  for (const n of nodesToTranslate) {
+    if (targetLang === 'ja') {
+      n.nodeValue = n.originalText; // 日本語に戻す
+    } else {
+      const translated = await fetchMyTranslation(n.originalText, targetLang);
+      if (translated) {
+        n.nodeValue = translated;
+      }
+    }
+  }
+}
+
+// バックグラウンドで翻訳APIを叩く安全な非同期処理
+async function fetchMyTranslation(text, targetLang) {
+  try {
+    // Google翻訳の隠しエンドポイントを利用（UIのバーは一切生成されません）
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    
+    const data = await res.json();
+    if (Array.isArray(data) && data[0]) {
+      return data[0].map(item => item[0]).join("");
+    }
+  } catch (e) {
+    console.error("翻訳フェッチエラー:", e);
+  }
+  return null;
 }
 </script>
 </body>
