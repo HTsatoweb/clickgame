@@ -586,6 +586,66 @@ button, .btn-action-prestige, .click-core-btn, .card-upgrade-node, .factory-line
   user-select: none; /* 文字選択を防ぐ */
   touch-action: manipulation; /* ダブルタップズームを無効化し、反応速度を上げる */
 }
+  /* =========================================================================
+ * 🌐 全世界対応ユニバーサルフォント定義（文字化け・フォント崩れ完全防止）
+ * ========================================================================= */
+body, button, input, select, textarea, [class*="game-"] {
+  font-family: 
+    system-ui, 
+    -apple-system, 
+    "Segoe UI", 
+    Roboto, 
+    Helvetica, 
+    Arial, 
+    /* 日本語・CJK統合漢字（簡体字・繁体字・韓国語） */
+    "Hiragino Sans", 
+    "Meiryo", 
+    "Microsoft YaHei", 
+    "Microsoft JhengHei", 
+    "Malgun Gothic", 
+    "Apple SD Gothic Neo",
+    /* キリル文字圏（ロシア語・ウクライナ語など） */
+    "Ubuntu", 
+    "DejaVu Sans", 
+    /* アラビア語・ペルシャ語・ウルドゥー語 */
+    "Noto Sans Arabic", 
+    "Amiri", 
+    "Tahoma", 
+    /* デーヴァナーガリー文字（ヒンディー語・マラーティー語など） */
+    "Noto Sans Devanagari", 
+    /* ベンガル語 */
+    "Noto Sans Bengali", 
+    /* タイ語 */
+    "Noto Sans Thai", 
+    /* グルジア語 */
+    "Noto Sans Georgian", 
+    /* アルメニア語 */
+    "Noto Sans Armenian", 
+    /* ギリシャ語 */
+    "Noto Sans Symbols", 
+    /* ヘブライ語 */
+    "Noto Sans Hebrew", 
+    /* タミール語・テルグ語などの南インド系言語 */
+    "Noto Sans Tamil", 
+    "Noto Sans Telugu", 
+    "Noto Sans Kannada", 
+    "Noto Sans Malayalam", 
+    /* エチオピア・アムハラ語 */
+    "Noto Sans Ethiopic", 
+    /* クメール語（カンボジア） */
+    "Noto Sans Khmer", 
+    /* ミャンマー語 */
+    "Noto Sans Myanmar", 
+    /* フォールバック */
+    "Noto Sans", 
+    sans-serif !important;
+}
+
+/* RTL（右から左へ書く言語：アラビア語やペルシャ語など）のレイアウト自然化 */
+[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
 </style>
 </head>
 <body>
@@ -3447,6 +3507,9 @@ async function setGameLanguage(langCode, langName) {
   localStorage.setItem("game_lang", langCode);
   
   toggleLangMenu(); // メニューを閉じる
+  
+  // 🌐 HTML自体の言語属性を変更（フォント適用のため）
+  document.documentElement.lang = langCode;
   
   // チャンク分割翻訳を実行
   await autoTranslatePageInChunks(langCode);
