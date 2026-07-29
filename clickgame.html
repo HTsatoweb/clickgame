@@ -3499,7 +3499,7 @@ function filterLanguages() {
 }
 /**
  * =========================================================================
- * 言語決定と高速並行翻訳の実行（動的更新対応版）
+ * 言語決定と高速並行翻訳の実行（動的更新＆リアルタイム監視対応版）
  * =========================================================================
  */
 async function setGameLanguage(langCode, langName) {
@@ -3513,6 +3513,9 @@ async function setGameLanguage(langCode, langName) {
   // ページ全体の翻訳を実行
   await autoTranslatePageFast(langCode);
   
+  // リアルタイム監視（MutationObserver）を開始
+  initRealtimeTranslator();
+  
   if (typeof pushLog === "function") {
     pushLog(`🌐 Language changed to: ${langName || langCode.toUpperCase()}`, "var(--color-upgrade)");
   }
@@ -3522,27 +3525,7 @@ async function setGameLanguage(langCode, langName) {
 
 // ページ内のテキストをスキャンし、Windows風ドットアニメーションと高速並行処理で翻訳する関数
 async function autoTranslatePageFast(targetLang) {
-  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
-    acceptNode: function(node) {
-      if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
-      const parentTag = node.parentNode.tagName;
-      if (['SCRIPT', 'STYLE', 'NOSCRIPT', 'CODE', 'PRE'].includes(parentTag)) {
-        return NodeFilter.FILTER_REJECT;
-      }
-      return NodeFilter.FILTER_ACCEPT;
-    }
-  });
-
-  let node;
-  const nodesToTranslate = [];
-  while (node = walker.nextNode()) {
-    // すでに originalText があればそれを維持、なければ現在の値（日本語等）を保存
-    if (!node.originalText) {
-      node.originalText = node.nodeValue;
-    }
-    nodesToTranslate.push(node);
-  }
-
+  const nodesToTranslate = collectTextNodes(document.body);
   const total = nodesToTranslate.length;
   if (total === 0) return;
 
@@ -3628,13 +3611,7 @@ async function autoTranslatePageFast(targetLang) {
     const slice = nodesToTranslate.slice(i, i + CONCURRENT_LIMIT);
     
     await Promise.all(slice.map(async (targetNode) => {
-      // すでに翻訳キャッシュがあればそれを使う、なければAPIを叩く
-      if (!targetNode.translatedCache) {
-        targetNode.translatedCache = await fetchMyTranslation(targetNode.originalText, targetLang);
-      }
-      if (targetNode.translatedCache) {
-        targetNode.nodeValue = targetNode.translatedCache;
-      }
+      await translateSingleNode(targetNode, targetLang);
       processedCount++;
     }));
 
@@ -3649,6 +3626,45 @@ async function autoTranslatePageFast(targetLang) {
   setTimeout(() => {
     progressOverlay.style.display = "none";
   }, 400);
+}
+
+// 翻訳対象のテキストノードを収集するヘルパー関数
+function collectTextNodes(rootElement) {
+  const walker = document.createTreeWalker(rootElement, NodeFilter.SHOW_TEXT, {
+    acceptNode: function(node) {
+      if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+      const parentTag = node.parentNode.tagName;
+      if (['SCRIPT', 'STYLE', 'NOSCRIPT', 'CODE', 'PRE', 'TEXTAREA'].includes(parentTag)) {
+        return NodeFilter.FILTER_REJECT;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+
+  let node;
+  const nodes = [];
+  while (node = walker.nextNode()) {
+    if (!node.originalText) {
+      node.originalText = node.nodeValue;
+    }
+    nodes.push(node);
+  }
+  return nodes;
+}
+
+// 単一ノードの翻訳処理（キャッシュ活用）
+async function translateSingleNode(targetNode, targetLang) {
+  if (targetLang === 'ja') {
+    targetNode.nodeValue = targetNode.originalText;
+    return;
+  }
+
+  if (!targetNode.translatedCache) {
+    targetNode.translatedCache = await fetchMyTranslation(targetNode.originalText, targetLang);
+  }
+  if (targetNode.translatedCache) {
+    targetNode.nodeValue = targetNode.translatedCache;
+  }
 }
 
 // 翻訳APIを叩く安全な非同期処理
@@ -3666,6 +3682,55 @@ async function fetchMyTranslation(text, targetLang) {
     console.error("翻訳フェッチエラー:", e);
   }
   return null;
+}
+
+// =========================================================================
+// 動的追加要素のリアルタイム監視（MutationObserver）
+// =========================================================================
+let translationObserver = null;
+
+function initRealtimeTranslator() {
+  // すでに監視中であれば一度停止
+  if (translationObserver) {
+    translationObserver.disconnect();
+  }
+
+  const currentLang = localStorage.getItem("game_lang") || "ja";
+  if (currentLang === "ja") return; // 日本語なら監視不要
+
+  translationObserver = new MutationObserver(async (mutations) => {
+    for (const mutation of mutations) {
+      if (mutation.addedNodes.length > 0) {
+        for (const addedNode of mutation.addedNodes) {
+          // 要素ノードの場合、その中にあるテキストノードを回収して翻訳
+          if (addedNode.nodeType === Node.ELEMENT_NODE) {
+            // プログレスオーバーレイ自体やスクリプトタグなどは除外
+            if (addedNode.id === "translationProgressOverlay") continue;
+            
+            const newTextNodes = collectTextNodes(addedNode);
+            for (const node of newTextNodes) {
+              await translateSingleNode(node, currentLang);
+            }
+          } 
+          // 直接テキストノードが追加された場合
+          else if (addedNode.nodeType === Node.TEXT_NODE) {
+            if (addedNode.nodeValue.trim()) {
+              if (!addedNode.originalText) {
+                addedNode.originalText = addedNode.nodeValue;
+              }
+              await translateSingleNode(addedNode, currentLang);
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // ページ全体のDOM変更を監視
+  translationObserver.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
 }
 </script>
 </body>
