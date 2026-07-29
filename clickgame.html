@@ -3685,46 +3685,192 @@ async function fetchMyTranslation(text, targetLang) {
 }
 
 // =========================================================================
-// Edge並みの超高速リアルタイム監視＆即時翻訳エンジン
+// 確実な動的翻訳＆初期翻訳エンジンの完全版
 // =========================================================================
+
 let translationObserver = null;
-let pendingNodesToTranslate = new Set(); // 重複を防ぐためSetに変更
+let pendingNodesToTranslate = new Set();
 let observerTimer = null;
 let isTranslatingNow = false;
 
-// 翻訳キャッシュ（一度翻訳したテキストを記憶して2回目以降を「一瞬」にする）
+// 翻訳キャッシュ（一度翻訳したテキストは二度とAPIを叩かず一瞬で反映）
 const translationMemory = new Map();
 
-// 単一ノードの翻訳処理（キャッシュ最優先・超高速版）
-async function translateSingleNode(targetNode, targetLang) {
+// 言語設定と初期化
+async function setGameLanguage(langCode, langName) {
+  localStorage.setItem("game_lang", langCode);
+  
+  if (typeof toggleLangMenu === "function") toggleLangMenu();
+  document.documentElement.lang = langCode;
+  
+  await autoTranslatePageFast(langCode);
+  initRealtimeTranslator();
+  
+  if (typeof pushLog === "function") {
+    pushLog(`🌐 Language changed to: ${langName || langCode.toUpperCase()}`, "var(--color-upgrade)");
+  }
+  if (typeof playOkSound === "function") playOkSound();
+}
+
+// ページ内のテキストをスキャンし、限界まで並列化して高速翻訳
+async function autoTranslatePageFast(targetLang) {
+  const nodesToTranslate = collectTextNodes(document.body);
+  const total = nodesToTranslate.length;
+  if (total === 0) return;
+
+  let progressOverlay = document.getElementById("translationProgressOverlay");
+  if (!progressOverlay) {
+    progressOverlay = document.createElement("div");
+    progressOverlay.id = "translationProgressOverlay";
+    progressOverlay.style.cssText = `
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.7); display: flex; flex-direction: column;
+      justify-content: center; align-items: center; z-index: 99999;
+      color: #fff; font-family: sans-serif;
+    `;
+    
+    if (!document.getElementById("winLoaderStyle")) {
+      const style = document.createElement("style");
+      style.id = "winLoaderStyle";
+      style.innerHTML = `
+        @keyframes winDotSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .win-spinner { width: 40px; height: 40px; position: relative; animation: winDotSpin 1.4s infinite linear; margin-bottom: 16px; }
+        .win-dot { width: 8px; height: 8px; background: var(--color-upgrade, #4caf50); border-radius: 50%; position: absolute; top: 0; left: 16px; }
+        .win-dot:nth-child(1) { transform: rotate(0deg) translate(0, -16px); transform-origin: 4px 20px; }
+        .win-dot:nth-child(2) { transform: rotate(72deg) translate(0, -16px); transform-origin: 4px 20px; opacity: 0.85; }
+        .win-dot:nth-child(3) { transform: rotate(144deg) translate(0, -16px); transform-origin: 4px 20px; opacity: 0.7; }
+        .win-dot:nth-child(4) { transform: rotate(216deg) translate(0, -16px); transform-origin: 4px 20px; opacity: 0.55; }
+        .win-dot:nth-child(5) { transform: rotate(288deg) translate(0, -16px); transform-origin: 4px 20px; opacity: 0.4; }
+      `;
+      document.head.appendChild(style);
+    }
+
+    progressOverlay.innerHTML = `
+      <div style="background: #222; padding: 25px 35px; border-radius: 8px; text-align: center; min-width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center;">
+        <div class="win-spinner"><div class="win-dot"></div><div class="win-dot"></div><div class="win-dot"></div><div class="win-dot"></div><div class="win-dot"></div></div>
+        <p id="translationStatusText" style="margin-bottom: 12px; font-size: 15px;">Translating... 0%</p>
+        <div style="width: 100%; background: #444; height: 6px; border-radius: 3px; overflow: hidden;">
+          <div id="translationProgressBar" style="width: 0%; height: 100%; background: var(--color-upgrade, #4caf50); transition: width 0.15s ease;"></div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(progressOverlay);
+  } else {
+    progressOverlay.style.display = "flex";
+  }
+
+  const statusText = document.getElementById("translationStatusText");
+  const progressBar = document.getElementById("translationProgressBar");
+
   if (targetLang === 'ja') {
-    targetNode.nodeValue = targetNode.originalText;
+    for (let i = 0; i < total; i++) {
+      if (nodesToTranslate[i].originalText) {
+        nodesToTranslate[i].nodeValue = nodesToTranslate[i].originalText;
+      }
+      const percent = Math.floor(((i + 1) / total) * 100);
+      if (statusText) statusText.innerText = `Reverting to Japanese... ${percent}%`;
+      if (progressBar) progressBar.style.width = `${percent}%`;
+    }
+    setTimeout(() => { progressOverlay.style.display = "none"; }, 300);
     return;
+  }
+
+  const CONCURRENT_LIMIT = 12; 
+  let processedCount = 0;
+
+  for (let i = 0; i < total; i += CONCURRENT_LIMIT) {
+    const slice = nodesToTranslate.slice(i, i + CONCURRENT_LIMIT);
+    await Promise.all(slice.map(async (targetNode) => {
+      await translateSingleNode(targetNode, targetLang);
+      processedCount++;
+    }));
+
+    const percent = Math.floor((processedCount / total) * 100);
+    if (statusText) statusText.innerText = `Translating... ${percent}% (${processedCount}/${total})`;
+    if (progressBar) progressBar.style.width = `${percent}%`;
+  }
+
+  if (progressBar) progressBar.style.width = "100%";
+  if (statusText) statusText.innerText = "Complete! 100%";
+  setTimeout(() => { progressOverlay.style.display = "none"; }, 400);
+}
+
+// テキストノード収集ヘルパー
+function collectTextNodes(rootElement) {
+  const walker = document.createTreeWalker(rootElement, NodeFilter.SHOW_TEXT, {
+    acceptNode: function(node) {
+      if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+      const parentTag = node.parentNode ? node.parentNode.tagName : '';
+      if (['SCRIPT', 'STYLE', 'NOSCRIPT', 'CODE', 'PRE', 'TEXTAREA'].includes(parentTag)) {
+        return NodeFilter.FILTER_REJECT;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+
+  let node;
+  const nodes = [];
+  while (node = walker.nextNode()) {
+    if (!node.originalText) {
+      node.originalText = node.nodeValue;
+    }
+    nodes.push(node);
+  }
+  return nodes;
+}
+
+// 単一ノードの翻訳（メモリキャッシュ優先）
+async function translateSingleNode(targetNode, targetLang) {
+  if (!targetNode || !targetNode.nodeValue) return;
+  
+  if (targetLang === 'ja') {
+    if (targetNode.originalText) {
+      targetNode.nodeValue = targetNode.originalText;
+    }
+    return;
+  }
+
+  // まだオリジナルがなければ現在の値を設定
+  if (!targetNode.originalText) {
+    targetNode.originalText = targetNode.nodeValue;
   }
 
   const textToTranslate = targetNode.originalText;
   const cacheKey = `${targetLang}_${textToTranslate}`;
 
-  // 1. メモリ上にキャッシュがあれば、ネットワーク通信なしで「一瞬」で書き換え
+  // 1. キャッシュがあれば一瞬で適用
   if (translationMemory.has(cacheKey)) {
     targetNode.nodeValue = translationMemory.get(cacheKey);
     return;
   }
 
-  if (!targetNode.translatedCache) {
-    // 2. APIを叩く
-    const translated = await fetchMyTranslation(textToTranslate, targetLang);
-    if (translated) {
-      targetNode.translatedCache = translated;
-      translationMemory.set(cacheKey, translated); // キャッシュに保存
-    }
-  }
-
-  if (targetNode.translatedCache) {
-    targetNode.nodeValue = targetNode.translatedCache;
+  // 2. なければAPIフェッチ
+  const translated = await fetchMyTranslation(textToTranslate, targetLang);
+  if (translated) {
+    translationMemory.set(cacheKey, translated);
+    targetNode.nodeValue = translated;
   }
 }
 
+// 翻訳API呼び出し
+async function fetchMyTranslation(text, targetLang) {
+  try {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (Array.isArray(data) && data[0]) {
+      return data[0].map(item => item[0]).join("");
+    }
+  } catch (e) {
+    console.error("翻訳フェッチエラー:", e);
+  }
+  return null;
+}
+
+// =========================================================================
+// 動的追加要素のリアルタイム監視（確実動作・高速バッチ版）
+// =========================================================================
 function initRealtimeTranslator() {
   if (translationObserver) {
     translationObserver.disconnect();
@@ -3739,8 +3885,7 @@ function initRealtimeTranslator() {
     let hasChanges = false;
 
     for (const mutation of mutations) {
-      // A. 新しい要素やテキストが追加された場合
-      if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+      if (mutation.addedNodes && mutation.addedNodes.length > 0) {
         for (const addedNode of mutation.addedNodes) {
           if (addedNode.nodeType === Node.ELEMENT_NODE) {
             if (addedNode.id === "translationProgressOverlay") continue;
@@ -3751,7 +3896,7 @@ function initRealtimeTranslator() {
               hasChanges = true;
             }
           } else if (addedNode.nodeType === Node.TEXT_NODE) {
-            if (addedNode.nodeValue.trim()) {
+            if (addedNode.nodeValue && addedNode.nodeValue.trim()) {
               if (!addedNode.originalText) {
                 addedNode.originalText = addedNode.nodeValue;
               }
@@ -3761,33 +3906,17 @@ function initRealtimeTranslator() {
           }
         }
       }
-      // B. 既存のテキストノードの中身が直接書き換わった場合（Edge並みの反応速度）
-      else if (mutation.type === 'characterData') {
-        const textNode = mutation.target;
-        if (textNode && textNode.nodeType === Node.TEXT_NODE) {
-          if (!textNode.originalText) {
-            textNode.originalText = mutation.oldValue || textNode.nodeValue;
-          }
-          // 日本語以外の新しい文字列に変更された場合
-          if (textNode.nodeValue !== textNode.originalText && !translationMemory.has(`${currentLang}_${textNode.originalText}`)) {
-            textNode.originalText = textNode.nodeValue; // 新しいオリジナルとして更新
-          }
-          pendingNodesToTranslate.add(textNode);
-          hasChanges = true;
-        }
-      }
     }
 
     if (hasChanges) {
       if (observerTimer) clearTimeout(observerTimer);
       
-      // 変更検知から処理開始までのディレイを「20ms」に短縮し、Edge並みのレスポンスに
       observerTimer = setTimeout(async () => {
         isTranslatingNow = true;
 
         const nodesBatch = Array.from(pendingNodesToTranslate);
         pendingNodesToTranslate.clear();
-        
+
         const BATCH_LIMIT = 10;
         for (let i = 0; i < nodesBatch.length; i += BATCH_LIMIT) {
           const slice = nodesBatch.slice(i, i + BATCH_LIMIT);
@@ -3802,12 +3931,9 @@ function initRealtimeTranslator() {
     }
   });
 
-  // ページ全体の構造変更 ＋ テキストの直接変更の両方を監視
   translationObserver.observe(document.body, {
     childList: true,
-    subtree: true,
-    characterData: true,
-    characterDataOldValue: true
+    subtree: true
   });
 }
 </script>
