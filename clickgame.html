@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ja">
+<html lang="ja" translate="no">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -698,6 +698,8 @@ button, .btn-action-prestige, .click-core-btn, .card-upgrade-node, .factory-line
   <button class="btn-utility" onclick="saveGameManual()">手動セーブ</button>
   <button class="btn-utility" onclick="saveAndReloadGame()" style="color: var(--color-timeline); border-color: var(--color-timeline);">保存して再読込</button>
   <button class="btn-utility btn-danger" onclick="hardResetGame()">リセット</button>
+      <!-- 右上のシステムボタンの並びに追加 -->
+<button class="btn-utility" onclick="toggleLangMenu()" style="color: var(--color-upgrade); border-color: var(--color-upgrade);">🌐 言語</button>
 </div>
   </div>
 
@@ -736,6 +738,18 @@ button, .btn-action-prestige, .click-core-btn, .card-upgrade-node, .factory-line
 
   <div class="right-header">SYSTEM LOG (宇宙の因果履歴)</div>
   <div class="log-stream-box" id="logBox"></div>
+  <!-- 言語設定モーダル -->
+<div id="langModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:99999; align-items:center; justify-content:center;">
+  <div style="background:var(--bg-panel); border:1px solid var(--border-strong); padding:20px; border-radius:8px; width:300px; text-align:center;">
+    <div style="font-size:0.85rem; font-weight:900; color:#fff; margin-bottom:12px;">LANGUAGES / 言語設定</div>
+    <div style="font-size:0.68rem; color:var(--text-muted); margin-bottom:15px;">Google翻訳を使用して言語を切り替えます。</div>
+    
+    <!-- Google翻訳ウィジェットの挿入場所 -->
+    <div id="google_translate_element" style="margin-bottom:15px; display:flex; justify-content:center;"></div>
+    
+    <button class="btn-utility" onclick="toggleLangMenu()" style="width:100%; padding:6px;">閉じる</button>
+  </div>
+</div>
 </div>
 
 <script>
@@ -3080,7 +3094,71 @@ function checkAchievements() {
   };
   console.log("🛠️ SYSTEM LOADER: " + _docs.metaEngineName + " verification array initialized successfully. All " + _docs.endpointsWiredCount + " hooks validated.");
 })();
+/**
+ * =========================================================================
+ * 1. Firefox等ブラウザ推奨警告システム
+ * =========================================================================
+ */
+function checkBrowserSupport() {
+  const ua = navigator.userAgent.toLowerCase();
+  const isFirefox = ua.includes("firefox") || ua.includes("fxios");
 
+  if (isFirefox) {
+    setTimeout(() => {
+      if (typeof createToast === "function") {
+        createToast(
+          "推奨ブラウザのお知らせ",
+          "Firefox系ブラウザはお勧めしません。動作が重く感じられる場合があります。おすすめはChrome系ブラウザです。"
+        );
+      }
+    }, 1000);
+  }
+}
+
+// ページ読み込み時にブラウザチェックとイベントを登録
+window.addEventListener("DOMContentLoaded", () => {
+  checkBrowserSupport();
+});
+
+
+/**
+ * =========================================================================
+ * 2. Google翻訳モーダル制御システム
+ * =========================================================================
+ */
+function toggleLangMenu() {
+  const modal = document.getElementById("langModal");
+  if (!modal) return;
+  
+  if (modal.style.display === "none" || !modal.style.display) {
+    modal.style.display = "flex";
+    initGoogleTranslateOnce(); // 初回表示時にGoogle翻訳を読み込む
+  } else {
+    modal.style.display = "none";
+  }
+}
+
+let googleTranslateInitialized = false;
+
+function initGoogleTranslateOnce() {
+  if (googleTranslateInitialized) return;
+  googleTranslateInitialized = true;
+
+  // Google翻訳公式スクリプトの読み込み
+  const script = document.createElement("script");
+  script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+  document.head.appendChild(script);
+}
+
+// Google翻訳のコールバック
+window.googleTranslateElementInit = function() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'ja',
+    includedLanguages: 'ja,en,zh-CN,ko,es,fr',
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+    autoDisplay: false
+  }, 'google_translate_element');
+};
 </script>
 </body>
 </html>
