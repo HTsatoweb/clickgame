@@ -3235,10 +3235,9 @@ function closeBrowserWarning() {
 window.addEventListener("DOMContentLoaded", () => {
   checkBrowserSupport();
 });
-
 /**
  * =========================================================================
- * 2. 独自言語メニュー制御（完全自動・バーなし・辞書なしの動的翻訳版）
+ * 2. 独自言語メニュー制御（一括結合・一括送信・進捗バー付き動的翻訳版）
  * =========================================================================
  */
 function toggleLangMenu() {
@@ -3248,31 +3247,28 @@ function toggleLangMenu() {
   const isOpen = (modal.style.display === "flex");
   modal.style.display = isOpen ? "none" : "flex";
   
-  playSettingSound(); // 🌐 メニュー開閉音を再生
+  playSettingSound();
 }
 
 async function setGameLanguage(lang) {
   localStorage.setItem("game_lang", lang);
   
-  // 🌐 画面上の全テキストを自動走査して翻訳・置換（バーは出ません）
-  await autoTranslatePage(lang);
+  await autoTranslatePageBatch(lang);
   
   if (typeof pushLog === "function") {
     pushLog(`🌐 Language changed to: ${lang.toUpperCase()}`, "var(--color-upgrade)");
   }
   
-  playOkSound(); // ✔️ 言語決定のOK音を再生
+  playOkSound();
   alert(lang === 'en' ? "Language set to English" : "言語を日本語に設定しました");
   toggleLangMenu();
 }
 
-// ページ内のすべてのテキストノードを自動で探し出して翻訳する関数
-async function autoTranslatePage(targetLang) {
+// ページ内のテキストをスキャンし、一括結合して超高速翻訳する関数
+async function autoTranslatePageBatch(targetLang) {
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
     acceptNode: function(node) {
-      // 空白や改行のみのテキストは除外
       if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
-      // スクリプトやスタイルタグの中身は除外
       const parentTag = node.parentNode.tagName;
       if (['SCRIPT', 'STYLE', 'NOSCRIPT', 'CODE', 'PRE'].includes(parentTag)) {
         return NodeFilter.FILTER_REJECT;
@@ -3284,30 +3280,97 @@ async function autoTranslatePage(targetLang) {
   let node;
   const nodesToTranslate = [];
   while (node = walker.nextNode()) {
-    // 初回の原文を保持
     if (!node.originalText) {
       node.originalText = node.nodeValue;
     }
     nodesToTranslate.push(node);
   }
 
-  // 1つずつ翻訳APIで変換
-  for (const n of nodesToTranslate) {
-    if (targetLang === 'ja') {
-      n.nodeValue = n.originalText; // 日本語に戻す
+  const total = nodesToTranslate.length;
+  if (total === 0) return;
+
+  // 進捗表示用オーバーレイの作成
+  let progressOverlay = document.getElementById("translationProgressOverlay");
+  if (!progressOverlay) {
+    progressOverlay = document.createElement("div");
+    progressOverlay.id = "translationProgressOverlay";
+    progressOverlay.style.cssText = `
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.7); display: flex; flex-direction: column;
+      justify-content: center; align-items: center; z-index: 99999;
+      color: #fff; font-family: sans-serif;
+    `;
+    progressOverlay.innerHTML = `
+      <div style="background: #222; padding: 20px 30px; border-radius: 8px; text-align: center; min-width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+        <p id="translationStatusText" style="margin-bottom: 12px; font-size: 16px;">Preparing... 0%</p>
+        <div style="width: 100%; background: #444; height: 10px; border-radius: 5px; overflow: hidden;">
+          <div id="translationProgressBar" style="width: 0%; height: 100%; background: var(--color-upgrade, #4caf50); transition: width 0.2s ease;"></div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(progressOverlay);
+  } else {
+    progressOverlay.style.display = "flex";
+  }
+
+  const statusText = document.getElementById("translationStatusText");
+  const progressBar = document.getElementById("translationProgressBar");
+
+  // 日本語に戻す場合
+  if (targetLang === 'ja') {
+    statusText.innerText = "Reverting to Japanese...";
+    progressBar.style.width = "100%";
+    for (const n of nodesToTranslate) {
+      n.nodeValue = n.originalText;
+    }
+    setTimeout(() => { progressOverlay.style.display = "none"; }, 300);
+    return;
+  }
+
+  statusText.innerText = "Analyzing texts... 10%";
+  progressBar.style.width = "10%";
+
+  // 改行区切りで全テキストを結合（長すぎる場合は分割も可能ですが、まずは一括結合）
+  const textsToJoin = nodesToTranslate.map(n => n.originalText);
+  
+  // Google翻訳は大量の改行テキストも一度に処理できます
+  statusText.innerText = `Translating ${total} items... 50%`;
+  progressBar.style.width = "50%";
+
+  const combinedText = textsToJoin.join("\n___SPLIT___\n");
+  const translatedCombined = await fetchMyTranslation(combinedText, targetLang);
+
+  if (translatedCombined) {
+    statusText.innerText = "Applying translations... 90%";
+    progressBar.style.width = "90%";
+
+    const translatedArray = translatedCombined.split(/\s*___\s*SPLIT___\s*/);
+    
+    // 数が一致する場合のみ綺麗に流し込む
+    if (translatedArray.length === nodesToTranslate.length) {
+      for (let i = 0; i < nodesToTranslate.length; i++) {
+        nodesToTranslate[i].nodeValue = translatedArray[i];
+      }
     } else {
-      const translated = await fetchMyTranslation(n.originalText, targetLang);
-      if (translated) {
-        n.nodeValue = translated;
+      // 万が一区切りがずれた場合のフォールバック（1つずつ安全に処理）
+      for (let i = 0; i < nodesToTranslate.length; i++) {
+        const trans = await fetchMyTranslation(nodesToTranslate[i].originalText, targetLang);
+        if (trans) nodesToTranslate[i].nodeValue = trans;
       }
     }
   }
+
+  progressBar.style.width = "100%";
+  statusText.innerText = "Complete! 100%";
+  
+  setTimeout(() => {
+    progressOverlay.style.display = "none";
+  }, 400);
 }
 
-// バックグラウンドで翻訳APIを叩く安全な非同期処理
+// 翻訳APIを叩く安全な非同期処理
 async function fetchMyTranslation(text, targetLang) {
   try {
-    // Google翻訳の隠しエンドポイントを利用（UIのバーは一切生成されません）
     const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
     const res = await fetch(url);
     if (!res.ok) return null;
