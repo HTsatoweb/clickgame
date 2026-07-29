@@ -3500,7 +3500,7 @@ function filterLanguages() {
 
 /**
  * =========================================================================
- * 言語決定とチャンク分割翻訳の実行
+ * 言語決定と安全な順次翻訳の実行
  * =========================================================================
  */
 async function setGameLanguage(langCode, langName) {
@@ -3511,8 +3511,8 @@ async function setGameLanguage(langCode, langName) {
   // 🌐 HTML自体の言語属性を変更（フォント適用のため）
   document.documentElement.lang = langCode;
   
-  // チャンク分割翻訳を実行
-  await autoTranslatePageInChunks(langCode);
+  // 安全な順次翻訳を実行
+  await autoTranslatePageSequentially(langCode);
   
   if (typeof pushLog === "function") {
     pushLog(`🌐 Language changed to: ${langName || langCode.toUpperCase()}`, "var(--color-upgrade)");
@@ -3521,8 +3521,8 @@ async function setGameLanguage(langCode, langName) {
   if (typeof playOkSound === "function") playOkSound();
 }
 
-// ページ内のテキストをスキャンし、文字数オーバーしないようチャンク分割して進行度を表示する関数
-async function autoTranslatePageInChunks(targetLang) {
+// ページ内のテキストをスキャンし、1つずつ安全に順次翻訳・進行度を表示する関数
+async function autoTranslatePageSequentially(targetLang) {
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
     acceptNode: function(node) {
       if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
@@ -3585,61 +3585,26 @@ async function autoTranslatePageInChunks(targetLang) {
     return;
   }
 
-  const CHUNK_CHAR_LIMIT = 1500;
-  const chunks = [];
-  let currentChunkNodes = [];
-  let currentChunkLength = 0;
-
-  for (const n of nodesToTranslate) {
-    const textLen = n.originalText.length;
-    if (currentChunkLength + textLen > CHUNK_CHAR_LIMIT && currentChunkNodes.length > 0) {
-      chunks.push(currentChunkNodes);
-      currentChunkNodes = [n];
-      currentChunkLength = textLen;
-    } else {
-      currentChunkNodes.push(n);
-      currentChunkLength += textLen;
-    }
-  }
-  if (currentChunkNodes.length > 0) {
-    chunks.push(currentChunkNodes);
-  }
-
+  // 1つずつ確実に順番（直列）に翻訳を適用していく
   let processedCount = 0;
 
-  for (let cIndex = 0; cIndex < chunks.length; cIndex++) {
-    const chunkNodes = chunks[cIndex];
-    const textsToJoin = chunkNodes.map(n => n.originalText);
-    const combinedText = textsToJoin.join("\n__SPLIT__\n");
-
-    const translatedCombined = await fetchMyTranslation(combinedText, targetLang);
-
-    if (translatedCombined) {
-      const translatedArray = translatedCombined.split(/\s*__SPLIT__\s*/);
-      
-      for (let i = 0; i < chunkNodes.length; i++) {
-        if (translatedArray[i] !== undefined) {
-          chunkNodes[i].nodeValue = translatedArray[i];
-        }
-        processedCount++;
-        
-        const percent = Math.floor((processedCount / total) * 100);
-        if (statusText) statusText.innerText = `Translating... ${percent}% (${processedCount}/${total})`;
-        if (progressBar) progressBar.style.width = `${percent}%`;
-      }
-    } else {
-      for (let i = 0; i < chunkNodes.length; i++) {
-        const trans = await fetchMyTranslation(chunkNodes[i].originalText, targetLang);
-        if (trans) chunkNodes[i].nodeValue = trans;
-        processedCount++;
-        
-        const percent = Math.floor((processedCount / total) * 100);
-        if (statusText) statusText.innerText = `Translating (fallback)... ${percent}%`;
-        if (progressBar) progressBar.style.width = `${percent}%`;
-      }
+  for (let i = 0; i < total; i++) {
+    const targetNode = nodesToTranslate[i];
+    const translatedText = await fetchMyTranslation(targetNode.originalText, targetLang);
+    
+    if (translatedText) {
+      targetNode.nodeValue = translatedText;
     }
     
-    await new Promise(r => setTimeout(r, 50));
+    processedCount++;
+    const percent = Math.floor((processedCount / total) * 100);
+    if (statusText) statusText.innerText = `Translating... ${percent}% (${processedCount}/${total})`;
+    if (progressBar) progressBar.style.width = `${percent}%`;
+
+    // API制限（レートリミット）回避とブラウザのフリーズを防ぐための小休止
+    if (i % 10 === 0) {
+      await new Promise(r => setTimeout(r, 10));
+    }
   }
 
   if (progressBar) progressBar.style.width = "100%";
