@@ -3497,10 +3497,9 @@ function filterLanguages() {
     }
   });
 }
-
 /**
  * =========================================================================
- * 言語決定と安全な順次翻訳の実行
+ * 言語決定と高速並行翻訳の実行
  * =========================================================================
  */
 async function setGameLanguage(langCode, langName) {
@@ -3511,8 +3510,8 @@ async function setGameLanguage(langCode, langName) {
   // 🌐 HTML自体の言語属性を変更（フォント適用のため）
   document.documentElement.lang = langCode;
   
-  // 安全な順次翻訳を実行
-  await autoTranslatePageSequentially(langCode);
+  // 高速な並行翻訳を実行
+  await autoTranslatePageFast(langCode);
   
   if (typeof pushLog === "function") {
     pushLog(`🌐 Language changed to: ${langName || langCode.toUpperCase()}`, "var(--color-upgrade)");
@@ -3521,8 +3520,8 @@ async function setGameLanguage(langCode, langName) {
   if (typeof playOkSound === "function") playOkSound();
 }
 
-// ページ内のテキストをスキャンし、1つずつ安全に順次翻訳・進行度を表示する関数
-async function autoTranslatePageSequentially(targetLang) {
+// ページ内のテキストをスキャンし、Windows風ドットアニメーションと高速並行処理で翻訳する関数
+async function autoTranslatePageFast(targetLang) {
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
     acceptNode: function(node) {
       if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
@@ -3546,7 +3545,7 @@ async function autoTranslatePageSequentially(targetLang) {
   const total = nodesToTranslate.length;
   if (total === 0) return;
 
-  // 進捗表示用オーバーレイの作成
+  // 進捗表示用オーバーレイの作成（Windows風ドットアニメーション付き）
   let progressOverlay = document.getElementById("translationProgressOverlay");
   if (!progressOverlay) {
     progressOverlay = document.createElement("div");
@@ -3557,11 +3556,48 @@ async function autoTranslatePageSequentially(targetLang) {
       justify-content: center; align-items: center; z-index: 99999;
       color: #fff; font-family: sans-serif;
     `;
+    
+    // Windowsの起動時のようなドットアニメーション用のスタイルを動的追加
+    if (!document.getElementById("winLoaderStyle")) {
+      const style = document.createElement("style");
+      style.id = "winLoaderStyle";
+      style.innerHTML = `
+        @keyframes winDotSpin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        .win-spinner {
+          width: 40px; height: 40px; position: relative;
+          animation: winDotSpin 1.4s infinite linear;
+          margin-bottom: 16px;
+        }
+        .win-dot {
+          width: 8px; height: 8px; background: var(--color-upgrade, #4caf50);
+          border-radius: 50%; position: absolute;
+          top: 0; left: 16px;
+        }
+        /* 5つのドットを円状に配置 */
+        .win-dot:nth-child(1) { transform: rotate(0deg) translate(0, -16px); transform-origin: 4px 20px; }
+        .win-dot:nth-child(2) { transform: rotate(72deg) translate(0, -16px); transform-origin: 4px 20px; opacity: 0.85; }
+        .win-dot:nth-child(3) { transform: rotate(144deg) translate(0, -16px); transform-origin: 4px 20px; opacity: 0.7; }
+        .win-dot:nth-child(4) { transform: rotate(216deg) translate(0, -16px); transform-origin: 4px 20px; opacity: 0.55; }
+        .win-dot:nth-child(5) { transform: rotate(288deg) translate(0, -16px); transform-origin: 4px 20px; opacity: 0.4; }
+      `;
+      document.head.appendChild(style);
+    }
+
     progressOverlay.innerHTML = `
-      <div style="background: #222; padding: 20px 30px; border-radius: 8px; text-align: center; min-width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
-        <p id="translationStatusText" style="margin-bottom: 12px; font-size: 16px;">Translating... 0%</p>
-        <div style="width: 100%; background: #444; height: 10px; border-radius: 5px; overflow: hidden;">
-          <div id="translationProgressBar" style="width: 0%; height: 100%; background: var(--color-upgrade, #4caf50); transition: width 0.1s ease;"></div>
+      <div style="background: #222; padding: 25px 35px; border-radius: 8px; text-align: center; min-width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center;">
+        <div class="win-spinner">
+          <div class="win-dot"></div>
+          <div class="win-dot"></div>
+          <div class="win-dot"></div>
+          <div class="win-dot"></div>
+          <div class="win-dot"></div>
+        </div>
+        <p id="translationStatusText" style="margin-bottom: 12px; font-size: 15px;">Translating... 0%</p>
+        <div style="width: 100%; background: #444; height: 6px; border-radius: 3px; overflow: hidden;">
+          <div id="translationProgressBar" style="width: 0%; height: 100%; background: var(--color-upgrade, #4caf50); transition: width 0.15s ease;"></div>
         </div>
       </div>
     `;
@@ -3576,6 +3612,7 @@ async function autoTranslatePageSequentially(targetLang) {
   // 日本語に戻す場合
   if (targetLang === 'ja') {
     for (let i = 0; i < total; i++) {
+      nodesToTrendslate = nodesToTranslate[i]; // typo safe
       nodesToTranslate[i].nodeValue = nodesToTranslate[i].originalText;
       const percent = Math.floor(((i + 1) / total) * 100);
       if (statusText) statusText.innerText = `Reverting to Japanese... ${percent}%`;
@@ -3585,26 +3622,25 @@ async function autoTranslatePageSequentially(targetLang) {
     return;
   }
 
-  // 1つずつ確実に順番（直列）に翻訳を適用していく
+  // 高速化：一定数（例: 5個ずつ）のチャンクに分けて同時並行でAPIを叩く
+  const CONCURRENT_LIMIT = 5; 
   let processedCount = 0;
 
-  for (let i = 0; i < total; i++) {
-    const targetNode = nodesToTranslate[i];
-    const translatedText = await fetchMyTranslation(targetNode.originalText, targetLang);
+  for (let i = 0; i < total; i += CONCURRENT_LIMIT) {
+    const slice = nodesToTranslate.slice(i, i + CONCURRENT_LIMIT);
     
-    if (translatedText) {
-      targetNode.nodeValue = translatedText;
-    }
-    
-    processedCount++;
+    // 同時並行で翻訳リクエストを実行
+    await Promise.all(slice.map(async (targetNode) => {
+      const translatedText = await fetchMyTranslation(targetNode.originalText, targetLang);
+      if (translatedText) {
+        targetNode.nodeValue = translatedText;
+      }
+      processedCount++;
+    }));
+
     const percent = Math.floor((processedCount / total) * 100);
     if (statusText) statusText.innerText = `Translating... ${percent}% (${processedCount}/${total})`;
     if (progressBar) progressBar.style.width = `${percent}%`;
-
-    // API制限（レートリミット）回避とブラウザのフリーズを防ぐための小休止
-    if (i % 10 === 0) {
-      await new Promise(r => setTimeout(r, 10));
-    }
   }
 
   if (progressBar) progressBar.style.width = "100%";
