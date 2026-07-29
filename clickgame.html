@@ -752,13 +752,17 @@ button, .btn-action-prestige, .click-core-btn, .card-upgrade-node, .factory-line
 
 <!-- ② 言語設定モーダル（右上の「🌐 言語」ボタンから開く） -->
 <div id="langModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:99999; align-items:center; justify-content:center;">
-  <div style="background:var(--bg-panel, #1a1a1a); border:1px solid var(--border-strong, #444); padding:20px; border-radius:8px; width:300px; text-align:center;">
-    <div style="font-size:0.85rem; font-weight:900; color:#fff; margin-bottom:12px;">LANGUAGES / 言語設定</div>
-    <div style="font-size:0.68rem; color:var(--text-muted, #ccc); margin-bottom:15px;">表示言語を選択してください</div>
+  <div style="background:var(--bg-panel, #1a1a1a); border:1px solid var(--border-strong, #444); padding:20px; border-radius:8px; width:320px; text-align:center; display:flex; flex-direction:column; max-height:80vh;">
     
-    <div style="display:flex; gap:10px; margin-bottom:15px;">
-      <button class="btn-utility" onclick="setGameLanguage('ja')" style="flex:1; padding:10px; font-weight:bold;">日本語</button>
-      <button class="btn-utility" onclick="setGameLanguage('en')" style="flex:1; padding:10px; font-weight:bold;">English</button>
+    <div style="font-size:0.85rem; font-weight:900; color:#fff; margin-bottom:4px;">LANGUAGES / 言語設定</div>
+    <div style="font-size:0.68rem; color:var(--text-muted, #ccc); margin-bottom:12px;">表示言語を選択してください</div>
+    
+    <!-- 🔍 検索バー -->
+    <input type="text" id="langSearch" placeholder="Search language..." onkeyup="filterLanguages()" style="padding: 8px 10px; margin-bottom: 12px; border-radius: 4px; border: 1px solid var(--border-strong, #444); background: #222; color: white; font-size: 0.8rem; outline: none;">
+
+    <!-- 🌐 言語ボタンが入るリスト（スクロール可能） -->
+    <div id="langList" style="display:flex; flex-direction:column; gap:6px; margin-bottom:15px; overflow-y:auto; max-height:250px; padding-right:2px;">
+      <!-- JavaScriptで自動生成されます -->
     </div>
     
     <button class="btn-utility" onclick="toggleLangMenu()" style="width:100%; padding:6px;">閉じる</button>
@@ -3237,7 +3241,148 @@ window.addEventListener("DOMContentLoaded", () => {
 });
   /**
  * =========================================================================
- * 2. 独自言語メニュー制御（チャンク分割・進捗バー付き動的翻訳版）
+ * 🌐 言語リストの定義（必要なものをどんどん追加してOK）
+ * =========================================================================
+ */
+const SUPPORTED_LANGUAGES = [
+  { code: 'af', name: 'Afrikaans' },
+  { code: 'sq', name: 'Shqip (Albanian)' },
+  { code: 'am', name: 'አማርኛ (Amharic)' },
+  { code: 'ar', name: 'العربية (Arabic)' },
+  { code: 'hy', name: 'Հայերեն (Armenian)' },
+  { code: 'as', name: 'অসমীয়া (Assamese)' },
+  { code: 'ay', name: 'Aymara' },
+  { code: 'az', name: 'Azərbaycan (Azerbaijani)' },
+  { code: 'bm', name: 'Bamanankan (Bambara)' },
+  { code: 'eu', name: 'Euskara (Basque)' },
+  { code: 'be', name: 'Беларуская (Belarusian)' },
+  { code: 'bn', name: 'বাংলা (Bengali)' },
+  { code: 'bho', name: 'भोजपुरी (Bhojpuri)' },
+  { code: 'bs', name: 'Bosanski (Bosnian)' },
+  { code: 'bg', name: 'Български (Bulgarian)' },
+  { code: 'ca', name: 'Català (Catalan)' },
+  { code: 'ceb', name: 'Cebuano' },
+  { code: 'ny', name: 'Chichewa' },
+  { code: 'zh-CN', name: '简体中文 (Chinese Simplified)' },
+  { code: 'zh-TW', name: '繁體中文 (Chinese Traditional)' },
+  { code: 'co', name: 'Corsu (Corsican)' },
+  { code: 'hr', name: 'Hrvatski (Croatian)' },
+  { code: 'cs', name: 'Čeština (Czech)' },
+  { code: 'da', name: 'Dansk (Danish)' },
+  { code: 'dv', name: 'ދިވެހިބަސް (Dhivehi)' },
+  { code: 'doi', name: 'डोगरी (Dogri)' },
+  { code: 'nl', name: 'Nederlands (Dutch)' },
+  { code: 'en', name: 'English' },
+  { code: 'eo', name: 'Esperanto' },
+  { code: 'et', name: 'Eesti (Estonian)' },
+  { code: 'ee', name: 'Eʋegbe (Ewe)' },
+  { code: 'fil', name: 'Filipino (Tagalog)' },
+  { code: 'fi', name: 'Suomi (Finnish)' },
+  { code: 'fr', name: 'Français (French)' },
+  { code: 'fy', name: 'Frysk (Frisian)' },
+  { code: 'gl', name: 'Galego (Galician)' },
+  { code: 'ka', name: 'ქართული (Georgian)' },
+  { code: 'de', name: 'Deutsch (German)' },
+  { code: 'el', name: 'Ελληνικά (Greek)' },
+  { code: 'gn', name: 'Guarani' },
+  { code: 'gu', name: 'ગુજરાતી (Gujarati)' },
+  { code: 'ht', name: 'Kreyòl ayisyen (Haitian Creole)' },
+  { code: 'ha', name: 'Hausa' },
+  { code: 'haw', name: 'Ōlelo Hawaiʻi (Hawaiian)' },
+  { code: 'he', name: 'עברית (Hebrew)' },
+  { code: 'hi', name: 'हिन्दी (Hindi)' },
+  { code: 'hmn', name: 'Hmoob (Hmong)' },
+  { code: 'hu', name: 'Magyar (Hungarian)' },
+  { code: 'is', name: 'Íslenska (Icelandic)' },
+  { code: 'ig', name: 'Igbo' },
+  { code: 'ilo', name: 'Ilokano' },
+  { code: 'id', name: 'Bahasa Indonesia (Indonesian)' },
+  { code: 'ga', name: 'Gaeilge (Irish)' },
+  { code: 'it', name: 'Italiano (Italian)' },
+  { code: 'ja', name: '日本語 (Japanese)' },
+  { code: 'jv', name: 'Basa Jawa (Javanese)' },
+  { code: 'kn', name: 'ಕನ್ನಡ (Kannada)' },
+  { code: 'kk', name: 'Қазақ тілі (Kazakh)' },
+  { code: 'km', name: 'ភាសាខ្មែរ (Khmer)' },
+  { code: 'rw', name: 'Kinyarwanda' },
+  { code: 'gom', name: 'कोंकणी (Konkani)' },
+  { code: 'ko', name: '한국어 (Korean)' },
+  { code: 'kri', name: 'Krio' },
+  { code: 'ku', name: 'Kurdî (Kurdish)' },
+  { code: 'ckb', name: 'کوردی سۆرانی (Kurdish Sorani)' },
+  { code: 'ky', name: 'Кыргызча (Kyrgyz)' },
+  { code: 'lo', name: 'ລາວ (Lao)' },
+  { code: 'la', name: 'Latina (Latin)' },
+  { code: 'lv', name: 'Latviešu (Latvian)' },
+  { code: 'ln', name: 'Lingála' },
+  { code: 'lt', name: 'Lietuvių (Lithuanian)' },
+  { code: 'lg', name: 'Luganda' },
+  { code: 'lb', name: 'Lëtzebuergesch (Luxembourgish)' },
+  { code: 'mk', name: 'Македонски (Macedonian)' },
+  { code: 'mai', name: 'मैथिली (Maithili)' },
+  { code: 'mg', name: 'Malagasy' },
+  { code: 'ms', name: 'Bahasa Melayu (Malay)' },
+  { code: 'ml', name: 'മലയാളം (Malayalam)' },
+  { code: 'mt', name: 'Malti (Maltese)' },
+  { code: 'mi', name: 'Māori' },
+  { code: 'mr', name: 'मराठी (Marathi)' },
+  { code: 'mni-Mtei', name: 'মৈতৈলোন্ (Meiteilon / Manipuri)' },
+  { code: 'lus', name: 'Mizo' },
+  { code: 'mn', name: 'Монгол (Mongolian)' },
+  { code: 'my', name: 'မြန်မာ (Myanmar / Burmese)' },
+  { code: 'ne', name: 'नेपाली (Nepali)' },
+  { code: 'no', name: 'Norsk (Norwegian)' },
+  { code: 'or', name: 'ଓଡ଼ିଆ (Odia / Oriya)' },
+  { code: 'om', name: 'Oromoo' },
+  { code: 'ps', name: 'پښتو (Pashto)' },
+  { code: 'fa', name: 'فارسی (Persian)' },
+  { code: 'pl', name: 'Polski (Polish)' },
+  { code: 'pt', name: 'Português (Portuguese)' },
+  { code: 'pa', name: 'ਪੰਜਾਬੀ (Punjabi)' },
+  { code: 'qu', name: 'Runa Simi (Quechua)' },
+  { code: 'ro', name: 'Română (Romanian)' },
+  { code: 'ru', name: 'Русский (Russian)' },
+  { code: 'sm', name: 'Samoa (Samoan)' },
+  { code: 'sa', name: 'संस्कृतम् (Sanskrit)' },
+  { code: 'gd', name: 'Gàidhlig (Scots Gaelic)' },
+  { code: 'nso', name: 'Sepedi' },
+  { code: 'sr', name: 'Српски (Serbian)' },
+  { code: 'st', name: 'Sesotho' },
+  { code: 'sn', name: 'Shona' },
+  { code: 'sd', name: 'سنڌي (Sindhi)' },
+  { code: 'si', name: 'සිංහල (Sinhala)' },
+  { code: 'sk', name: 'Slovenčina (Slovak)' },
+  { code: 'sl', name: 'Slovenščina (Slovenian)' },
+  { code: 'so', name: 'Soomaali (Somali)' },
+  { code: 'es', name: 'Español (Spanish)' },
+  { code: 'su', name: 'Basa Sunda (Sundanese)' },
+  { code: 'sw', name: 'Kiswahili (Swahili)' },
+  { code: 'sv', name: 'Svenska (Swedish)' },
+  { code: 'tg', name: 'Тоҷикӣ (Tajik)' },
+  { code: 'ta', name: 'தமிழ் (Tamil)' },
+  { code: 'tt', name: 'Татарча (Tatar)' },
+  { code: 'te', name: 'తెలుగు (Telugu)' },
+  { code: 'th', name: 'ไทย (Thai)' },
+  { code: 'ti', name: 'ትግርኛ (Tigrinya)' },
+  { code: 'ts', name: 'Xitsonga' },
+  { code: 'tr', name: 'Türkçe (Turkish)' },
+  { code: 'tk', name: 'Türkmençe (Turkmen)' },
+  { code: 'ak', name: 'Twi' },
+  { code: 'uk', name: 'Українська (Ukrainian)' },
+  { code: 'ur', name: 'اردو (Urdu)' },
+  { code: 'ug', name: 'ئۇيغۇرچە (Uyghur)' },
+  { code: 'uz', name: 'Oʻzbekcha (Uzbek)' },
+  { code: 'vi', name: 'Tiếng Việt (Vietnamese)' },
+  { code: 'cy', name: 'Cymraeg (Welsh)' },
+  { code: 'xh', name: 'isiXhosa' },
+  { code: 'yi', name: 'ייִדיש (Yiddish)' },
+  { code: 'yo', name: 'Yorùbá' },
+  { code: 'zu', name: 'isiZulu' }
+];
+
+/**
+ * =========================================================================
+ * 2. 独自言語メニュー制御（多言語・検索機能付き）
  * =========================================================================
  */
 function toggleLangMenu() {
@@ -3247,174 +3392,70 @@ function toggleLangMenu() {
   const isOpen = (modal.style.display === "flex");
   modal.style.display = isOpen ? "none" : "flex";
   
-  playSettingSound();
-}
-
-async function setGameLanguage(lang) {
-  localStorage.setItem("game_lang", lang);
-  
-  await autoTranslatePageInChunks(lang);
-  
-  if (typeof pushLog === "function") {
-    pushLog(`🌐 Language changed to: ${lang.toUpperCase()}`, "var(--color-upgrade)");
+  if (!isOpen) {
+    // 開くときに言語リストを描画し、検索バーをリセット
+    renderLanguageList();
+    document.getElementById("langSearch").value = "";
   }
   
-  playOkSound();
-  alert(lang === 'en' ? "Language set to English" : "言語を日本語に設定しました");
-  toggleLangMenu();
+  if (typeof playSettingSound === "function") playSettingSound();
 }
 
-// ページ内のテキストをスキャンし、文字数オーバーしないようチャンク（小分け）にして翻訳する関数
-async function autoTranslatePageInChunks(targetLang) {
-  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
-    acceptNode: function(node) {
-      if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
-      const parentTag = node.parentNode.tagName;
-      if (['SCRIPT', 'STYLE', 'NOSCRIPT', 'CODE', 'PRE'].includes(parentTag)) {
-        return NodeFilter.FILTER_REJECT;
-      }
-      return NodeFilter.FILTER_ACCEPT;
+// 🌐 言語ボタンを動的に生成して配置する関数
+function renderLanguageList() {
+  const langList = document.getElementById("langList");
+  langList.innerHTML = ""; // 一旦クリア
+
+  SUPPORTED_LANGUAGES.forEach(lang => {
+    const btn = document.createElement("button");
+    btn.className = "lang-btn";
+    btn.setAttribute("data-lang", lang.code);
+    btn.innerText = lang.name;
+    // スタイル調整（お好みで変更してね）
+    btn.style.cssText = "padding: 10px; background: #444; color: white; border: none; border-radius: 4px; cursor: pointer; text-align: left; font-size: 16px; transition: background 0.2s;";
+    btn.onmouseover = () => btn.style.background = "#555";
+    btn.onmouseout = () => btn.style.background = "#444";
+    
+    // クリック時の処理
+    btn.onclick = () => setGameLanguage(lang.code, lang.name);
+    
+    langList.appendChild(btn);
+  });
+}
+
+// 🔍 検索バーに入力したテキストで言語を絞り込む関数
+function filterLanguages() {
+  const searchBox = document.getElementById("langSearch");
+  const filterText = searchBox.value.toLowerCase();
+  const buttons = document.querySelectorAll(".lang-btn");
+
+  buttons.forEach(btn => {
+    const btnText = btn.innerText.toLowerCase();
+    const btnCode = btn.getAttribute("data-lang").toLowerCase();
+    
+    // 言語の名前かコード（ja, en等）に一致すれば表示、それ以外は隠す
+    if (btnText.includes(filterText) || btnCode.includes(filterText)) {
+      btn.style.display = "block";
+    } else {
+      btn.style.display = "none";
     }
   });
-
-  let node;
-  const nodesToTranslate = [];
-  while (node = walker.nextNode()) {
-    if (!node.originalText) {
-      node.originalText = node.nodeValue;
-    }
-    nodesToTranslate.push(node);
-  }
-
-  const total = nodesToTranslate.length;
-  if (total === 0) return;
-
-  // 進捗表示用オーバーレイの作成
-  let progressOverlay = document.getElementById("translationProgressOverlay");
-  if (!progressOverlay) {
-    progressOverlay = document.createElement("div");
-    progressOverlay.id = "translationProgressOverlay";
-    progressOverlay.style.cssText = `
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.7); display: flex; flex-direction: column;
-      justify-content: center; align-items: center; z-index: 99999;
-      color: #fff; font-family: sans-serif;
-    `;
-    progressOverlay.innerHTML = `
-      <div style="background: #222; padding: 20px 30px; border-radius: 8px; text-align: center; min-width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
-        <p id="translationStatusText" style="margin-bottom: 12px; font-size: 16px;">Translating... 0%</p>
-        <div style="width: 100%; background: #444; height: 10px; border-radius: 5px; overflow: hidden;">
-          <div id="translationProgressBar" style="width: 0%; height: 100%; background: var(--color-upgrade, #4caf50); transition: width 0.1s ease;"></div>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(progressOverlay);
-  } else {
-    progressOverlay.style.display = "flex";
-  }
-
-  const statusText = document.getElementById("translationStatusText");
-  const progressBar = document.getElementById("translationProgressBar");
-
-  // 日本語に戻す場合
-  if (targetLang === 'ja') {
-    for (let i = 0; i < total; i++) {
-      nodesToTranslate[i].nodeValue = nodesToTranslate[i].originalText;
-      const percent = Math.floor(((i + 1) / total) * 100);
-      statusText.innerText = `Reverting to Japanese... ${percent}%`;
-      progressBar.style.width = `${percent}%`;
-    }
-    setTimeout(() => { progressOverlay.style.display = "none"; }, 300);
-    return;
-  }
-
-  // 1回のリクエストに含める最大文字数（安全のため約1500文字〜2000文字程度に制限）
-  const CHUNK_CHAR_LIMIT = 1500;
-  
-  // ノードを安全なサイズごとにグループ化（チャンク分割）
-  const chunks = [];
-  let currentChunkNodes = [];
-  let currentChunkLength = 0;
-
-  for (const n of nodesToTranslate) {
-    const textLen = n.originalText.length;
-    if (currentChunkLength + textLen > CHUNK_CHAR_LIMIT && currentChunkNodes.length > 0) {
-      chunks.push(currentChunkNodes);
-      currentChunkNodes = [n];
-      currentChunkLength = textLen;
-    } else {
-      currentChunkNodes.push(n);
-      currentChunkLength += textLen;
-    }
-  }
-  if (currentChunkNodes.length > 0) {
-    chunks.push(currentChunkNodes);
-  }
-
-  let processedCount = 0;
-
-  // チャンクごとにまとめて翻訳リクエストを送信
-  for (let cIndex = 0; cIndex < chunks.length; cIndex++) {
-    const chunkNodes = chunks[cIndex];
-    const textsToJoin = chunkNodes.map(n => n.originalText);
-    const combinedText = textsToJoin.join("\n__SPLIT__\n");
-
-    const translatedCombined = await fetchMyTranslation(combinedText, targetLang);
-
-    if (translatedCombined) {
-      const translatedArray = translatedCombined.split(/\s*__SPLIT__\s*/);
-      
-      for (let i = 0; i < chunkNodes.length; i++) {
-        if (translatedArray[i] !== undefined) {
-          chunkNodes[i].nodeValue = translatedArray[i];
-        }
-        processedCount++;
-        
-        // 進行度をリアルタイム更新
-        const percent = Math.floor((processedCount / total) * 100);
-        statusText.innerText = `Translating... ${percent}% (${processedCount}/${total})`;
-        progressBar.style.width = `${percent}%`;
-      }
-    } else {
-      // 万が一チャンク全体の翻訳が失敗した場合は個別にフォールバック
-      for (let i = 0; i < chunkNodes.length; i++) {
-        const trans = await fetchMyTranslation(chunkNodes[i].originalText, targetLang);
-        if (trans) chunkNodes[i].nodeValue = trans;
-        processedCount++;
-        
-        const percent = Math.floor((processedCount / total) * 100);
-        statusText.innerText = `Translating (fallback)... ${percent}%`;
-        progressBar.style.width = `${percent}%`;
-      }
-    }
-    
-    // サーバー負荷軽減のわずかなウェイト
-    await new Promise(r => setTimeout(r, 50));
-  }
-
-  progressBar.style.width = "100%";
-  statusText.innerText = "Complete! 100%";
-  
-  setTimeout(() => {
-    progressOverlay.style.display = "none";
-  }, 400);
 }
 
-// 翻訳APIを叩く安全な非同期処理
-async function fetchMyTranslation(text, targetLang) {
-  try {
-    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    
-    const data = await res.json();
-    if (Array.isArray(data) && data[0]) {
-      return data[0].map(item => item[0]).join("");
-    }
-  } catch (e) {
-    console.error("翻訳フェッチエラー:", e);
+// 🚀 選択された言語をセットして翻訳を開始する関数
+async function setGameLanguage(langCode, langName) {
+  localStorage.setItem("game_lang", langCode);
+  
+  toggleLangMenu(); // 先にメニューを閉じる
+  
+  // 前回成功したチャンク分割翻訳関数を呼び出す
+  await autoTranslatePageInChunks(langCode);
+  
+  if (typeof pushLog === "function") {
+    pushLog(`🌐 Language changed to: ${langName}`, "var(--color-upgrade)");
   }
-  return null;
+  
+  if (typeof playOkSound === "function") playOkSound();
 }
 </script>
 </body>
