@@ -3685,12 +3685,45 @@ async function fetchMyTranslation(text, targetLang) {
 }
 
 // =========================================================================
-// 動的追加要素のリアルタイム監視（無限ループ防止＆デバウンス対応版）
+// Edge並みの超高速リアルタイム監視＆即時翻訳エンジン
 // =========================================================================
 let translationObserver = null;
-let pendingNodesToTranslate = [];
+let pendingNodesToTranslate = new Set(); // 重複を防ぐためSetに変更
 let observerTimer = null;
-let isTranslatingNow = false; // 🔄 翻訳中フラグ（無限ループ防止用）
+let isTranslatingNow = false;
+
+// 翻訳キャッシュ（一度翻訳したテキストを記憶して2回目以降を「一瞬」にする）
+const translationMemory = new Map();
+
+// 単一ノードの翻訳処理（キャッシュ最優先・超高速版）
+async function translateSingleNode(targetNode, targetLang) {
+  if (targetLang === 'ja') {
+    targetNode.nodeValue = targetNode.originalText;
+    return;
+  }
+
+  const textToTranslate = targetNode.originalText;
+  const cacheKey = `${targetLang}_${textToTranslate}`;
+
+  // 1. メモリ上にキャッシュがあれば、ネットワーク通信なしで「一瞬」で書き換え
+  if (translationMemory.has(cacheKey)) {
+    targetNode.nodeValue = translationMemory.get(cacheKey);
+    return;
+  }
+
+  if (!targetNode.translatedCache) {
+    // 2. APIを叩く
+    const translated = await fetchMyTranslation(textToTranslate, targetLang);
+    if (translated) {
+      targetNode.translatedCache = translated;
+      translationMemory.set(cacheKey, translated); // キャッシュに保存
+    }
+  }
+
+  if (targetNode.translatedCache) {
+    targetNode.nodeValue = targetNode.translatedCache;
+  }
+}
 
 function initRealtimeTranslator() {
   if (translationObserver) {
@@ -3698,67 +3731,83 @@ function initRealtimeTranslator() {
   }
 
   const currentLang = localStorage.getItem("game_lang") || "ja";
-  if (currentLang === "ja") return; // 日本語なら監視不要
+  if (currentLang === "ja") return;
 
   translationObserver = new MutationObserver((mutations) => {
-    // 自身が翻訳したときの変更であれば無視する
     if (isTranslatingNow) return;
 
-    let hasNewNodes = false;
+    let hasChanges = false;
 
     for (const mutation of mutations) {
-      if (mutation.addedNodes.length > 0) {
+      // A. 新しい要素やテキストが追加された場合
+      if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
         for (const addedNode of mutation.addedNodes) {
           if (addedNode.nodeType === Node.ELEMENT_NODE) {
             if (addedNode.id === "translationProgressOverlay") continue;
             
             const newTextNodes = collectTextNodes(addedNode);
             for (const node of newTextNodes) {
-              pendingNodesToTranslate.push(node);
-              hasNewNodes = true;
+              pendingNodesToTranslate.add(node);
+              hasChanges = true;
             }
           } else if (addedNode.nodeType === Node.TEXT_NODE) {
             if (addedNode.nodeValue.trim()) {
               if (!addedNode.originalText) {
                 addedNode.originalText = addedNode.nodeValue;
               }
-              pendingNodesToTranslate.push(addedNode);
-              hasNewNodes = true;
+              pendingNodesToTranslate.add(addedNode);
+              hasChanges = true;
             }
           }
         }
       }
+      // B. 既存のテキストノードの中身が直接書き換わった場合（Edge並みの反応速度）
+      else if (mutation.type === 'characterData') {
+        const textNode = mutation.target;
+        if (textNode && textNode.nodeType === Node.TEXT_NODE) {
+          if (!textNode.originalText) {
+            textNode.originalText = mutation.oldValue || textNode.nodeValue;
+          }
+          // 日本語以外の新しい文字列に変更された場合
+          if (textNode.nodeValue !== textNode.originalText && !translationMemory.has(`${currentLang}_${textNode.originalText}`)) {
+            textNode.originalText = textNode.nodeValue; // 新しいオリジナルとして更新
+          }
+          pendingNodesToTranslate.add(textNode);
+          hasChanges = true;
+        }
+      }
     }
 
-    if (hasNewNodes) {
+    if (hasChanges) {
       if (observerTimer) clearTimeout(observerTimer);
       
+      // 変更検知から処理開始までのディレイを「20ms」に短縮し、Edge並みのレスポンスに
       observerTimer = setTimeout(async () => {
-        // 🔄 翻訳処理に入る直前にフラグを立てて、監視の反応をブロック
         isTranslatingNow = true;
 
-        const nodesBatch = [...pendingNodesToTranslate];
-        pendingNodesToTranslate = [];
-        const uniqueNodes = [...new Set(nodesBatch)];
+        const nodesBatch = Array.from(pendingNodesToTranslate);
+        pendingNodesToTranslate.clear();
         
-        const BATCH_LIMIT = 6;
-        for (let i = 0; i < uniqueNodes.length; i += BATCH_LIMIT) {
-          const slice = uniqueNodes.slice(i, i + BATCH_LIMIT);
+        const BATCH_LIMIT = 10;
+        for (let i = 0; i < nodesBatch.length; i += BATCH_LIMIT) {
+          const slice = nodesBatch.slice(i, i + BATCH_LIMIT);
           await Promise.all(slice.map(node => translateSingleNode(node, currentLang)));
         }
 
-        // 🔄 翻訳が終わったら少し待ってから監視を再開
         setTimeout(() => {
           isTranslatingNow = false;
-        }, 100);
+        }, 50);
 
-      }, 50);
+      }, 20);
     }
   });
 
+  // ページ全体の構造変更 ＋ テキストの直接変更の両方を監視
   translationObserver.observe(document.body, {
     childList: true,
-    subtree: true
+    subtree: true,
+    characterData: true,
+    characterDataOldValue: true
   });
 }
 </script>
