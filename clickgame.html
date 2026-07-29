@@ -739,15 +739,27 @@ button, .btn-action-prestige, .click-core-btn, .card-upgrade-node, .factory-line
 
   <div class="right-header">SYSTEM LOG (宇宙の因果履歴)</div>
   <div class="log-stream-box" id="logBox"></div>
-  <!-- 言語設定モーダル -->
-<!-- 言語設定モーダル -->
+ <!-- ① 専用のブラウザ警告モーダル（ページ読み込み時に自動で出る） -->
+<div id="browserWarningModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:999999; align-items:center; justify-content:center;">
+  <div style="background:var(--bg-panel, #1a1a1a); border:2px solid #ff4444; padding:25px; border-radius:10px; width:340px; text-align:center; box-shadow: 0 0 20px rgba(255,68,68,0.4);">
+    <div style="font-size:1rem; font-weight:900; color:#ff4444; margin-bottom:12px;">⚠️ 推奨ブラウザのお知らせ</div>
+    <div style="font-size:0.75rem; color:var(--text-muted, #ccc); margin-bottom:20px; line-height:1.5;">
+      現在ご利用のブラウザ（Firefox / Floorp系）では、動作が重く感じられるか、正常に動作しない場合があります。<br><br>快適に遊ぶためには <b>Google Chrome</b> などのChrome系ブラウザをおすすめします。
+    </div>
+    <button class="btn-utility" onclick="closeBrowserWarning()" style="width:100%; padding:10px; font-weight:bold; background:#ff4444; color:#fff; border:none; border-radius:5px; cursor:pointer;">理解して閉じる</button>
+  </div>
+</div>
+
+<!-- ② 言語設定モーダル（右上の「🌐 言語」ボタンから開く） -->
 <div id="langModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:99999; align-items:center; justify-content:center;">
-  <div style="background:var(--bg-panel); border:1px solid var(--border-strong); padding:20px; border-radius:8px; width:320px; text-align:center;">
-    <div style="font-size:0.85rem; font-weight:900; color:#fff; margin-bottom:8px;">GOOGLE TRANSLATE</div>
-    <div style="font-size:0.68rem; color:var(--text-muted); margin-bottom:15px;">言語を選択するとページ全体が翻訳されます</div>
+  <div style="background:var(--bg-panel, #1a1a1a); border:1px solid var(--border-strong, #444); padding:20px; border-radius:8px; width:300px; text-align:center;">
+    <div style="font-size:0.85rem; font-weight:900; color:#fff; margin-bottom:12px;">LANGUAGES / 言語設定</div>
+    <div style="font-size:0.68rem; color:var(--text-muted, #ccc); margin-bottom:15px;">表示言語を選択してください</div>
     
-    <!-- Google翻訳ウィジェットが自動生成される場所 -->
-    <div id="google_translate_element" style="margin-bottom:15px; display:flex; justify-content:center; overflow:hidden;"></div>
+    <div style="display:flex; gap:10px; margin-bottom:15px;">
+      <button class="btn-utility" onclick="setGameLanguage('ja')" style="flex:1; padding:10px; font-weight:bold;">日本語</button>
+      <button class="btn-utility" onclick="setGameLanguage('en')" style="flex:1; padding:10px; font-weight:bold;">English</button>
+    </div>
     
     <button class="btn-utility" onclick="toggleLangMenu()" style="width:100%; padding:6px;">閉じる</button>
   </div>
@@ -3098,89 +3110,57 @@ function checkAchievements() {
 })();
 /**
  * =========================================================================
- * ブラウザ推奨警告システム（Floorp / Firefox対応版）
+ * 1. 専用ブラウザ警告システム（Firefox / Floorp検知）
  * =========================================================================
  */
 function checkBrowserSupport() {
   const ua = navigator.userAgent.toLowerCase();
-  
-  // Firefox系（Firefox, ゲッコウエンジン系、Floorpなど）を幅広く検知
   const isFirefoxFamily = ua.includes("firefox") || ua.includes("fxios") || ua.includes("floorp");
 
-  if (isFirefoxFamily) {
+  // まだユーザーが警告を閉じていなければ専用モーダルを表示
+  if (isFirefoxFamily && !localStorage.getItem("browser_warning_closed")) {
     setTimeout(() => {
-      if (typeof createToast === "function") {
-        createToast(
-          "推奨ブラウザのお知らせ",
-          "Firefox/Floorp系ブラウザはお勧めしません。動作が重く感じられる場合があります。おすすめはChrome系ブラウザです。"
-        );
+      const modal = document.getElementById("browserWarningModal");
+      if (modal) {
+        modal.style.display = "flex";
       }
-    }, 1000);
+    }, 800);
   }
 }
 
-// 読み込み時に実行
+function closeBrowserWarning() {
+  const modal = document.getElementById("browserWarningModal");
+  if (modal) {
+    modal.style.display = "none";
+  }
+  localStorage.setItem("browser_warning_closed", "true");
+}
+
 window.addEventListener("DOMContentLoaded", () => {
   checkBrowserSupport();
 });
+
+
 /**
  * =========================================================================
- * Google翻訳ウィジェット統合システム
+ * 2. 独自言語メニュー制御（上のバーが出ない安全なポップアップ版）
  * =========================================================================
  */
-
-// モーダルの開閉
 function toggleLangMenu() {
   const modal = document.getElementById("langModal");
   if (!modal) return;
+  modal.style.display = (modal.style.display === "flex") ? "none" : "flex";
+}
+
+function setGameLanguage(lang) {
+  localStorage.setItem("game_lang", lang);
   
-  const isOpen = (modal.style.display === "flex");
-  modal.style.display = isOpen ? "none" : "flex";
-  
-  if (!isOpen) {
-    initGoogleTranslateOnce();
+  if (typeof pushLog === "function") {
+    pushLog(`🌐 Language changed to: ${lang.toUpperCase()}`, "var(--color-upgrade)");
   }
-}
-
-let isTranslateScriptLoaded = false;
-
-// Google翻訳のスクリプトを安全にロード
-function initGoogleTranslateOnce() {
-  if (isTranslateScriptLoaded) return;
-  isTranslateScriptLoaded = true;
-
-  const script = document.createElement("script");
-  script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-  document.head.appendChild(script);
-}
-
-// Google翻訳の初期化コールバック
-window.googleTranslateElementInit = function() {
-  new google.translate.TranslateElement({
-    pageLanguage: 'ja',
-    includedLanguages: 'ja,en,zh-CN,ko,es,fr',
-    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-    autoDisplay: false // 画面上の強制的な上部バー（バナー）を出すのを防ぐ
-  }, 'google_translate_element');
-
-  // ウィジェット読み込み後に不要な翻訳バナーやフレームが画面上部に漏れ出すのをCSSで強制的に隠す
-  hideGoogleBannerFrames();
-};
-
-// Google翻訳特有の上部バーや隙間を消すハック
-function hideGoogleBannerFrames() {
-  const observer = new MutationObserver(() => {
-    // 画面上部に現れるGoogle翻訳のiframe（押し出しバー）を非表示にする
-    const iframe = document.querySelector(".goog-te-banner-frame");
-    if (iframe) {
-      iframe.style.display = "none";
-    }
-    // bodyのズレを修正
-    if (document.body.style.top !== "0px") {
-      document.body.style.top = "0px";
-    }
-  });
-  observer.observe(document.body, { attributes: true, childList: true, subtree: true });
+  
+  alert(lang === 'en' ? "Language set to English" : "言語を日本語に設定しました");
+  toggleLangMenu();
 }
 </script>
 </body>
