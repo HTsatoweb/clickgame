@@ -3499,7 +3499,7 @@ function filterLanguages() {
 }
 /**
  * =========================================================================
- * 言語決定と高速並行翻訳の実行
+ * 言語決定と高速並行翻訳の実行（動的更新対応版）
  * =========================================================================
  */
 async function setGameLanguage(langCode, langName) {
@@ -3510,7 +3510,7 @@ async function setGameLanguage(langCode, langName) {
   // 🌐 HTML自体の言語属性を変更（フォント適用のため）
   document.documentElement.lang = langCode;
   
-  // 高速な並行翻訳を実行
+  // ページ全体の翻訳を実行
   await autoTranslatePageFast(langCode);
   
   if (typeof pushLog === "function") {
@@ -3536,6 +3536,7 @@ async function autoTranslatePageFast(targetLang) {
   let node;
   const nodesToTranslate = [];
   while (node = walker.nextNode()) {
+    // すでに originalText があればそれを維持、なければ現在の値（日本語等）を保存
     if (!node.originalText) {
       node.originalText = node.nodeValue;
     }
@@ -3557,7 +3558,6 @@ async function autoTranslatePageFast(targetLang) {
       color: #fff; font-family: sans-serif;
     `;
     
-    // Windowsの起動時のようなドットアニメーション用のスタイルを動的追加
     if (!document.getElementById("winLoaderStyle")) {
       const style = document.createElement("style");
       style.id = "winLoaderStyle";
@@ -3576,7 +3576,6 @@ async function autoTranslatePageFast(targetLang) {
           border-radius: 50%; position: absolute;
           top: 0; left: 16px;
         }
-        /* 5つのドットを円状に配置 */
         .win-dot:nth-child(1) { transform: rotate(0deg) translate(0, -16px); transform-origin: 4px 20px; }
         .win-dot:nth-child(2) { transform: rotate(72deg) translate(0, -16px); transform-origin: 4px 20px; opacity: 0.85; }
         .win-dot:nth-child(3) { transform: rotate(144deg) translate(0, -16px); transform-origin: 4px 20px; opacity: 0.7; }
@@ -3612,7 +3611,6 @@ async function autoTranslatePageFast(targetLang) {
   // 日本語に戻す場合
   if (targetLang === 'ja') {
     for (let i = 0; i < total; i++) {
-      nodesToTrendslate = nodesToTranslate[i]; // typo safe
       nodesToTranslate[i].nodeValue = nodesToTranslate[i].originalText;
       const percent = Math.floor(((i + 1) / total) * 100);
       if (statusText) statusText.innerText = `Reverting to Japanese... ${percent}%`;
@@ -3622,18 +3620,20 @@ async function autoTranslatePageFast(targetLang) {
     return;
   }
 
-  // 高速化：一定数（例: 5個ずつ）のチャンクに分けて同時並行でAPIを叩く
+  // 高速化：一定数ずつ並行処理
   const CONCURRENT_LIMIT = 5; 
   let processedCount = 0;
 
   for (let i = 0; i < total; i += CONCURRENT_LIMIT) {
     const slice = nodesToTranslate.slice(i, i + CONCURRENT_LIMIT);
     
-    // 同時並行で翻訳リクエストを実行
     await Promise.all(slice.map(async (targetNode) => {
-      const translatedText = await fetchMyTranslation(targetNode.originalText, targetLang);
-      if (translatedText) {
-        targetNode.nodeValue = translatedText;
+      // すでに翻訳キャッシュがあればそれを使う、なければAPIを叩く
+      if (!targetNode.translatedCache) {
+        targetNode.translatedCache = await fetchMyTranslation(targetNode.originalText, targetLang);
+      }
+      if (targetNode.translatedCache) {
+        targetNode.nodeValue = targetNode.translatedCache;
       }
       processedCount++;
     }));
