@@ -3235,10 +3235,9 @@ window.addEventListener("DOMContentLoaded", () => {
   checkBrowserSupport();
 });
 
-
 /**
  * =========================================================================
- * 2. 独自言語メニュー制御（安全なポップアップ版 ＋ 設定音・OK音）
+ * 2. 独自言語メニュー制御（完全バックグラウンドAPI翻訳版）
  * =========================================================================
  */
 function toggleLangMenu() {
@@ -3251,8 +3250,11 @@ function toggleLangMenu() {
   playSettingSound(); // 🌐 メニュー開閉音を再生
 }
 
-function setGameLanguage(lang) {
+async function setGameLanguage(lang) {
   localStorage.setItem("game_lang", lang);
+  
+  // 🌐 画面上のテキストを裏側でAPI翻訳して書き換え（上のバー等は一切出ません）
+  await translatePageContent(lang);
   
   if (typeof pushLog === "function") {
     pushLog(`🌐 Language changed to: ${lang.toUpperCase()}`, "var(--color-upgrade)");
@@ -3261,6 +3263,53 @@ function setGameLanguage(lang) {
   playOkSound(); // ✔️ 言語決定のOK音を再生
   alert(lang === 'en' ? "Language set to English" : "言語を日本語に設定しました");
   toggleLangMenu();
+}
+
+// ページ内のテキストを全自動で取得・置換する関数
+async function translatePageContent(targetLang) {
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+    acceptNode: function(node) {
+      if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+      const parentTag = node.parentNode.tagName;
+      if (parentTag === 'SCRIPT' || parentTag === 'STYLE' || parentTag === 'NOSCRIPT') {
+        return NodeFilter.FILTER_REJECT;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+
+  let node;
+  while (node = walker.nextNode()) {
+    if (!node.originalText) {
+      node.originalText = node.nodeValue;
+    }
+
+    if (targetLang === 'ja') {
+      node.nodeValue = node.originalText;
+    } else {
+      const translated = await fetchTranslation(node.originalText, targetLang);
+      if (translated) {
+        node.nodeValue = translated;
+      }
+    }
+  }
+}
+
+// 翻訳APIのバックグラウンド通信
+async function fetchTranslation(text, targetLang) {
+  try {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    
+    const data = await res.json();
+    if (Array.isArray(data) && data[0]) {
+      return data[0].map(item => item[0]).join("");
+    }
+  } catch (e) {
+    console.error("翻訳APIエラー:", e);
+  }
+  return null;
 }
 </script>
 </body>
