@@ -3239,9 +3239,9 @@ function closeBrowserWarning() {
 window.addEventListener("DOMContentLoaded", () => {
   checkBrowserSupport();
 });
-  /**
+/**
  * =========================================================================
- * 🌐 言語リストの定義（必要なものをどんどん追加してOK）
+ * 🌐 Google翻訳対応の全言語リスト（100言語以上）
  * =========================================================================
  */
 const SUPPORTED_LANGUAGES = [
@@ -3382,7 +3382,7 @@ const SUPPORTED_LANGUAGES = [
 
 /**
  * =========================================================================
- * 2. 独自言語メニュー制御（多言語・検索機能付き）
+ * メニュー開閉・リスト自動生成・検索機能
  * =========================================================================
  */
 function toggleLangMenu() {
@@ -3393,39 +3393,36 @@ function toggleLangMenu() {
   modal.style.display = isOpen ? "none" : "flex";
   
   if (!isOpen) {
-    // 開くときに言語リストを描画し、検索バーをリセット
     renderLanguageList();
-    document.getElementById("langSearch").value = "";
+    const searchBox = document.getElementById("langSearch");
+    if (searchBox) searchBox.value = "";
   }
   
   if (typeof playSettingSound === "function") playSettingSound();
 }
 
-// 🌐 言語ボタンを動的に生成して配置する関数
 function renderLanguageList() {
   const langList = document.getElementById("langList");
-  langList.innerHTML = ""; // 一旦クリア
+  if (!langList) return;
+  langList.innerHTML = "";
 
   SUPPORTED_LANGUAGES.forEach(lang => {
     const btn = document.createElement("button");
     btn.className = "lang-btn";
     btn.setAttribute("data-lang", lang.code);
     btn.innerText = lang.name;
-    // スタイル調整（お好みで変更してね）
-    btn.style.cssText = "padding: 10px; background: #444; color: white; border: none; border-radius: 4px; cursor: pointer; text-align: left; font-size: 16px; transition: background 0.2s;";
-    btn.onmouseover = () => btn.style.background = "#555";
-    btn.onmouseout = () => btn.style.background = "#444";
+    btn.style.cssText = "padding: 8px 10px; background: #333; color: white; border: 1px solid #444; border-radius: 4px; cursor: pointer; text-align: left; font-size: 0.9rem; transition: background 0.2s;";
+    btn.onmouseover = () => btn.style.background = "#444";
+    btn.onmouseout = () => btn.style.background = "#333";
     
-    // クリック時の処理
     btn.onclick = () => setGameLanguage(lang.code, lang.name);
-    
     langList.appendChild(btn);
   });
 }
 
-// 🔍 検索バーに入力したテキストで言語を絞り込む関数
 function filterLanguages() {
   const searchBox = document.getElementById("langSearch");
+  if (!searchBox) return;
   const filterText = searchBox.value.toLowerCase();
   const buttons = document.querySelectorAll(".lang-btn");
 
@@ -3433,7 +3430,6 @@ function filterLanguages() {
     const btnText = btn.innerText.toLowerCase();
     const btnCode = btn.getAttribute("data-lang").toLowerCase();
     
-    // 言語の名前かコード（ja, en等）に一致すれば表示、それ以外は隠す
     if (btnText.includes(filterText) || btnCode.includes(filterText)) {
       btn.style.display = "block";
     } else {
@@ -3442,20 +3438,170 @@ function filterLanguages() {
   });
 }
 
-// 🚀 選択された言語をセットして翻訳を開始する関数
+/**
+ * =========================================================================
+ * 言語決定とチャンク分割翻訳の実行
+ * =========================================================================
+ */
 async function setGameLanguage(langCode, langName) {
   localStorage.setItem("game_lang", langCode);
   
-  toggleLangMenu(); // 先にメニューを閉じる
+  toggleLangMenu(); // メニューを閉じる
   
-  // 前回成功したチャンク分割翻訳関数を呼び出す
+  // チャンク分割翻訳を実行
   await autoTranslatePageInChunks(langCode);
   
   if (typeof pushLog === "function") {
-    pushLog(`🌐 Language changed to: ${langName}`, "var(--color-upgrade)");
+    pushLog(`🌐 Language changed to: ${langName || langCode.toUpperCase()}`, "var(--color-upgrade)");
   }
   
   if (typeof playOkSound === "function") playOkSound();
+}
+
+// ページ内のテキストをスキャンし、文字数オーバーしないようチャンク分割して進行度を表示する関数
+async function autoTranslatePageInChunks(targetLang) {
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+    acceptNode: function(node) {
+      if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+      const parentTag = node.parentNode.tagName;
+      if (['SCRIPT', 'STYLE', 'NOSCRIPT', 'CODE', 'PRE'].includes(parentTag)) {
+        return NodeFilter.FILTER_REJECT;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+
+  let node;
+  const nodesToTranslate = [];
+  while (node = walker.nextNode()) {
+    if (!node.originalText) {
+      node.originalText = node.nodeValue;
+    }
+    nodesToTranslate.push(node);
+  }
+
+  const total = nodesToTranslate.length;
+  if (total === 0) return;
+
+  // 進捗表示用オーバーレイの作成
+  let progressOverlay = document.getElementById("translationProgressOverlay");
+  if (!progressOverlay) {
+    progressOverlay = document.createElement("div");
+    progressOverlay.id = "translationProgressOverlay";
+    progressOverlay.style.cssText = `
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.7); display: flex; flex-direction: column;
+      justify-content: center; align-items: center; z-index: 99999;
+      color: #fff; font-family: sans-serif;
+    `;
+    progressOverlay.innerHTML = `
+      <div style="background: #222; padding: 20px 30px; border-radius: 8px; text-align: center; min-width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+        <p id="translationStatusText" style="margin-bottom: 12px; font-size: 16px;">Translating... 0%</p>
+        <div style="width: 100%; background: #444; height: 10px; border-radius: 5px; overflow: hidden;">
+          <div id="translationProgressBar" style="width: 0%; height: 100%; background: var(--color-upgrade, #4caf50); transition: width 0.1s ease;"></div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(progressOverlay);
+  } else {
+    progressOverlay.style.display = "flex";
+  }
+
+  const statusText = document.getElementById("translationStatusText");
+  const progressBar = document.getElementById("translationProgressBar");
+
+  // 日本語に戻す場合
+  if (targetLang === 'ja') {
+    for (let i = 0; i < total; i++) {
+      nodesToTranslate[i].nodeValue = nodesToTranslate[i].originalText;
+      const percent = Math.floor(((i + 1) / total) * 100);
+      if (statusText) statusText.innerText = `Reverting to Japanese... ${percent}%`;
+      if (progressBar) progressBar.style.width = `${percent}%`;
+    }
+    setTimeout(() => { progressOverlay.style.display = "none"; }, 300);
+    return;
+  }
+
+  const CHUNK_CHAR_LIMIT = 1500;
+  const chunks = [];
+  let currentChunkNodes = [];
+  let currentChunkLength = 0;
+
+  for (const n of nodesToTranslate) {
+    const textLen = n.originalText.length;
+    if (currentChunkLength + textLen > CHUNK_CHAR_LIMIT && currentChunkNodes.length > 0) {
+      chunks.push(currentChunkNodes);
+      currentChunkNodes = [n];
+      currentChunkLength = textLen;
+    } else {
+      currentChunkNodes.push(n);
+      currentChunkLength += textLen;
+    }
+  }
+  if (currentChunkNodes.length > 0) {
+    chunks.push(currentChunkNodes);
+  }
+
+  let processedCount = 0;
+
+  for (let cIndex = 0; cIndex < chunks.length; cIndex++) {
+    const chunkNodes = chunks[cIndex];
+    const textsToJoin = chunkNodes.map(n => n.originalText);
+    const combinedText = textsToJoin.join("\n__SPLIT__\n");
+
+    const translatedCombined = await fetchMyTranslation(combinedText, targetLang);
+
+    if (translatedCombined) {
+      const translatedArray = translatedCombined.split(/\s*__SPLIT__\s*/);
+      
+      for (let i = 0; i < chunkNodes.length; i++) {
+        if (translatedArray[i] !== undefined) {
+          chunkNodes[i].nodeValue = translatedArray[i];
+        }
+        processedCount++;
+        
+        const percent = Math.floor((processedCount / total) * 100);
+        if (statusText) statusText.innerText = `Translating... ${percent}% (${processedCount}/${total})`;
+        if (progressBar) progressBar.style.width = `${percent}%`;
+      }
+    } else {
+      for (let i = 0; i < chunkNodes.length; i++) {
+        const trans = await fetchMyTranslation(chunkNodes[i].originalText, targetLang);
+        if (trans) chunkNodes[i].nodeValue = trans;
+        processedCount++;
+        
+        const percent = Math.floor((processedCount / total) * 100);
+        if (statusText) statusText.innerText = `Translating (fallback)... ${percent}%`;
+        if (progressBar) progressBar.style.width = `${percent}%`;
+      }
+    }
+    
+    await new Promise(r => setTimeout(r, 50));
+  }
+
+  if (progressBar) progressBar.style.width = "100%";
+  if (statusText) statusText.innerText = "Complete! 100%";
+  
+  setTimeout(() => {
+    progressOverlay.style.display = "none";
+  }, 400);
+}
+
+// 翻訳APIを叩く安全な非同期処理
+async function fetchMyTranslation(text, targetLang) {
+  try {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    
+    const data = await res.json();
+    if (Array.isArray(data) && data[0]) {
+      return data[0].map(item => item[0]).join("");
+    }
+  } catch (e) {
+    console.error("翻訳フェッチエラー:", e);
+  }
+  return null;
 }
 </script>
 </body>
