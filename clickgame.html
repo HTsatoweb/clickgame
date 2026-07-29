@@ -3235,9 +3235,9 @@ function closeBrowserWarning() {
 window.addEventListener("DOMContentLoaded", () => {
   checkBrowserSupport();
 });
-/**
+  /**
  * =========================================================================
- * 2. 独自言語メニュー制御（一括結合・一括送信・進捗バー付き動的翻訳版）
+ * 2. 独自言語メニュー制御（チャンク分割・進捗バー付き動的翻訳版）
  * =========================================================================
  */
 function toggleLangMenu() {
@@ -3253,7 +3253,7 @@ function toggleLangMenu() {
 async function setGameLanguage(lang) {
   localStorage.setItem("game_lang", lang);
   
-  await autoTranslatePageBatch(lang);
+  await autoTranslatePageInChunks(lang);
   
   if (typeof pushLog === "function") {
     pushLog(`🌐 Language changed to: ${lang.toUpperCase()}`, "var(--color-upgrade)");
@@ -3264,8 +3264,8 @@ async function setGameLanguage(lang) {
   toggleLangMenu();
 }
 
-// ページ内のテキストをスキャンし、一括結合して超高速翻訳する関数
-async function autoTranslatePageBatch(targetLang) {
+// ページ内のテキストをスキャンし、文字数オーバーしないようチャンク（小分け）にして翻訳する関数
+async function autoTranslatePageInChunks(targetLang) {
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
     acceptNode: function(node) {
       if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
@@ -3302,9 +3302,9 @@ async function autoTranslatePageBatch(targetLang) {
     `;
     progressOverlay.innerHTML = `
       <div style="background: #222; padding: 20px 30px; border-radius: 8px; text-align: center; min-width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
-        <p id="translationStatusText" style="margin-bottom: 12px; font-size: 16px;">Preparing... 0%</p>
+        <p id="translationStatusText" style="margin-bottom: 12px; font-size: 16px;">Translating... 0%</p>
         <div style="width: 100%; background: #444; height: 10px; border-radius: 5px; overflow: hidden;">
-          <div id="translationProgressBar" style="width: 0%; height: 100%; background: var(--color-upgrade, #4caf50); transition: width 0.2s ease;"></div>
+          <div id="translationProgressBar" style="width: 0%; height: 100%; background: var(--color-upgrade, #4caf50); transition: width 0.1s ease;"></div>
         </div>
       </div>
     `;
@@ -3318,46 +3318,78 @@ async function autoTranslatePageBatch(targetLang) {
 
   // 日本語に戻す場合
   if (targetLang === 'ja') {
-    statusText.innerText = "Reverting to Japanese...";
-    progressBar.style.width = "100%";
-    for (const n of nodesToTranslate) {
-      n.nodeValue = n.originalText;
+    for (let i = 0; i < total; i++) {
+      nodesToTranslate[i].nodeValue = nodesToTranslate[i].originalText;
+      const percent = Math.floor(((i + 1) / total) * 100);
+      statusText.innerText = `Reverting to Japanese... ${percent}%`;
+      progressBar.style.width = `${percent}%`;
     }
     setTimeout(() => { progressOverlay.style.display = "none"; }, 300);
     return;
   }
 
-  statusText.innerText = "Analyzing texts... 10%";
-  progressBar.style.width = "10%";
-
-  // 改行区切りで全テキストを結合（長すぎる場合は分割も可能ですが、まずは一括結合）
-  const textsToJoin = nodesToTranslate.map(n => n.originalText);
+  // 1回のリクエストに含める最大文字数（安全のため約1500文字〜2000文字程度に制限）
+  const CHUNK_CHAR_LIMIT = 1500;
   
-  // Google翻訳は大量の改行テキストも一度に処理できます
-  statusText.innerText = `Translating ${total} items... 50%`;
-  progressBar.style.width = "50%";
+  // ノードを安全なサイズごとにグループ化（チャンク分割）
+  const chunks = [];
+  let currentChunkNodes = [];
+  let currentChunkLength = 0;
 
-  const combinedText = textsToJoin.join("\n___SPLIT___\n");
-  const translatedCombined = await fetchMyTranslation(combinedText, targetLang);
+  for (const n of nodesToTranslate) {
+    const textLen = n.originalText.length;
+    if (currentChunkLength + textLen > CHUNK_CHAR_LIMIT && currentChunkNodes.length > 0) {
+      chunks.push(currentChunkNodes);
+      currentChunkNodes = [n];
+      currentChunkLength = textLen;
+    } else {
+      currentChunkNodes.push(n);
+      currentChunkLength += textLen;
+    }
+  }
+  if (currentChunkNodes.length > 0) {
+    chunks.push(currentChunkNodes);
+  }
 
-  if (translatedCombined) {
-    statusText.innerText = "Applying translations... 90%";
-    progressBar.style.width = "90%";
+  let processedCount = 0;
 
-    const translatedArray = translatedCombined.split(/\s*___\s*SPLIT___\s*/);
-    
-    // 数が一致する場合のみ綺麗に流し込む
-    if (translatedArray.length === nodesToTranslate.length) {
-      for (let i = 0; i < nodesToTranslate.length; i++) {
-        nodesToTranslate[i].nodeValue = translatedArray[i];
+  // チャンクごとにまとめて翻訳リクエストを送信
+  for (let cIndex = 0; cIndex < chunks.length; cIndex++) {
+    const chunkNodes = chunks[cIndex];
+    const textsToJoin = chunkNodes.map(n => n.originalText);
+    const combinedText = textsToJoin.join("\n__SPLIT__\n");
+
+    const translatedCombined = await fetchMyTranslation(combinedText, targetLang);
+
+    if (translatedCombined) {
+      const translatedArray = translatedCombined.split(/\s*__SPLIT__\s*/);
+      
+      for (let i = 0; i < chunkNodes.length; i++) {
+        if (translatedArray[i] !== undefined) {
+          chunkNodes[i].nodeValue = translatedArray[i];
+        }
+        processedCount++;
+        
+        // 進行度をリアルタイム更新
+        const percent = Math.floor((processedCount / total) * 100);
+        statusText.innerText = `Translating... ${percent}% (${processedCount}/${total})`;
+        progressBar.style.width = `${percent}%`;
       }
     } else {
-      // 万が一区切りがずれた場合のフォールバック（1つずつ安全に処理）
-      for (let i = 0; i < nodesToTranslate.length; i++) {
-        const trans = await fetchMyTranslation(nodesToTranslate[i].originalText, targetLang);
-        if (trans) nodesToTranslate[i].nodeValue = trans;
+      // 万が一チャンク全体の翻訳が失敗した場合は個別にフォールバック
+      for (let i = 0; i < chunkNodes.length; i++) {
+        const trans = await fetchMyTranslation(chunkNodes[i].originalText, targetLang);
+        if (trans) chunkNodes[i].nodeValue = trans;
+        processedCount++;
+        
+        const percent = Math.floor((processedCount / total) * 100);
+        statusText.innerText = `Translating (fallback)... ${percent}%`;
+        progressBar.style.width = `${percent}%`;
       }
     }
+    
+    // サーバー負荷軽減のわずかなウェイト
+    await new Promise(r => setTimeout(r, 50));
   }
 
   progressBar.style.width = "100%";
