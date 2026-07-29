@@ -2366,6 +2366,98 @@ const SoundManager = {
 function toggleBGM() {
   SoundManager.toggleBGM();
 }
+  /**
+ * =========================================================================
+ * 効果音（SE）システム（Web Audio API版）
+ * =========================================================================
+ */
+let audioCtx = null;
+
+function getAudioContext() {
+  if (!audioCtx) {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (AudioContext) {
+      audioCtx = new AudioContext();
+    }
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  return audioCtx;
+}
+
+// 1. 警告音（不穏な高音のピピピッ）
+function playWarningSound() {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  const now = ctx.currentTime;
+  for (let i = 0; i < 3; i++) {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(440, now + (i * 0.12));
+    osc.frequency.exponentialRampToValueAtTime(300, now + (i * 0.12) + 0.08);
+    
+    gain.gain.setValueAtTime(0.15, now + (i * 0.12));
+    gain.gain.exponentialRampToValueAtTime(0.01, now + (i * 0.12) + 0.08);
+    
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    
+    osc.start(now + (i * 0.12));
+    osc.stop(now + (i * 0.12) + 0.08);
+  }
+}
+
+// 2. OKボタンの音（軽快な決定音）
+function playOkSound() {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  const now = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(587.33, now);
+  osc.frequency.exponentialRampToValueAtTime(880, now + 0.08);
+  
+  gain.gain.setValueAtTime(0.2, now);
+  gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+  
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  
+  osc.start(now);
+  osc.stop(now + 0.08);
+}
+
+// 3. 設定音 / メニュー開閉音（シュッとした開閉音）
+function playSettingSound() {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  const now = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  
+  osc.type = "triangle";
+  osc.frequency.setValueAtTime(300, now);
+  osc.frequency.exponentialRampToValueAtTime(600, now + 0.05);
+  
+  gain.gain.setValueAtTime(0.1, now);
+  gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+  
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  
+  osc.start(now);
+  osc.stop(now + 0.05);
+}
+
+
 /**
  * =========================================================================
  * Viewport Refresher & State Synchronization Interface
@@ -3108,9 +3200,10 @@ function checkAchievements() {
   };
   console.log("🛠️ SYSTEM LOADER: " + _docs.metaEngineName + " verification array initialized successfully. All " + _docs.endpointsWiredCount + " hooks validated.");
 })();
+
 /**
  * =========================================================================
- * 1. 専用ブラウザ警告システム（Firefox / Floorp検知）
+ * 1. 専用ブラウザ警告システム（Firefox / Floorp検知 ＋ 警告音）
  * =========================================================================
  */
 function checkBrowserSupport() {
@@ -3123,6 +3216,7 @@ function checkBrowserSupport() {
       const modal = document.getElementById("browserWarningModal");
       if (modal) {
         modal.style.display = "flex";
+        playWarningSound(); // ⚠️ 警告音を再生
       }
     }, 800);
   }
@@ -3134,6 +3228,7 @@ function closeBrowserWarning() {
     modal.style.display = "none";
   }
   localStorage.setItem("browser_warning_closed", "true");
+  playOkSound(); // ✔️ OKボタンの音を再生
 }
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -3143,13 +3238,17 @@ window.addEventListener("DOMContentLoaded", () => {
 
 /**
  * =========================================================================
- * 2. 独自言語メニュー制御（上のバーが出ない安全なポップアップ版）
+ * 2. 独自言語メニュー制御（安全なポップアップ版 ＋ 設定音・OK音）
  * =========================================================================
  */
 function toggleLangMenu() {
   const modal = document.getElementById("langModal");
   if (!modal) return;
-  modal.style.display = (modal.style.display === "flex") ? "none" : "flex";
+  
+  const isOpen = (modal.style.display === "flex");
+  modal.style.display = isOpen ? "none" : "flex";
+  
+  playSettingSound(); // 🌐 メニュー開閉音を再生
 }
 
 function setGameLanguage(lang) {
@@ -3159,6 +3258,7 @@ function setGameLanguage(lang) {
     pushLog(`🌐 Language changed to: ${lang.toUpperCase()}`, "var(--color-upgrade)");
   }
   
+  playOkSound(); // ✔️ 言語決定のOK音を再生
   alert(lang === 'en' ? "Language set to English" : "言語を日本語に設定しました");
   toggleLangMenu();
 }
