@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="google" content="notranslate">
 <title>インクリメンタル絶対神 — INFINITY MATRIX OMEGA ULTRA MULTI-LAYER MAX 65+ API OVERDRIVE —</title>
 <style>
 :root {
@@ -739,13 +740,14 @@ button, .btn-action-prestige, .click-core-btn, .card-upgrade-node, .factory-line
   <div class="right-header">SYSTEM LOG (宇宙の因果履歴)</div>
   <div class="log-stream-box" id="logBox"></div>
   <!-- 言語設定モーダル -->
+<!-- 言語設定モーダル -->
 <div id="langModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:99999; align-items:center; justify-content:center;">
-  <div style="background:var(--bg-panel); border:1px solid var(--border-strong); padding:20px; border-radius:8px; width:300px; text-align:center;">
-    <div style="font-size:0.85rem; font-weight:900; color:#fff; margin-bottom:12px;">LANGUAGES / 言語設定</div>
-    <div style="font-size:0.68rem; color:var(--text-muted); margin-bottom:15px;">Google翻訳を使用して言語を切り替えます。</div>
+  <div style="background:var(--bg-panel); border:1px solid var(--border-strong); padding:20px; border-radius:8px; width:320px; text-align:center;">
+    <div style="font-size:0.85rem; font-weight:900; color:#fff; margin-bottom:8px;">GOOGLE TRANSLATE</div>
+    <div style="font-size:0.68rem; color:var(--text-muted); margin-bottom:15px;">言語を選択するとページ全体が翻訳されます</div>
     
-    <!-- Google翻訳ウィジェットの挿入場所 -->
-    <div id="google_translate_element" style="margin-bottom:15px; display:flex; justify-content:center;"></div>
+    <!-- Google翻訳ウィジェットが自動生成される場所 -->
+    <div id="google_translate_element" style="margin-bottom:15px; display:flex; justify-content:center; overflow:hidden;"></div>
     
     <button class="btn-utility" onclick="toggleLangMenu()" style="width:100%; padding:6px;">閉じる</button>
   </div>
@@ -3096,69 +3098,90 @@ function checkAchievements() {
 })();
 /**
  * =========================================================================
- * 1. Firefox等ブラウザ推奨警告システム
+ * ブラウザ推奨警告システム（Floorp / Firefox対応版）
  * =========================================================================
  */
 function checkBrowserSupport() {
   const ua = navigator.userAgent.toLowerCase();
-  const isFirefox = ua.includes("firefox") || ua.includes("fxios");
+  
+  // Firefox系（Firefox, ゲッコウエンジン系、Floorpなど）を幅広く検知
+  const isFirefoxFamily = ua.includes("firefox") || ua.includes("fxios") || ua.includes("floorp");
 
-  if (isFirefox) {
+  if (isFirefoxFamily) {
     setTimeout(() => {
       if (typeof createToast === "function") {
         createToast(
           "推奨ブラウザのお知らせ",
-          "Firefox系ブラウザはお勧めしません。動作が重く感じられる場合があります。おすすめはChrome系ブラウザです。"
+          "Firefox/Floorp系ブラウザはお勧めしません。動作が重く感じられる場合があります。おすすめはChrome系ブラウザです。"
         );
       }
     }, 1000);
   }
 }
 
-// ページ読み込み時にブラウザチェックとイベントを登録
+// 読み込み時に実行
 window.addEventListener("DOMContentLoaded", () => {
   checkBrowserSupport();
 });
-
-
 /**
  * =========================================================================
- * 2. Google翻訳モーダル制御システム
+ * Google翻訳ウィジェット統合システム
  * =========================================================================
  */
+
+// モーダルの開閉
 function toggleLangMenu() {
   const modal = document.getElementById("langModal");
   if (!modal) return;
   
-  if (modal.style.display === "none" || !modal.style.display) {
-    modal.style.display = "flex";
-    initGoogleTranslateOnce(); // 初回表示時にGoogle翻訳を読み込む
-  } else {
-    modal.style.display = "none";
+  const isOpen = (modal.style.display === "flex");
+  modal.style.display = isOpen ? "none" : "flex";
+  
+  if (!isOpen) {
+    initGoogleTranslateOnce();
   }
 }
 
-let googleTranslateInitialized = false;
+let isTranslateScriptLoaded = false;
 
+// Google翻訳のスクリプトを安全にロード
 function initGoogleTranslateOnce() {
-  if (googleTranslateInitialized) return;
-  googleTranslateInitialized = true;
+  if (isTranslateScriptLoaded) return;
+  isTranslateScriptLoaded = true;
 
-  // Google翻訳公式スクリプトの読み込み
   const script = document.createElement("script");
   script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
   document.head.appendChild(script);
 }
 
-// Google翻訳のコールバック
+// Google翻訳の初期化コールバック
 window.googleTranslateElementInit = function() {
   new google.translate.TranslateElement({
     pageLanguage: 'ja',
     includedLanguages: 'ja,en,zh-CN,ko,es,fr',
     layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-    autoDisplay: false
+    autoDisplay: false // 画面上の強制的な上部バー（バナー）を出すのを防ぐ
   }, 'google_translate_element');
+
+  // ウィジェット読み込み後に不要な翻訳バナーやフレームが画面上部に漏れ出すのをCSSで強制的に隠す
+  hideGoogleBannerFrames();
 };
+
+// Google翻訳特有の上部バーや隙間を消すハック
+function hideGoogleBannerFrames() {
+  const observer = new MutationObserver(() => {
+    // 画面上部に現れるGoogle翻訳のiframe（押し出しバー）を非表示にする
+    const iframe = document.querySelector(".goog-te-banner-frame");
+    if (iframe) {
+      iframe.style.display = "none";
+    }
+    // bodyのズレを修正
+    if (document.body.style.top !== "0px") {
+      document.body.style.top = "0px";
+    }
+  });
+  observer.observe(document.body, { attributes: true, childList: true, subtree: true });
+}
 </script>
 </body>
 </html>
