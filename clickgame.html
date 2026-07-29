@@ -3685,11 +3685,12 @@ async function fetchMyTranslation(text, targetLang) {
 }
 
 // =========================================================================
-// 動的追加要素のリアルタイム監視（デバウンス処理による負荷激減版）
+// 動的追加要素のリアルタイム監視（無限ループ防止＆デバウンス対応版）
 // =========================================================================
 let translationObserver = null;
 let pendingNodesToTranslate = [];
 let observerTimer = null;
+let isTranslatingNow = false; // 🔄 翻訳中フラグ（無限ループ防止用）
 
 function initRealtimeTranslator() {
   if (translationObserver) {
@@ -3700,6 +3701,9 @@ function initRealtimeTranslator() {
   if (currentLang === "ja") return; // 日本語なら監視不要
 
   translationObserver = new MutationObserver((mutations) => {
+    // 自身が翻訳したときの変更であれば無視する
+    if (isTranslatingNow) return;
+
     let hasNewNodes = false;
 
     for (const mutation of mutations) {
@@ -3726,28 +3730,32 @@ function initRealtimeTranslator() {
       }
     }
 
-    // デバウンス処理: 頻繁なDOM変更が落ち着くのを少し待ってから（50msおきに）まとめて高速処理
     if (hasNewNodes) {
       if (observerTimer) clearTimeout(observerTimer);
       
       observerTimer = setTimeout(async () => {
-        const nodesBatch = [...pendingNodesToTranslate];
-        pendingNodesToTranslate = []; // キューをクリア
+        // 🔄 翻訳処理に入る直前にフラグを立てて、監視の反応をブロック
+        isTranslatingNow = true;
 
-        // 重複を除外
+        const nodesBatch = [...pendingNodesToTranslate];
+        pendingNodesToTranslate = [];
         const uniqueNodes = [...new Set(nodesBatch)];
         
-        // バックグラウンドで並行翻訳を実行（UIをカクつかせないよう小分けにする）
         const BATCH_LIMIT = 6;
         for (let i = 0; i < uniqueNodes.length; i += BATCH_LIMIT) {
           const slice = uniqueNodes.slice(i, i + BATCH_LIMIT);
           await Promise.all(slice.map(node => translateSingleNode(node, currentLang)));
         }
-      }, 50); // 50msの遅延で、大量の変更を光の速さかつ省エネでまとめ打ち
+
+        // 🔄 翻訳が終わったら少し待ってから監視を再開
+        setTimeout(() => {
+          isTranslatingNow = false;
+        }, 100);
+
+      }, 50);
     }
   });
 
-  // ページ全体のDOM変更を監視
   translationObserver.observe(document.body, {
     childList: true,
     subtree: true
