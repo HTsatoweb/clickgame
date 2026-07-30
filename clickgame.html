@@ -1115,21 +1115,7 @@ const DB_ACHIEVEMENTS = [
   { id: 'ach_73', text: '「インフィニット・エネルギー・ロード」', req: () => (game.energy ?? 0) >= 1.0e60, desc: 'エネルギー量が1.00e60を超え、全宇宙の物理法則の頂点に立つ。' },
   { id: 'ach_74', text: '「アブソリュート・シンギュラリティ」', req: () => (game.galaxyNodes ?? 0) >= 50, desc: '50個を超える銀河ノードを完全に統べたマルチバースの真の創造主。' },
   { id: 'ach_75', text: '「オムニ・マトリクス・エターナル」', req: () => (game.facCounts ?? []).reduce((a,b)=>a+(b??0), 0) >= 1000, desc: '全プラントの総稼働数が1,000機を突破し、無限の自動化宇宙を完成させた。' },
-    { id: 'ach_76', text: '「Ωの扉」', req: () => (game.omegaPoints ?? 0) >= 1, desc: '初めてΩポイントを獲得し、新たな次元の扉を開いた。' },
-  { id: 'ach_77', text: '「特異点の統合者」', req: () => (game.prestigeOpCount ?? 0) >= 1, desc: 'Ω転生を初めて成功させた者。' },
-  { id: 'ach_78', text: '「オメガの蓄積」', req: () => (game.omegaPoints ?? 0) >= 10, desc: 'Ωポイントを10個以上蓄積した。' },
-  { id: 'ach_79', text: '「無限への接近」', req: () => (game.energy ?? 0) >= 1e80, desc: 'エネルギーが1.00e80を突破し、無限の領域に近づいた。' },
-  { id: 'ach_80', text: '「銀河の覇者」', req: () => (game.galaxyNodes ?? 0) >= 25, desc: '25個の銀河ノードを統合した。' },
-  { id: 'ach_81', text: '「時間の支配者」', req: () => (game.timeShards ?? 0) >= 1000, desc: '時間律の破片が1000に到達。' },
-  { id: 'ach_82', text: '「反物質の深淵」', req: () => (game.antimatter ?? 0) >= 10000, desc: '反物質が1万を超え、空間が負に満ちる。' },
-  { id: 'ach_83', text: '「自動化の極致」', req: () => !!(game.autoFacEnabled && game.autoUpgEnabled && game.autoAmEnabled), desc: 'すべての自動化が完全稼働した。' },
-  { id: 'ach_84', text: '「プラント軍団」', req: () => (game.facCounts ?? []).reduce((a,b)=>a+(b??0), 0) >= 500, desc: '全施設の合計が500機を突破。' },
-  { id: 'ach_85', text: '「概念の完成」', req: () => (game.upgLevels ?? []).filter(v => v > 0).length >= 30, desc: '30種類以上のアップグレードを解放した。' },
-  { id: 'ach_86', text: '「Ωの探求者」', req: () => (game.prestigeOpCount ?? 0) >= 5, desc: 'Ω転生を5回達成した。' },
-  { id: 'ach_87', text: '「無限マトリクスの住人」', req: () => (game.totalTime ?? 0) >= 86400 * 7, desc: '累積プレイ時間が1週間を超えた。' },
-  { id: 'ach_88', text: '「エネルギー・タイタン」', req: () => (game.energy ?? 0) >= 1e100, desc: 'エネルギーが1.00e100を突破した神話的存在。' },
-  { id: 'ach_89', text: '「全プレステージの主」', req: () => (game.prestigeAmCount ?? 0) >= 10 && (game.prestigeTlCount ?? 0) >= 5 && (game.prestigeGxCount ?? 0) >= 3, desc: 'すべての下位プレステージを複数回達成。' },
-  { id: 'ach_90', text: '「オメガ・アブソリュート」', req: () => (game.omegaPoints ?? 0) >= 100, desc: 'Ωポイントが100に到達し、真の上位存在となった。' }
+　{id: 'ach_infinity_reached',text: '「無限宇宙の到達者」',req: () => (game.energy ?? 0) === Infinity || !isFinite(game.energy ?? 0),desc: 'エネルギーが通常の数値を完全に超越。表示が「無限宇宙 (Infinity)」に到達した究極の栄誉。'}
 ];
 
 /**
@@ -1396,6 +1382,111 @@ function formatValue(n) {
   const exponent = Math.floor(Math.log10(n));
   const mantissa = n / Math.pow(10, exponent);
   return `${mantissa.toFixed(2)}e${exponent}`;
+}
+  // すでに無限大の演出が発火したかどうかのフラグ
+// すでに無限大の演出が発火したかどうかのフラグ
+let hasTriggeredInfinityEvent = false;
+
+function checkInfinityMilestone(energy) {
+  if (hasTriggeredInfinityEvent) return;
+
+  // 数値が Infinity になったか、あるいは表現の限界を超えたか
+  if (energy === Infinity || !isFinite(energy)) {
+    hasTriggeredInfinityEvent = true;
+
+    // 1. 既存のログやトーストで通知
+    if (typeof createToast === "function") {
+      createToast("🌌 【到達】無限宇宙 (Infinity)", "数理の限界を突破しました。");
+    }
+    if (typeof pushLog === "function") {
+      pushLog("【重大発表】エネルギーが無限大に到達。全マトリクスが統合されました。", "var(--color-energy)");
+    }
+
+    // 2. 【超盛大】マイクラ＆RPGエンディング風の全画面モーダル生成
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: #000;
+      z-index: 9999999;
+      display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+      color: #fff; font-family: 'Courier New', Courier, monospace, sans-serif;
+      opacity: 0; transition: opacity 2s ease;
+      overflow: hidden;
+      pointer-events: auto;
+    `;
+
+    modal.innerHTML = `
+      <!-- 背景の星空・エフェクト用のレイヤー -->
+      <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, #0a0a23 0%, #000 80%); z-index: 1; pointer-events: none;"></div>
+
+      <!-- スクロールするエンディングクレジット（RPG・マイクラ風） -->
+      <div id="endingScrollArea" style="position: relative; z-index: 2; width: 100%; max-width: 700px; height: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; overflow: hidden; padding: 20px;">
+        <div id="endingContent" style="position: absolute; top: 100%; width: 100%; padding-bottom: 100vh; animation: scrollCredits 28s linear forwards;">
+          
+          <h1 style="font-size: 3rem; margin-bottom: 20px; background: linear-gradient(90deg, #00f2fe, #ff0055, #ffea00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 30px rgba(0,242,254,0.6); letter-spacing: 2px;">
+            🌌 無限宇宙 (Infinity) 🌌
+          </h1>
+          <p style="font-size: 1.2rem; color: #00f2fe; margin-bottom: 50px; letter-spacing: 1px;">- THE END OF NUMBERS -</p>
+
+          <p style="font-size: 1.1rem; line-height: 2.2; color: #ccc; margin-bottom: 40px;">
+            果てしないクリックの音が響く部屋。<br>
+            幾千もの自動化システムが、夜通しエネルギーを紡ぎ続けた。<br>
+            数字は指数を超え、次元の壁を溶かし、<br>
+            そして今――すべての限界が消失する。
+          </p>
+
+          <h3 style="color: #ffea00; font-size: 1.5rem; margin-top: 50px; margin-bottom: 15px;">【 主な功績 】</h3>
+          <p style="font-size: 1.1rem; line-height: 2; color: #aaa; margin-bottom: 40px;">
+            第一段階：数理の覚醒（1e6）<br>
+            第二段階：概念の侵食（1e100）<br>
+            第三段階：超巨大数の階段（1e200）<br>
+            最終段階：全宇宙マトリクスの統合（Infinity）
+          </p>
+
+          <h3 style="color: #ff0055; font-size: 1.5rem; margin-top: 50px; margin-bottom: 15px;">【 開発・制作協力 】</h3>
+          <p style="font-size: 1.1rem; line-height: 2; color: #aaa; margin-bottom: 60px;">
+            プレイヤー：あなた自身<br>
+            システム：Incremental Engine<br>
+            そして遊んでくれたすべての心に感謝を。
+          </p>
+
+          <div style="margin-top: 80px; margin-bottom: 100px;">
+            <p style="font-size: 1.3rem; color: #fff; margin-bottom: 30px; text-shadow: 0 0 10px #fff;">
+              あなたは真の創造主となりました。
+            </p>
+            <button id="infinityCloseBtn" style="padding: 16px 40px; font-size: 1.2rem; font-weight: bold; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #000; border: none; border-radius: 12px; cursor: pointer; box-shadow: 0 0 30px rgba(0,242,254,0.8); transition: transform 0.2s; pointer-events: auto;">
+              新次元へ旅立つ (閉じる)
+            </button>
+          </div>
+
+        </div>
+      </div>
+    `;
+
+    // CSSアニメーションを動的に追加（クレジットを下から上に流す）
+    const styleSheet = document.createElement("style");
+    styleSheet.type = "text/css";
+    styleSheet.innerText = `
+      @keyframes scrollCredits {
+        0% { top: 100%; }
+        100% { top: -150%; }
+      }
+    `;
+    document.head.appendChild(styleSheet);
+    document.body.appendChild(modal);
+
+    // フェードイン
+    setTimeout(() => { modal.style.opacity = '1'; }, 50);
+
+    // ボタンを押したら華やかに閉じる処理
+    document.getElementById('infinityCloseBtn').addEventListener('click', () => {
+      modal.style.opacity = '0';
+      setTimeout(() => {
+        modal.remove();
+        styleSheet.remove();
+      }, 2000);
+    });
+  }
 }
 /**
  * =========================================================================
@@ -3189,6 +3280,11 @@ if (!window.__achievementPoller) {
   window.__achievementPoller = setInterval(() => {
     try {
       checkAchievements();
+      
+      // ★ ここで常にエネルギーが Infinity になっていないか監視する
+      if (typeof game !== 'undefined' && typeof game.energy !== 'undefined') {
+        checkInfinityMilestone(game.energy);
+      }
       
       // 実績タブが開かれている場合はリアルタイムで画面を更新
       const achTab = document.getElementById('tab-ach');
