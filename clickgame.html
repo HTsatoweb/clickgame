@@ -766,7 +766,7 @@ body, button, input, select, textarea, [class*="game-"] {
   <button class="btn-utility" onclick="saveAndReloadGame()" style="color: var(--color-timeline); border-color: var(--color-timeline);">保存して再読込</button>
   <button class="btn-utility btn-danger" onclick="hardResetGame()">リセット</button>
       <!-- 右上のシステムボタンの並びに追加 -->
-<button class="btn-utility" onclick="toggleLangMenu()" style="color: var(--color-upgrade); border-color: var(--color-upgrade);">🌐 言語</button>
+<button class="btn-utility" id="langMenuBtn" style="color: var(--color-upgrade); border-color: var(--color-upgrade);">🌐 言語</button>
 </div>
   </div>
 
@@ -3954,7 +3954,18 @@ window.renderAchievementsList = function() {
 window.toggleLangMenu = toggleLangMenu;
 window.filterLanguages = filterLanguages;
 window.setGameLanguage = setGameLanguage;
+// HTMLの読み込みが完了した後にイベントを安全に紐付ける
+document.addEventListener("DOMContentLoaded", () => {
+  const langMenuBtn = document.getElementById("langMenuBtn");
+  if (langMenuBtn) {
+    langMenuBtn.addEventListener("click", toggleLangMenu);
+  }
 
+  const langSearch = document.getElementById("langSearch");
+  if (langSearch) {
+    langSearch.addEventListener("input", filterLanguages);
+  }
+});
 </script>
 </body>
 </html>
