@@ -714,6 +714,7 @@ body, button, input, select, textarea, [class*="game-"] {
     <button class="tab-trigger-button tab-color-am" onclick="switchMainTab('tab-am-layer')">ANTIMATTER (反物質)</button>
     <button class="tab-trigger-button tab-color-tl" onclick="switchMainTab('tab-tl-layer')">TIME (時間律)</button>
     <button class="tab-trigger-button" onclick="switchMainTab('tab-auto')">AUTOMATION (自動化)</button>
+    <button class="tab-trigger-button" onclick="switchMainTab('tab-ach'); renderAchievementsList();" style="color: var(--color-upgrade); border-color: var(--color-upgrade);">ACHIEVEMENTS (実績)</button>
   </div>
 
   <div class="center-content-viewport">
@@ -746,6 +747,11 @@ body, button, input, select, textarea, [class*="game-"] {
       <div class="guide-text-block">完全自動化の領域。「CONCEPT」タブ最下層の【マトリクスの深淵】の購入で全稼働します。</div>
       <div id="containerAutomation"></div>
     </div>
+    <div class="tab-pane" id="tab-ach">
+  <div class="pane-heading" style="color: var(--color-upgrade);">ACHIEVEMENTS MATRIX (実績データベース)</div>
+  <div class="guide-text-block">宇宙の因果を紐解き、数々の条件を達成して称号を手に入れろ。<br>達成率: <span id="ach-progress-text">0 / 0</span> (<span id="ach-progress-percent">0%</span>)</div>
+  <div class="upgrade-matrix-grid" id="containerAchievements" style="display: flex; flex-direction: column; gap: 6px;"></div>
+</div>
 
   </div>
 </div>
@@ -3127,37 +3133,47 @@ window.addEventListener("DOMContentLoaded", () => {
   /* -------------------------
      自動ポーリング（任意）
      ------------------------- */
-  if (!window.__visualsEnergyPoller) {
-    window.__visualsEnergyPoller = setInterval(() => {
-      try {
-        const energy = (typeof game !== 'undefined' && typeof game.energy !== 'undefined') ? game.energy : null;
-        if (energy !== null) window.updateDynamicCoreAndResourceVisuals(energy);
-      } catch(e) {}
-    }, 250);
-  }
+/* -------------------------------------------------------------------------
+   エネルギーポーリングの継続実行（既存部分）
+   ------------------------------------------------------------------------- */
+if (!window.__visualsEnergyPoller) {
+  window.__visualsEnergyPoller = setInterval(() => {
+    try {
+      const energy = (typeof game !== 'undefined' && typeof game.energy !== 'undefined') ? game.energy : null;
+      if (energy !== null && typeof window.updateDynamicCoreAndResourceVisuals === 'function') {
+        window.updateDynamicCoreAndResourceVisuals(energy);
+      }
+    } catch(e) {}
+  }, 250);
+}
 
-})();
-/**
- * =========================================================================
- * 実績達成判定システムの組み込み
- * =========================================================================
- */
+/* -------------------------------------------------------------------------
+   実績達成判定システムの初期化と定期チェック
+   ------------------------------------------------------------------------- */
 if (typeof game !== "undefined") {
   if (!game.unlockedAchievements) game.unlockedAchievements = {};
 }
 
 function checkAchievements() {
-  if (typeof DB_ACHIEVEMENTS === "undefined") return;
+  if (typeof DB_ACHIEVEMENTS === "undefined" || typeof game === "undefined") return;
+  
   DB_ACHIEVEMENTS.forEach(ach => {
     if (!game.unlockedAchievements[ach.id]) {
       try {
         if (ach.req && ach.req()) {
           game.unlockedAchievements[ach.id] = true;
+          
           if (typeof SoundManager !== "undefined" && SoundManager.playAchievement) {
-            SoundManager.playAchievement();
+            try { SoundManager.playAchievement(); } catch(e) {}
           }
-          createToast("🏆 実績達成！", `${ach.text}<br><span style="font-size:0.65rem; color:var(--text-muted);">${ach.desc}</span>`);
-          pushLog(`🏆 実績解除: ${ach.text}`, "var(--color-upgrade)");
+          
+          if (typeof createToast === "function") {
+            createToast("🏆 実績達成！", `${ach.text}<br><span style="font-size:0.65rem; color:var(--text-muted);">${ach.desc}</span>`);
+          }
+          
+          if (typeof pushLog === "function") {
+            pushLog(`🏆 実績解除: ${ach.text}`, "var(--color-upgrade)");
+          }
           
           if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onAchievement) {
             window.ModAPI.hooks.onAchievement.forEach(cb => { try { cb({id: ach.id}); } catch(e){} });
@@ -3166,9 +3182,22 @@ function checkAchievements() {
       } catch (e) {}
     }
   });
-}// 【重要】ゲームループ内（例: executeCoreGameTick やタイマー内）の適当な位置で毎秒～数秒ごとに呼び出す
-// 例: setInterval(checkAchievements, 1000); または tick関数内に追加
-/**
+}
+
+// 1秒ごとに実績の達成条件を自動チェックするループ
+if (!window.__achievementPoller) {
+  window.__achievementPoller = setInterval(() => {
+    try {
+      checkAchievements();
+      
+      // 実績タブが開かれている場合はリアルタイムで画面を更新
+      const achTab = document.getElementById('tab-ach');
+      if (achTab && achTab.classList.contains('active') && typeof renderAchievementsList === 'function') {
+        renderAchievementsList();
+      }
+    } catch(e) {}
+  }, 1000);
+}
  * ==========================================================================================
  * MAXIMUM SYSTEM SPECIFICATION & VERIFIED API DEVELOPMENT EXHAUSTIVE DOCUMENTATION BLOCK
  * ==========================================================================================
@@ -3935,6 +3964,50 @@ function initRealtimeTranslator() {
     childList: true,
     subtree: true
   });
+}
+  function renderAchievementsList() {
+  const container = document.getElementById('containerAchievements');
+  if (!container || typeof DB_ACHIEVEMENTS === "undefined") return;
+  
+  container.innerHTML = '';
+  
+  let unlockedCount = 0;
+  const totalCount = DB_ACHIEVEMENTS.length;
+
+  DB_ACHIEVEMENTS.forEach(ach => {
+    const isUnlocked = game.unlockedAchievements && game.unlockedAchievements[ach.id];
+    if (isUnlocked) unlockedCount++;
+
+    const item = document.createElement('div');
+    item.style.cssText = `
+      display: flex;
+      flex-direction: column;
+      padding: 8px 12px;
+      background: ${isUnlocked ? 'rgba(0, 255, 128, 0.08)' : 'rgba(255, 255, 255, 0.02)'};
+      border: 1px solid ${isUnlocked ? 'rgba(0, 255, 128, 0.3)' : 'var(--border-weak, #333)'};
+      border-radius: 6px;
+      opacity: ${isUnlocked ? '1.0' : '0.6'};
+    `;
+
+    item.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+        <span style="font-size: 0.75rem; font-weight: bold; color: ${isUnlocked ? 'var(--color-energy, #00ff80)' : '#aaa'};">
+          ${isUnlocked ? '🏆' : '🔒'} ${ach.text}
+        </span>
+        <span style="font-size: 0.6rem; padding: 1px 6px; border-radius: 3px; background: ${isUnlocked ? 'rgba(0,255,128,0.2)' : 'rgba(255,255,255,0.05)'}; color: ${isUnlocked ? '#00ff80' : '#777'};">
+          ${isUnlocked ? '達成済み' : '未達成'}
+        </span>
+      </div>
+      <div style="font-size: 0.65rem; color: var(--text-muted, #ccc);">${ach.desc}</div>
+    `;
+    container.appendChild(item);
+  });
+
+  // 進捗率テキストの更新
+  const progText = document.getElementById('ach-progress-text');
+  const progPercent = document.getElementById('ach-progress-percent');
+  if (progText) progText.textContent = `${unlockedCount} / ${totalCount}`;
+  if (progPercent) progPercent.textContent = `${Math.floor((unlockedCount / totalCount) * 100)}%`;
 }
 </script>
 </body>
