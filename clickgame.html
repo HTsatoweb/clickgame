@@ -3966,7 +3966,8 @@ function initRealtimeTranslator() {
     subtree: true
   });
 }
-  function renderAchievementsList() {
+ // 各種UI更新やイベント処理のスクリプトブロック内、または独立したスクリプトタグ内に配置
+function renderAchievementsList() {
   const container = document.getElementById('containerAchievements');
   if (!container || typeof DB_ACHIEVEMENTS === "undefined") return;
   
@@ -3974,11 +3975,11 @@ function initRealtimeTranslator() {
   
   let unlockedCount = 0;
   const totalCount = DB_ACHIEVEMENTS.length;
-
+  
   DB_ACHIEVEMENTS.forEach(ach => {
-    const isUnlocked = game.unlockedAchievements && game.unlockedAchievements[ach.id];
+    const isUnlocked = (typeof game !== "undefined" && game.unlockedAchievements && game.unlockedAchievements[ach.id]);
     if (isUnlocked) unlockedCount++;
-
+    
     const item = document.createElement('div');
     item.style.cssText = `
       display: flex;
@@ -3989,7 +3990,7 @@ function initRealtimeTranslator() {
       border-radius: 6px;
       opacity: ${isUnlocked ? '1.0' : '0.6'};
     `;
-
+    
     item.innerHTML = `
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
         <span style="font-size: 0.75rem; font-weight: bold; color: ${isUnlocked ? 'var(--color-energy, #00ff80)' : '#aaa'};">
@@ -4003,7 +4004,7 @@ function initRealtimeTranslator() {
     `;
     container.appendChild(item);
   });
-
+  
   // 進捗率テキストの更新
   const progText = document.getElementById('ach-progress-text');
   const progPercent = document.getElementById('ach-progress-percent');
