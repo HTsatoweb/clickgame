@@ -838,11 +838,16 @@ body, button, input, select, textarea, [class*="game-"] {
 <div id="google_translate_element" style="display:none;"></div>
 <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <script>
-/**
+// ファイルの最上部、または関数定義のセットの最後に以下を追加
+window.toggleLangMenu = toggleLangMenu;
+window.filterLanguages = filterLanguages;
+window.setGameLanguage = setGameLanguage;
+  /**
  * =========================================================================
  * Extended Configuration Database Ecosystem (DEEP MASSIVE ARRAY ENHANCEMENT)
  * =========================================================================
  */
+
 const DB_FACTORIES = [
   { id: 0, name: 'パルス・レプリケーター', baseCost: 15, costMultiplier: 1.15, baseCps: 0.1, desc: '量子パルスを複製して極微小の電界を形成。空間を均質な低極振動状態に維持して無限の出力を担保する基本基礎ラインの基盤セクター。' },
   { id: 1, name: '熱原子抽出インジェクター', baseCost: 150, costMultiplier: 1.19, baseCps: 1.5, desc: '周囲の原子の熱運動を強制停止し電荷に置換。絶対零度へ至る過程の莫大なエネルギー落差を完全に回収し定着させる熱力学の破壊的装置。' },
