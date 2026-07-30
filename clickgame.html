@@ -3967,7 +3967,7 @@ function initRealtimeTranslator() {
   });
 }
  // 各種UI更新やイベント処理のスクリプトブロック内、または独立したスクリプトタグ内に配置
-function renderAchievementsList() {
+window.renderAchievementsList = function() {
   const container = document.getElementById('containerAchievements');
   if (!container || typeof DB_ACHIEVEMENTS === "undefined") return;
   
