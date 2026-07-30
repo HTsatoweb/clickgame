@@ -838,10 +838,6 @@ body, button, input, select, textarea, [class*="game-"] {
 <div id="google_translate_element" style="display:none;"></div>
 <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <script>
-// ファイルの最上部、または関数定義のセットの最後に以下を追加
-window.toggleLangMenu = toggleLangMenu;
-window.filterLanguages = filterLanguages;
-window.setGameLanguage = setGameLanguage;
   /**
  * =========================================================================
  * Extended Configuration Database Ecosystem (DEEP MASSIVE ARRAY ENHANCEMENT)
@@ -4113,6 +4109,11 @@ window.renderAchievementsList = function() {
   if (progPercent) progPercent.textContent = `${Math.floor((unlockedCount / totalCount) * 100)}%`;
 }
   })();
+  // ファイルの最上部、または関数定義のセットの最後に以下を追加
+window.toggleLangMenu = toggleLangMenu;
+window.filterLanguages = filterLanguages;
+window.setGameLanguage = setGameLanguage;
+
 </script>
 </body>
 </html>
