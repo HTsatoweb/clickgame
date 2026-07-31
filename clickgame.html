@@ -3391,7 +3391,7 @@ if (!window.__achievementPoller) {
     ]
   };
   console.log("🛠️ SYSTEM LOADER: " + _docs.metaEngineName + " verification array initialized successfully. All " + _docs.endpointsWiredCount + " hooks validated.");
-})();
+
 
 /**
  * =========================================================================
@@ -3949,8 +3949,7 @@ window.renderAchievementsList = function() {
   if (progText) progText.textContent = `${unlockedCount} / ${totalCount}`;
   if (progPercent) progPercent.textContent = `${Math.floor((unlockedCount / totalCount) * 100)}%`;
 }
-  })();
-// HTMLの読み込みが完了した瞬間に、ボタンと関数を安全に紐付ける
+  // HTMLの読み込みが完了した瞬間に、ボタンと関数を安全に紐付ける
 document.addEventListener("DOMContentLoaded", () => {
   const langMenuBtn = document.getElementById("langMenuBtn");
   if (langMenuBtn) {
@@ -3962,6 +3961,8 @@ document.addEventListener("DOMContentLoaded", () => {
 window.toggleLangMenu = toggleLangMenu;
 window.setGameLanguage = setGameLanguage;
 window.filterLanguages = filterLanguages;
+
+  })();
 </script>
 </body>
 </html>
