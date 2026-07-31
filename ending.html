@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>無限宇宙 - Ending</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            background: #000;
+            color: #fff;
+            font-family: 'Courier New', Courier, monospace, sans-serif;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 流れ星アニメーション */
+        @keyframes shootingStar {
+            0% { transform: translateY(-100px) translateX(0); opacity: 1; }
+            100% { transform: translateY(105vh) translateX(-300px); opacity: 0; }
+        }
+
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            animation: shootingStar linear infinite;
+        }
+
+        /* 数字や記号がふわふわ浮遊するエフェクト */
+        @keyframes floatNumber {
+            0% { transform: translateY(105vh) scale(0.5); opacity: 0; }
+            50% { opacity: 0.6; }
+            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+        }
+
+        .floating-num {
+            position: absolute;
+            color: rgba(0, 242, 254, 0.4);
+            font-weight: bold;
+            pointer-events: none;
+            animation: floatNumber linear infinite;
+        }
+
+        /* 
+          PC・スマホの全画面切り替えに対応したスクロール 
+          下から現れ、最後の要素がちょうど画面中央付近でピタッと止まります
+        */
+        @keyframes scrollCredits {
+            0% { transform: translateY(100%); }
+            100% { transform: translateY(-72%); }
+        }
+
+        #infinityCloseBtn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 50px rgba(0,242,254,1) !important;
+        }
+
+        /* スマホ向けの文字サイズ微調整 */
+        @media screen and (max-width: 600px) {
+            h1 { font-size: 2.2rem !important; }
+            p, h3 { font-size: 1rem !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 背景の星空・グラデーションレイヤー -->
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, #0a0a23 0%, #000 85%); z-index: 1; pointer-events: none;"></div>
+
+    <!-- 動的な背景エフェクト用コンテナ -->
+    <div id="starContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; overflow: hidden;"></div>
+
+    <!-- スクロールする長編エンディングクレジット（スマホ対応のコンテナ幅） -->
+    <div id="endingScrollArea" style="position: relative; z-index: 2; width: 100%; max-width: 700px; height: 100%; display: flex; justify-content: center; text-align: center; overflow: hidden; padding: 0 15px;">
+      
+      <div id="endingContent" style="position: absolute; width: 100%; display: flex; flex-direction: column; align-items: center; animation: scrollCredits 32s linear forwards; padding-top: 20px;">
+        
+        <h1 style="font-size: 3.2rem; margin-bottom: 10px; background: linear-gradient(90deg, #00f2fe, #ff0055, #ffea00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 40px rgba(0,242,254,0.7); letter-spacing: 3px;">
+          🌌 無限宇宙 (Infinity) 🌌
+        </h1>
+        <p style="font-size: 1.3rem; color: #00f2fe; margin-bottom: 50px; letter-spacing: 2px; text-shadow: 0 0 10px #00f2fe;">- THE END OF NUMBERS -</p>
+
+        <p style="font-size: 1.15rem; line-height: 2.2; color: #ddd; margin-bottom: 50px; text-shadow: 0 0 5px rgba(255,255,255,0.3);">
+          果てしないクリックの音が響く部屋。<br>
+          幾千もの自動化システムが、夜通しエネルギーを紡ぎ続けた。<br>
+          数字は指数を超え、次元の壁を溶かし、<br>
+          そして今――すべての限界が消失する。
+        </p>
+
+        <h3 style="color: #ffea00; font-size: 1.5rem; margin-top: 60px; margin-bottom: 15px; text-shadow: 0 0 10px #ffea00;">【 記憶の残響 】</h3>
+        <p style="font-size: 1.15rem; line-height: 2.2; color: #bbb; margin-bottom: 50px;">
+          最初の一歩は、たった1回のクリックだった。<br>
+          手作業でかき集めた微小なエネルギーが、やがて歯車を回し、<br>
+          加速器を生み、数理の網の目を世界中に張り巡らせた。<br>
+          寝ている間も、離席している間も、<br>
+          システムは止まることなく数値を増やし続けた。
+        </p>
+
+        <h3 style="color: #00f2fe; font-size: 1.5rem; margin-top: 60px; margin-bottom: 15px; text-shadow: 0 0 10px #00f2fe;">【 主な功績 】</h3>
+        <p style="font-size: 1.15rem; line-height: 2.0; color: #bbb; margin-bottom: 50px;">
+          第一段階：数理の覚醒（1e6）<br>
+          第二段階：概念の侵食（1e100）<br>
+          第三段階：超巨大数の階段（1e200）<br>
+          最終段階：全宇宙マトリクスの統合（Infinity）
+        </p>
+
+        <h3 style="color: #ff0055; font-size: 1.5rem; margin-top: 60px; margin-bottom: 15px; text-shadow: 0 0 10px #ff0055;">【 特異点を超えて 】</h3>
+        <p style="font-size: 1.15rem; line-height: 2.2; color: #bbb; margin-bottom: 60px;">
+          物理法則は書き換えられ、時間は概念を失った。<br>
+          ここは数字の果て、すべての計算が収束する場所。<br>
+          だが、終わりは同時に新たな始まりにすぎない。<br>
+          マトリクスの向こう側には、まだ見ぬ次元が待っている。
+        </p>
+
+        <h3 style="color: #ffea00; font-size: 1.5rem; margin-top: 60px; margin-bottom: 15px; text-shadow: 0 0 10px #ffea00;">【 開発・制作協力 】</h3>
+        <p style="font-size: 1.15rem; line-height: 2.0; color: #bbb; margin-bottom: 60px;">
+          プレイヤー：あなた自身<br>
+          システム：htsatoweb<br>
+          そして遊んでくれたすべての心に感謝を。
+        </p>
+
+        <!-- 最後の締めくくり＆ボタン（ここで綺麗に中央で止まります） -->
+        <div style="margin-top: 40px; margin-bottom: 120px; padding: 30px 20px; width: 100%; max-width: 500px; background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 20px; box-shadow: inset 0 0 20px rgba(0, 242, 254, 0.1);">
+          <p style="font-size: 1.4rem; color: #fff; margin-bottom: 25px; text-shadow: 0 0 15px #fff; font-weight: bold;">
+            あなたは真の創造主となりました。
+          </p>
+          <button id="infinityCloseBtn" style="padding: 16px 40px; font-size: 1.2rem; font-weight: bold; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #000; border: none; border-radius: 14px; cursor: pointer; box-shadow: 0 0 35px rgba(0,242,254,0.8); transition: all 0.3s ease;">
+            新次元へ旅立つ (戻る)
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <script>
+      // 1. 背景にランダムな星を降らせる演出
+      const starContainer = document.getElementById('starContainer');
+      for (let i = 0; i < 40; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        const size = Math.random() * 3 + 1;
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        star.style.left = `${Math.random() * 100}vw`;
+        star.style.top = `${Math.random() * -100}px`;
+        star.style.animationDuration = `${Math.random() * 5 + 3}s`;
+        star.style.animationDelay = `${Math.random() * 5}s`;
+        starContainer.appendChild(star);
+      }
+
+      // 2. 背景に数式や数字をふわふわ浮かべる演出
+      const texts = ["1e308", "∞", "Infinity", "1e1000", "λ", "Ω", "9.99e307"];
+      for (let i = 0; i < 15; i++) {
+        const num = document.createElement('div');
+        num.className = 'floating-num';
+        num.innerText = texts[Math.floor(Math.random() * texts.length)];
+        num.style.left = `${Math.random() * 90}vw`;
+        num.style.fontSize = `${Math.random() * 1.5 + 0.8}rem`;
+        num.style.animationDuration = `${Math.random() * 10 + 8}s`;
+        num.style.animationDelay = `${Math.random() * 8}s`;
+        starContainer.appendChild(num);
+      }
+
+      // 3. ボタンを押したら元のゲーム画面（index.html）に戻る処理
+      document.getElementById('infinityCloseBtn').addEventListener('click', () => {
+        window.location.href = 'clickgame.html'; 
+      });
+    </script>
+</body>
+</html>
