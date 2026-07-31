@@ -2904,7 +2904,7 @@ window.addEventListener("DOMContentLoaded", () => {
 /**
  =========================================================================
  * 🌈 フルスペクトル・ダイナミック演出 & 粒子パーティクルシステム
- * （決定論的カラー割当・文字色とコア色を常に同じ・同一段階中は不変）
+ * （308段階区切り・e308以降は虹色グラデーション）
  * 使い方：既存の関連スクリプトをこのファイルで完全に置き換えてください
  =========================================================================
  */
@@ -2931,7 +2931,7 @@ window.addEventListener("DOMContentLoaded", () => {
   function hslaFromHsl(hslStr, a = 0.08) { return hslStr.replace(/^hsl\(/, 'hsla(').replace(/\)$/, `, ${a})`); }
 
   // 決定論的に stage -> hue を返す（ランダム無し）
-  // Golden angle を使って均等分布。stage が同じなら常に同じ hue。
+  // 308段階全体で色相がスムーズに循環するように調整
   function hueForStage(stage) {
     const GOLDEN_ANGLE = 137.508; // degrees
     const startHue = 190; // 水色寄りの基準
@@ -2971,7 +2971,7 @@ window.addEventListener("DOMContentLoaded", () => {
       }
     } catch (e) {}
   }
-})();
+
   /* -------------------------
      状態保持（同一段階中は色を変えない）
      ------------------------- */
@@ -2979,9 +2979,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   /* -------------------------
      メイン：updateDynamicCoreAndResourceVisuals
-     - stage は e1~e10 => 1, e11~e20 => 2, ... 最大1000
-     - 文字色とコア色は同じ（決定論的）
-     - 同一段階中は再適用しない（ちらつき防止）
+     - 308段階ごとに区切り、e308（exponent >= 308）以降は虹色
      ------------------------- */
   window.updateDynamicCoreAndResourceVisuals = function(currentEnergy) {
     const coreBtn = document.getElementById('coreTrigger');
@@ -2994,22 +2992,25 @@ window.addEventListener("DOMContentLoaded", () => {
     const energyNum = (typeof currentEnergy === 'number') ? currentEnergy : Number(currentEnergy);
     const exponent = (isFinite(energyNum) && energyNum > 0) ? Math.max(0, Math.min(10000, Math.log10(energyNum))) : 0;
 
-    // stage 計算（e1~e10 => stage=1, e11~e20 => stage=2, ...）
+    // stage 計算（308段階で最大 308 まで振り分け）
     let stage = 1;
-    if (exponent >= 1) stage = Math.floor((exponent - 1) / 10) + 1;
-    stage = Math.max(1, Math.min(1000, stage));
+    if (exponent >= 1) {
+      // exponent (1 ～ 308) を 1 ～ 308 のステージにマッピング
+      stage = Math.floor((exponent - 1) * (308 / 308)) + 1;
+    }
+    stage = Math.max(1, Math.min(308, stage));
 
     // 前回 state を取得
     const prev = lastState.get(coreBtn) || { stage: null, hue: null };
 
-    // 同一段階中は何もしない（虹域 e10000 以上は例外で常に適用）
-    if (prev.stage === stage && exponent < 10000) return;
+    // 同一段階中は何もしない（e308 以上の虹域は例外で常に適用）
+    if (prev.stage === stage && exponent < 308) return;
 
-    // 決定論的に hue を決定（stage のみで決まる）
+    // 決定論的に hue を決定
     let hue = hueForStage(stage);
 
-    // 明度・彩度（stage に応じて変化）
-    const t = (stage - 1) / 999;
+    // 明度・彩度（308段階に応じて変化）
+    const t = (stage - 1) / 307;
     const lightness = 75 - (t * 40); // 75 -> 35
     const saturation = 70 + (t * 20); // 70 -> 90
 
@@ -3019,8 +3020,8 @@ window.addEventListener("DOMContentLoaded", () => {
     // 保存（次回比較用）
     lastState.set(coreBtn, { stage: stage, hue: hue });
 
-    // e10000 以上（虹域）処理（例外）
-    if (exponent >= 10000) {
+    // 🌟 e308 以上（虹域）処理（例外）
+    if (exponent >= 308) {
       const rainbow = 'linear-gradient(90deg, #00f2fe, #4facfe, #00ffcc, #ffea00, #ff0055, #9d4edd, #00f2fe)';
       energyValElem.style.setProperty('background', rainbow, 'important');
       energyValElem.style.setProperty('background-size', '300% 100%', 'important');
@@ -3048,8 +3049,8 @@ window.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // stage < 250: 単色運用（文字とコアを同色に）
-    if (stage < 250) {
+    // stage < 200: 単色運用（文字とコアを同色に）
+    if (stage < 200) {
       // 文字（単色）
       energyValElem.style.setProperty('animation', 'none', 'important');
       energyValElem.style.setProperty('background', 'none', 'important');
@@ -3059,14 +3060,14 @@ window.addEventListener("DOMContentLoaded", () => {
       energyValElem.style.setProperty('-webkit-text-fill-color', 'initial', 'important');
       energyValElem.style.setProperty('text-shadow', `0 0 18px ${hslaFromHsl(textColor, 0.45)}`, 'important');
 
-      // コアを文字と同じ色にする（ボーダー・グローも同色で統一）
+      // コアを文字と同じ色にする
       try {
         coreBtn.style.setProperty('background', 'none', 'important');
         coreBtn.style.setProperty('border-color', textColor, 'important');
         coreBtn.style.setProperty('box-shadow', `0 0 26px ${hslaFromHsl(textColor, 0.65)}`, 'important');
         coreBtn.style.setProperty('border-width', '4px', 'important');
         coreBtn.style.setProperty('animation', 'none', 'important');
-        // SVG 内部がある場合は内部パスにも同色を適用
+        
         const coreSvg = coreBtn.querySelector && coreBtn.querySelector('svg');
         if (coreSvg) {
           const paths = coreSvg.querySelectorAll('path, circle, rect');
@@ -3088,9 +3089,8 @@ window.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // stage >= 250: 文字は単色維持、コアは文字色を基準に控えめなグラデーションを許可
+    // stage >= 200: 文字は単色維持、コアは文字色を基準に控えめなグラデーションを許可
     {
-      // 文字は単色
       energyValElem.style.setProperty('animation', 'none', 'important');
       energyValElem.style.setProperty('background', 'none', 'important');
       energyValElem.style.removeProperty('background-clip');
@@ -3099,19 +3099,17 @@ window.addEventListener("DOMContentLoaded", () => {
       energyValElem.style.setProperty('-webkit-text-fill-color', 'initial', 'important');
       energyValElem.style.setProperty('text-shadow', `0 0 20px rgba(0,0,0,0.06)`, 'important');
 
-      // コアは文字色を基準に枠線・グローを合わせ、内部に控えめなグラデーションを入れる
       const accent1 = hsl((hue + 60) % 360, Math.max(50, saturation - 5), Math.max(35, lightness - 8));
       const accent2 = hsl((hue + 180) % 360, Math.max(50, saturation - 10), Math.max(30, lightness - 12));
       try {
         const coreGrad = `linear-gradient(135deg, ${textColor} 0%, ${accent1} 45%, ${accent2} 100%)`;
         coreBtn.style.setProperty('background', coreGrad, 'important');
-        coreBtn.style.setProperty('border-color', textColor, 'important'); // 枠線は文字色に合わせる
+        coreBtn.style.setProperty('border-color', textColor, 'important');
         coreBtn.style.setProperty('box-shadow', `0 0 36px ${hslaFromHsl(textColor, 0.55)}`, 'important');
         coreBtn.style.setProperty('border-width', '5px', 'important');
         coreBtn.style.setProperty('animation', 'corePulse 1.2s ease-in-out infinite', 'important');
       } catch (e) {}
 
-      // SVG 内部がある場合は内部パスに main/textColor を優先して適用（交互に）
       const coreSvg = coreBtn.querySelector && coreBtn.querySelector('svg');
       if (coreSvg) {
         try {
@@ -3123,7 +3121,6 @@ window.addEventListener("DOMContentLoaded", () => {
         } catch (e) {}
       }
 
-      // 商品ボタン群は文字色を基準にアクセントを混ぜるが、主要色は文字色に合わせる
       productButtons.forEach((btn, i) => {
         const c = (i % 3 === 0) ? textColor : (i % 3 === 1) ? accent1 : accent2;
         try {
@@ -3225,21 +3222,18 @@ window.addEventListener("DOMContentLoaded", () => {
   /* -------------------------
      自動ポーリング（任意）
      ------------------------- */
-/* -------------------------------------------------------------------------
-   エネルギーポーリングの継続実行（既存部分）
-   ------------------------------------------------------------------------- */
-if (!window.__visualsEnergyPoller) {
-  window.__visualsEnergyPoller = setInterval(() => {
-    try {
-      const energy = (typeof game !== 'undefined' && typeof game.energy !== 'undefined') ? game.energy : null;
-      if (energy !== null && typeof window.updateDynamicCoreAndResourceVisuals === 'function') {
-        window.updateDynamicCoreAndResourceVisuals(energy);
-      }
-    } catch(e) {}
-  }, 250);
-}
-
-/* -------------------------------------------------------------------------
+  if (!window.__visualsEnergyPoller) {
+    window.__visualsEnergyPoller = setInterval(() => {
+      try {
+        const energy = (typeof game !== 'undefined' && typeof game.energy !== 'undefined') ? game.energy : null;
+        if (energy !== null && typeof window.updateDynamicCoreAndResourceVisuals === 'function') {
+          window.updateDynamicCoreAndResourceVisuals(energy);
+        }
+      } catch(e) {}
+    }, 250);
+  }
+})();
+  /* -------------------------------------------------------------------------
    実績達成判定システムの初期化と定期チェック
    ------------------------------------------------------------------------- */
 if (typeof game !== "undefined") {
