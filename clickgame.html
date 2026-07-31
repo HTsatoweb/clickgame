@@ -1384,7 +1384,7 @@ function formatValue(n) {
   const mantissa = n / Math.pow(10, exponent);
   return `${mantissa.toFixed(2)}e${exponent}`;
 }
-  // すでに無限大の演出が発火したかどうかのフラグ
+
 // すでに無限大の演出が発火したかどうかのフラグ
 let hasTriggeredInfinityEvent = false;
 
@@ -1403,93 +1403,12 @@ function checkInfinityMilestone(energy) {
       pushLog("【重大発表】エネルギーが無限大に到達。全マトリクスが統合されました。", "var(--color-energy)");
     }
 
-    // 2. 【超盛大】マイクラ＆RPGエンディング風の全画面モーダル生成
-    const modal = document.createElement('div');
-    modal.style.cssText = `
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: #000;
-      z-index: 9999999;
-      display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
-      color: #fff; font-family: 'Courier New', Courier, monospace, sans-serif;
-      opacity: 0; transition: opacity 2s ease;
-      overflow: hidden;
-      pointer-events: auto;
-    `;
-
-    modal.innerHTML = `
-      <!-- 背景の星空・エフェクト用のレイヤー -->
-      <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, #0a0a23 0%, #000 80%); z-index: 1; pointer-events: none;"></div>
-
-      <!-- スクロールするエンディングクレジット（RPG・マイクラ風） -->
-      <div id="endingScrollArea" style="position: relative; z-index: 2; width: 100%; max-width: 700px; height: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; overflow: hidden; padding: 20px;">
-        <div id="endingContent" style="position: absolute; top: 100%; width: 100%; padding-bottom: 100vh; animation: scrollCredits 28s linear forwards;">
-          
-          <h1 style="font-size: 3rem; margin-bottom: 20px; background: linear-gradient(90deg, #00f2fe, #ff0055, #ffea00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 30px rgba(0,242,254,0.6); letter-spacing: 2px;">
-            🌌 無限宇宙 (Infinity) 🌌
-          </h1>
-          <p style="font-size: 1.2rem; color: #00f2fe; margin-bottom: 50px; letter-spacing: 1px;">- THE END OF NUMBERS -</p>
-
-          <p style="font-size: 1.1rem; line-height: 2.2; color: #ccc; margin-bottom: 40px;">
-            果てしないクリックの音が響く部屋。<br>
-            幾千もの自動化システムが、夜通しエネルギーを紡ぎ続けた。<br>
-            数字は指数を超え、次元の壁を溶かし、<br>
-            そして今――すべての限界が消失する。
-          </p>
-
-          <h3 style="color: #ffea00; font-size: 1.5rem; margin-top: 50px; margin-bottom: 15px;">【 主な功績 】</h3>
-          <p style="font-size: 1.1rem; line-height: 2; color: #aaa; margin-bottom: 40px;">
-            第一段階：数理の覚醒（1e6）<br>
-            第二段階：概念の侵食（1e100）<br>
-            第三段階：超巨大数の階段（1e200）<br>
-            最終段階：全宇宙マトリクスの統合（Infinity）
-          </p>
-
-          <h3 style="color: #ff0055; font-size: 1.5rem; margin-top: 50px; margin-bottom: 15px;">【 開発・制作協力 】</h3>
-          <p style="font-size: 1.1rem; line-height: 2; color: #aaa; margin-bottom: 60px;">
-            プレイヤー：あなた自身<br>
-            システム：Incremental Engine<br>
-            そして遊んでくれたすべての心に感謝を。
-          </p>
-
-          <div style="margin-top: 80px; margin-bottom: 100px;">
-            <p style="font-size: 1.3rem; color: #fff; margin-bottom: 30px; text-shadow: 0 0 10px #fff;">
-              あなたは真の創造主となりました。
-            </p>
-            <button id="infinityCloseBtn" style="padding: 16px 40px; font-size: 1.2rem; font-weight: bold; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #000; border: none; border-radius: 12px; cursor: pointer; box-shadow: 0 0 30px rgba(0,242,254,0.8); transition: transform 0.2s; pointer-events: auto;">
-              新次元へ旅立つ (閉じる)
-            </button>
-          </div>
-
-        </div>
-      </div>
-    `;
-
-    // CSSアニメーションを動的に追加（クレジットを下から上に流す）
-    const styleSheet = document.createElement("style");
-    styleSheet.type = "text/css";
-    styleSheet.innerText = `
-      @keyframes scrollCredits {
-        0% { top: 100%; }
-        100% { top: -150%; }
-      }
-    `;
-    document.head.appendChild(styleSheet);
-    document.body.appendChild(modal);
-
-    // フェードイン
-    setTimeout(() => { modal.style.opacity = '1'; }, 50);
-
-    // ボタンを押したら華やかに閉じる処理
-    document.getElementById('infinityCloseBtn').addEventListener('click', () => {
-      modal.style.opacity = '0';
-      setTimeout(() => {
-        modal.remove();
-        styleSheet.remove();
-      }, 2000);
-    });
+    // 2. 別のHTMLファイル（ending.html）へ画面を切り替える
+    setTimeout(() => {
+      window.location.href = 'ending.html';
+    }, 1500); // 1.5秒後にエンディング画面へジャンプ
   }
 }
-
   /**
  * =========================================================================
  * 統合ゲームエンジン拡張セーフティ・完全修復モジュール
