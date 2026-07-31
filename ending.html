@@ -173,6 +173,100 @@
       document.getElementById('infinityCloseBtn').addEventListener('click', () => {
         window.location.href = 'clickgame.html'; 
       });
-    </script>
+    
+let audioCtx = null;
+let isPlaying = false;
+
+// 盛大なBGMを開始する関数
+function startEpicBGM() {
+    if (isPlaying) return;
+    
+    // ブラウザの制限（ユーザー操作なしでの音声再生ブロック）を回避するため、AudioContextを生成
+    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new AudioContext();
+    isPlaying = true;
+
+    // 1. 壮大なパッド音（コード進行：Am -> F -> C -> G のような宇宙的な響き）
+    // 周波数(Hz)の配列（コード）
+    const chords = [
+        [220.00, 261.63, 329.63, 440.00], // A minor
+        [174.61, 220.00, 261.63, 349.23], // F major
+        [130.81, 164.81, 196.00, 261.63], // C major
+        [196.00, 246.94, 293.66, 392.00]  // G major
+    ];
+
+    let chordIndex = 0;
+
+    function playChord() {
+        if (!isPlaying) return;
+        const currentChord = chords[chordIndex];
+        
+        currentChord.forEach(freq => {
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+
+            // 「sawtooth（ノコギリ波）」を使うと、リッチで厚みのあるシンセサウンドになります
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+            // 音量のエンベロープ（ふわっと入って、ゆっくり消える）
+            gain.gain.setValueAtTime(0, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.03, audioCtx.currentTime + 1.5); // アタック
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 4.5); // リリース
+
+            // ローパスフィルターをかけて耳障りな高音を削り、温かみのある壮大さに
+            let filter = audioCtx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(800, audioCtx.currentTime);
+
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + 5.0);
+        });
+
+        chordIndex = (chordIndex + 1) % chords.length;
+    }
+
+    // 2. 星空のようなキラキラ音（高音のアルペジオ）をランダムに自動生成
+    function playSparkle() {
+        if (!isPlaying) return;
+        const scale = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50, 1318.51, 1567.98]; // Cメジャースケール高音
+        const freq = scale[Math.floor(Math.random() * scale.length)];
+
+        let osc = audioCtx.createOscillator();
+        let gain = audioCtx.createGain();
+
+        osc.type = 'sine'; // 透き通るようなサイン波
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+        gain.gain.setValueAtTime(0, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.02, audioCtx.currentTime + 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.2);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 1.3);
+    }
+
+    // 定期的にコードとキラキラ音をループ再生
+    playChord();
+    setInterval(playChord, 4000); // 4秒ごとにコード進行が変わる
+
+    setInterval(playSparkle, 300); // 0.3秒ごとに星の瞬きのような音がランダムで鳴る
+}
+
+// ページ上のどこかをクリックした瞬間、またはボタンを押したときにBGMを解禁する
+window.addEventListener('click', () => {
+    if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    startEpicBGM();
+}, { once: true });
+</script>
 </body>
 </html>
