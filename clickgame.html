@@ -3950,22 +3950,18 @@ window.renderAchievementsList = function() {
   if (progPercent) progPercent.textContent = `${Math.floor((unlockedCount / totalCount) * 100)}%`;
 }
   })();
-  // ファイルの最上部、または関数定義のセットの最後に以下を追加
-window.toggleLangMenu = toggleLangMenu;
-window.filterLanguages = filterLanguages;
-window.setGameLanguage = setGameLanguage;
-// HTMLの読み込みが完了した後にイベントを安全に紐付ける
+// HTMLの読み込みが完了した瞬間に、ボタンと関数を安全に紐付ける
 document.addEventListener("DOMContentLoaded", () => {
   const langMenuBtn = document.getElementById("langMenuBtn");
   if (langMenuBtn) {
     langMenuBtn.addEventListener("click", toggleLangMenu);
   }
-
-  const langSearch = document.getElementById("langSearch");
-  if (langSearch) {
-    langSearch.addEventListener("input", filterLanguages);
-  }
 });
+
+// グローバルスコープにも一応登録しておく
+window.toggleLangMenu = toggleLangMenu;
+window.setGameLanguage = setGameLanguage;
+window.filterLanguages = filterLanguages;
 </script>
 </body>
 </html>
