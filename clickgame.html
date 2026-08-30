@@ -587,6 +587,65 @@ button, .btn-action-prestige, .click-core-btn, .card-upgrade-node, .factory-line
   touch-action: manipulation; /* ダブルタップズームを無効化し、反応速度を上げる */
 }
   /* =========================================================================
+   🔧 ボタン・タップコアのレスポンシブ崩れ防止・可変対応
+   ========================================================================= */
+
+/* 右上ヘッダー内のボタン群：スマホなどで自然に折り返し、幅に合わせて縮小 */
+.column-right .right-header {
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.column-right .right-header > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+/* ユーティリティボタンが画面幅に応じて縮小・柔軟に配置されるようにする */
+.column-right .right-header .btn-utility {
+  font-size: 0.55rem;
+  padding: 4px 6px;
+  white-space: nowrap; /* 文字が不自然に縦に折れるのを防ぐ */
+  flex: 1 1 auto;      /* 空きスペースに応じて伸び縮みする */
+  min-width: fit-content;
+}
+
+/* タップコアコンテナ：画面幅が狭くなってもはみ出さず中央に収まるようにする */
+.click-core-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 10px 0;
+  box-sizing: border-box;
+}
+
+/* タップコアボタン本体：画面が小さい時は自動で少しコンパクトになる可変サイズ */
+.click-core-btn {
+  width: clamp(120px, 25vw, 160px);   /* 最小120px、最大160pxの間で画面に合わせて可変 */
+  height: clamp(120px, 25vw, 160px);
+  max-width: 100%;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* さらに画面が狭いスマホ縦向きなどのメディアクエリ追加調整 */
+@media screen and (max-width: 480px) {
+  .column-right .right-header .btn-utility {
+    font-size: 0.52rem;
+    padding: 3px 5px;
+  }
+}
+  /* =========================================================================
  * 🌐 全世界対応ユニバーサルフォント定義（文字化け・フォント崩れ完全防止）
  * ========================================================================= */
 body, button, input, select, textarea, [class*="game-"] {
