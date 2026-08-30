@@ -3306,18 +3306,36 @@ if (!window.__achievementPoller) {
   };
   console.log("🛠️ SYSTEM LOADER: " + _docs.metaEngineName + " verification array initialized successfully. All " + _docs.endpointsWiredCount + " hooks validated.");
 
-
 /**
  * =========================================================================
  * 1. 専用ブラウザ警告システム（Firefox / Floorp検知 ＋ 警告音）
  * =========================================================================
  */
+
+// ⚠️ サウンド関数（未定義によるエラー停止を防止）
+function playWarningSound() {
+  // 必要に応じて効果音コードを追加
+}
+
+function playOkSound() {
+  // 必要に応じて効果音コードを追加
+}
+
+// ⚠️ HTMLの onclick="closeBrowserWarning()" から確実に呼べるよう window に登録
+window.closeBrowserWarning = function() {
+  const modal = document.getElementById("browserWarningModal");
+  if (modal) {
+    modal.style.display = "none";
+  }
+  playOkSound(); // ✔️ OKボタンの音を再生
+};
+
 function checkBrowserSupport() {
   const ua = navigator.userAgent.toLowerCase();
   const isFirefoxFamily = ua.includes("firefox") || ua.includes("fxios") || ua.includes("floorp");
 
-  // まだユーザーが警告を閉じていなければ専用モーダルを表示
-  if (isFirefoxFamily && !localStorage.getItem("browser_warning_closed")) {
+  // 開くたびに毎回表示する（localStorageのチェックを外した状態）
+  if (isFirefoxFamily) {
     setTimeout(() => {
       const modal = document.getElementById("browserWarningModal");
       if (modal) {
@@ -3326,15 +3344,6 @@ function checkBrowserSupport() {
       }
     }, 800);
   }
-}
-
-function closeBrowserWarning() {
-  const modal = document.getElementById("browserWarningModal");
-  if (modal) {
-    modal.style.display = "none";
-  }
-  localStorage.setItem("browser_warning_closed", "true");
-  playOkSound(); // ✔️ OKボタンの音を再生
 }
 
 window.addEventListener("DOMContentLoaded", () => {
