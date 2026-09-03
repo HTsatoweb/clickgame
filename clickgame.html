@@ -642,6 +642,38 @@ button, .btn-action-prestige, .click-core-btn, .card-upgrade-node, .factory-line
     padding: 3px 5px;
   }
 }
+  /* 右側UI全体のコンテナ崩れ防止 */
+.column-right, .right-header, .settings-group {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+/* 4等分・複数並びのUIグリッド/フレックスの修復 */
+.ui-four-split, .settings-buttons-row, .btn-container-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+
+/* ボタンが縦に潰れて「┆」になる現象の防止 */
+.column-right button, 
+.right-header button, 
+.btn-utility, 
+.product-btn {
+  white-space: nowrap; /* テキストを強制的に改行させない */
+  flex: 1 1 auto;      /* 画面幅に合わせて伸縮させる */
+  min-width: 70px;     /* 潰れすぎを防ぐ最小幅 */
+  box-sizing: border-box;
+}
+
+/* 4等分したいエリアがある場合のグリッド定義 */
+.grid-4-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+  gap: 6px;
+  width: 100%;
+}
   /* =========================================================================
  * 🌐 全世界対応ユニバーサルフォント定義（文字化け・フォント崩れ完全防止）
  * ========================================================================= */
@@ -811,12 +843,12 @@ body, button, input, select, textarea, [class*="game-"] {
 
   </div>
 </div>
-  <!-- ⚙️ 設定ボタン（既存のSYSTEM DATA内、または任意の場所へ配置） -->
-<button class="btn-utility" id="settingsMenuBtn" onclick="toggleSettingsMenu()" style="color: var(--color-upgrade); border-color: var(--color-upgrade);">⚙️ 設定</button>
+<!-- ⚙️ 設定ボタン（既存のSYSTEM DATA内、または任意の場所へ配置） -->
+<button class="btn-utility" id="settingsMenuBtn" onclick="toggleSettingsMenu()" style="color: var(--color-upgrade); border-color: var(--color-upgrade); white-space: nowrap;">⚙️ 設定</button>
 
 <!-- 🎛️ 設定モーダルウィンドウ（初期状態では非表示） -->
-<div id="settingsModalOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); z-index: 99999; justify-content: center; align-items: center;">
-  <div style="background: rgba(15,10,25,0.95); border: 1px solid var(--border-strong, #444); border-radius: 8px; width: 90%; max-width: 420px; box-shadow: 0 8px 25px rgba(0,0,0,0.6); overflow: hidden; font-family: sans-serif;">
+<div id="settingsModalOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); z-index: 99999; justify-content: center; align-items: center; box-sizing: border-box; padding: 15px;">
+  <div style="background: rgba(15,10,25,0.95); border: 1px solid var(--border-strong, #444); border-radius: 8px; width: 100%; max-width: 420px; box-shadow: 0 8px 25px rgba(0,0,0,0.6); overflow: hidden; font-family: sans-serif; box-sizing: border-box;">
     
     <!-- モーダルヘッダー -->
     <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(10,6,20,0.9); border-bottom: 1px solid var(--border-weak, #333);">
@@ -824,40 +856,41 @@ body, button, input, select, textarea, [class*="game-"] {
       <button onclick="toggleSettingsMenu()" style="background: none; border: none; color: #aaa; font-size: 1.1rem; cursor: pointer; padding: 0 4px;">✕</button>
     </div>
 
-    <!-- モーダルコンテンツ（ご提示いただいたUI群） -->
-    <div style="padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+    <!-- モーダルコンテンツ -->
+    <div style="padding: 16px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box;">
       
-      <!-- システムボタン行 -->
-      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-        <button class="btn-utility" id="bgmBtn" onclick="toggleBGM()" style="flex: 1; min-width: 80px; color: var(--color-energy); border-color: var(--color-energy); font-weight: bold;">BGM: OFF</button>
-        <button class="btn-utility" onclick="saveGameManual()" style="flex: 1; min-width: 80px;">手動セーブ</button>
+      <!-- システムボタン行 1 -->
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; width: 100%;">
+        <button class="btn-utility" id="bgmBtn" onclick="toggleBGM()" style="flex: 1 1 120px; min-width: 0; color: var(--color-energy); border-color: var(--color-energy); font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">BGM: OFF</button>
+        <button class="btn-utility" onclick="saveGameManual()" style="flex: 1 1 120px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">手動セーブ</button>
       </div>
 
-      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-        <button class="btn-utility" onclick="saveAndReloadGame()" style="flex: 1; min-width: 100px; color: var(--color-timeline); border-color: var(--color-timeline);">保存して再読込</button>
-        <button class="btn-utility btn-danger" onclick="hardResetGame()" style="flex: 1; min-width: 80px;">リセット</button>
+      <!-- システムボタン行 2 -->
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; width: 100%;">
+        <button class="btn-utility" onclick="saveAndReloadGame()" style="flex: 1 1 140px; min-width: 0; color: var(--color-timeline); border-color: var(--color-timeline); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">保存して再読込</button>
+        <button class="btn-utility btn-danger" onclick="hardResetGame()" style="flex: 1 1 100px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">リセット</button>
       </div>
 
-      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-        <button class="btn-utility" id="langMenuBtn" style="flex: 1; min-width: 80px; color: var(--color-upgrade); border-color: var(--color-upgrade);">🌐 言語</button>
-        <button id="lightweightToggleBtn" onclick="toggleLightweightMode()" class="product-btn" style="flex: 1; min-width: 100px; padding: 8px 10px; background: #333; color: white; border: 1px solid #444; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">
+      <!-- システムボタン行 3 -->
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; width: 100%;">
+        <button class="btn-utility" id="langMenuBtn" style="flex: 1 1 120px; min-width: 0; color: var(--color-upgrade); border-color: var(--color-upgrade); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">🌐 言語</button>
+        <button id="lightweightToggleBtn" onclick="toggleLightweightMode()" class="product-btn" style="flex: 1 1 120px; min-width: 0; padding: 8px 10px; background: #333; color: white; border: 1px solid #444; border-radius: 4px; cursor: pointer; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
           ⚡ 軽量化切替
         </button>
       </div>
 
       <!-- データ入出力グループ -->
-      <div class="settings-group" style="padding: 8px 12px; border: 1px solid var(--border-weak, #333); border-radius: 6px; background: rgba(0,0,0,0.2);">
-        <div style="display: flex; gap: 4px; margin-bottom: 6px;">
-          <button class="btn-utility" onclick="exportSaveData()" style="flex:1;">データ書出</button>
-          <button class="btn-utility" onclick="importSaveData(document.getElementById('importDataInput').value)" style="flex:1;">データ読込</button>
+      <div class="settings-group" style="padding: 8px 12px; border: 1px solid var(--border-weak, #333); border-radius: 6px; background: rgba(0,0,0,0.2); box-sizing: border-box; width: 100%;">
+        <div style="display: flex; gap: 4px; margin-bottom: 6px; width: 100%;">
+          <button class="btn-utility" onclick="exportSaveData()" style="flex: 1; min-width: 0; white-space: nowrap;">データ書出</button>
+          <button class="btn-utility" onclick="importSaveData(document.getElementById('importDataInput').value)" style="flex: 1; min-width: 0; white-space: nowrap;">データ読込</button>
         </div>
-        <textarea id="importDataInput" placeholder="ここにセーブ文字列を貼り付け" style="width:100%; height:45px; background:#090611; color:#fff; border:1px solid var(--border-strong); font-size: 0.65rem; padding: 6px; border-radius: 4px; resize: none;"></textarea>
+        <textarea id="importDataInput" placeholder="ここにセーブ文字列を貼り付け" style="width:100%; height:45px; background:#090611; color:#fff; border:1px solid var(--border-strong); font-size: 0.65rem; padding: 6px; border-radius: 4px; resize: none; box-sizing: border-box;"></textarea>
       </div>
 
     </div>
   </div>
 </div>
-  
   <div class="stat-scroller-box">
     <div class="stat-item-line"><span>この世界線の経過時間</span><span id="s-run-time">0.0s</span></div>
     <div class="stat-item-line"><span>全期間の総稼働時間</span><span id="s-total-time">0.0s</span></div>
