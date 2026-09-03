@@ -25,7 +25,12 @@
   --text-muted: #6b7280;
   --text-dark: #1f2937;
 }
-
+/* 右クリック時の長押しメニューやテキスト選択の青いハイライトを防止する */
+body, button, input, textarea {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
 * {
   box-sizing: border-box;
   font-family: 'Consolas', 'Fira Code', 'Courier New', monospace, system-ui;
