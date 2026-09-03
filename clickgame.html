@@ -51,7 +51,7 @@ body {
   display: flex;
   user-select: none;
 }
-
+/* Webkit (Edge, Chrome) 用スクロールバー設定 */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -67,6 +67,11 @@ body {
   background: var(--color-energy);
 }
 
+/* Firefox (Floorp) 用スクロールバー設定 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) rgba(0, 0, 0, 0.4);
+}
 .column-left {
   flex: 1;
   min-width: 320px;
