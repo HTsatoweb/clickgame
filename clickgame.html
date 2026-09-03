@@ -734,6 +734,63 @@ body, button, input, select, textarea, [class*="game-"] {
   direction: rtl;
   text-align: right;
 }
+  /* =========================================================================
+   ⚙️ 既存CSSに統合する中央モーダル & ボタン崩れ完全防止パッチ
+   ========================================================================= */
+
+/* 1. モーダル本体の確実に中央固定・背景の安全確保 */
+#settingsModalOverlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 99999;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 15px;
+}
+
+/* 2. モーダルコンテナがPC/スマホ共通で絶対に破綻しない指定 */
+#settingsModalOverlay > div {
+  background: rgba(15, 10, 25, 0.98);
+  border: 1px solid var(--border-strong, #444);
+  border-radius: 8px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* 3. モーダル内部のボタン群が縦に潰れて「┆」になるのを完全に阻止 */
+#settingsModalOverlay button,
+#settingsModalOverlay .btn-utility,
+#settingsModalOverlay .product-btn {
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+  white-space: nowrap !important;
+  word-break: normal !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  box-sizing: border-box !important;
+  flex: 1 1 120px !important;
+  min-width: 0 !important;
+}
+
+/* 4. 右上のシステムヘッダーのボタンが暴発しないための整理 */
+.column-right .right-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: rgba(10, 6, 20, 0.9);
+  flex-wrap: wrap;
+  gap: 8px;
+}
 </style>
 </head>
 <body>
