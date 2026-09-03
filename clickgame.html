@@ -3963,6 +3963,27 @@ if (typeof window.spawnParticleEffect === 'function') {
 window.toggleLangMenu = toggleLangMenu;
 window.setGameLanguage = setGameLanguage;
 window.filterLanguages = filterLanguages;
+  // 必ずグローバルに定義する
+window.toggleLightweightMode = function() {
+  window.isLightweightMode = !window.isLightweightMode;
+  
+  if (typeof createToast === "function") {
+    createToast("⚡ 軽量化設定", window.isLightweightMode ? "アニメーション・パーティクルを抑制します" : "通常モードに戻しました");
+  }
+  
+  if (typeof pushLog === "function") {
+    pushLog(window.isLightweightMode ? "⚡ Lightweight mode: ON" : "⚡ Lightweight mode: OFF", "var(--color-upgrade)");
+  }
+  
+  const btn = document.getElementById("lightweightToggleBtn");
+  if (btn) {
+    btn.style.borderColor = window.isLightweightMode ? "var(--color-upgrade, #4caf50)" : "#444";
+    btn.style.background = window.isLightweightMode ? "rgba(0,255,128,0.1)" : "#333";
+  }
+
+  if (typeof playOkSound === "function") playOkSound();
+  return window.isLightweightMode;
+};
 
   })();
 </script>
