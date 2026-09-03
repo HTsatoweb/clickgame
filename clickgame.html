@@ -903,58 +903,25 @@ body, button, input, select, textarea, [class*="game-"] {
 <div class="column-right">
   <div class="right-header" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(10,6,20,0.9); flex-wrap: wrap; gap: 8px;">
     <span style="font-size: 0.72rem; color: var(--color-upgrade);">SYSTEM DATA (システム)</span>
-    
-    <!-- 右上には「手動セーブ」と「設定」ボタンだけをスッキリ配置 -->
     <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+      <button class="btn-utility" id="bgmBtn" onclick="toggleBGM()" style="color: var(--color-energy); border-color: var(--color-energy); font-weight: bold; white-space: nowrap;">BGM: OFF</button>
       <button class="btn-utility" onclick="saveGameManual()" style="white-space: nowrap;">手動セーブ</button>
+      <button class="btn-utility" onclick="saveAndReloadGame()" style="color: var(--color-timeline); border-color: var(--color-timeline); white-space: nowrap;">再読込</button>
+      <button class="btn-utility btn-danger" onclick="hardResetGame()" style="white-space: nowrap;">リセット</button>
+      <button class="btn-utility" id="langMenuBtn" onclick="toggleLangMenu()" style="color: var(--color-upgrade); border-color: var(--color-upgrade); white-space: nowrap;">🌐 言語</button>
       <button class="btn-utility" id="settingsMenuBtn" onclick="toggleSettingsMenu()" style="color: var(--color-upgrade); border-color: var(--color-upgrade); white-space: nowrap; font-weight: bold;">⚙️ 設定</button>
+      <button id="lightweightToggleBtn" onclick="toggleLightweightMode()" class="product-btn" style="padding: 4px 8px; background: #333; color: white; border: 1px solid #444; border-radius: 4px; cursor: pointer; font-size: 0.75rem; white-space: nowrap;">⚡ 軽量化</button>
     </div>
   </div>
-</div>
-  <!-- 🎛️ 中央モーダル設定ウィンドウ -->
-<div id="settingsModalOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); z-index: 99999; justify-content: center; align-items: center; box-sizing: border-box; padding: 15px;">
-  <div style="background: rgba(15,10,25,0.95); border: 1px solid var(--border-strong, #444); border-radius: 8px; width: 100%; max-width: 440px; box-shadow: 0 8px 25px rgba(0,0,0,0.6); overflow: hidden; font-family: sans-serif; box-sizing: border-box;">
-    
-    <!-- モーダルヘッダー -->
-    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(10,6,20,0.9); border-bottom: 1px solid var(--border-weak, #333);">
-      <span style="font-size: 0.85rem; font-weight: bold; color: var(--color-upgrade, #4caf50);">⚙️ GAME SETTINGS (設定)</span>
-      <button onclick="toggleSettingsMenu()" style="background: none; border: none; color: #aaa; font-size: 1.1rem; cursor: pointer; padding: 0 4px;">✕</button>
+
+  <div class="settings-group" style="padding: 8px 12px; border-bottom: 1px solid var(--border-weak); background: rgba(0,0,0,0.2);">
+    <div style="display: flex; gap: 4px; margin-bottom: 4px;">
+      <button class="btn-utility" onclick="exportSaveData()" style="flex:1; white-space: nowrap;">データ書出</button>
+      <button class="btn-utility" onclick="importSaveData(document.getElementById('importDataInput').value)" style="flex:1; white-space: nowrap;">データ読込</button>
     </div>
-
-    <!-- モーダルコンテンツ（潰れ防止の min-width と flex-wrap を徹底） -->
-    <div style="padding: 16px; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box;">
-      
-      <!-- ボタン行 1: BGM と 再読込 -->
-      <div style="display: flex; gap: 8px; flex-wrap: wrap; width: 100%;">
-        <button class="btn-utility" id="bgmBtn" onclick="toggleBGM()" style="flex: 1 1 130px; min-width: 0; color: var(--color-energy); border-color: var(--color-energy); font-weight: bold; white-space: nowrap;">BGM: OFF</button>
-        <button class="btn-utility" onclick="saveAndReloadGame()" style="flex: 1 1 150px; min-width: 0; color: var(--color-timeline); border-color: var(--color-timeline); white-space: nowrap;">保存して再読込</button>
-      </div>
-
-      <!-- ボタン行 2: 言語 と 軽量化 -->
-      <div style="display: flex; gap: 8px; flex-wrap: wrap; width: 100%;">
-        <button class="btn-utility" id="langMenuBtn" style="flex: 1 1 130px; min-width: 0; color: var(--color-upgrade); border-color: var(--color-upgrade); white-space: nowrap;">🌐 言語</button>
-        <button id="lightweightToggleBtn" onclick="toggleLightweightMode()" class="product-btn" style="flex: 1 1 130px; min-width: 0; padding: 6px 10px; background: #333; color: white; border: 1px solid #444; border-radius: 4px; cursor: pointer; font-size: 0.9rem; white-space: nowrap;">
-          ⚡ 軽量化切替
-        </button>
-      </div>
-
-      <!-- ボタン行 3: リセット -->
-      <div style="display: flex; width: 100%;">
-        <button class="btn-utility btn-danger" onclick="hardResetGame()" style="width: 100%; white-space: nowrap;">⚠️ リセット</button>
-      </div>
-
-      <!-- データ入出力グループ -->
-      <div class="settings-group" style="padding: 8px 12px; border: 1px solid var(--border-weak, #333); border-radius: 6px; background: rgba(0,0,0,0.2); box-sizing: border-box; width: 100%; margin-top: 4px;">
-        <div style="display: flex; gap: 6px; margin-bottom: 6px; width: 100%;">
-          <button class="btn-utility" onclick="exportSaveData()" style="flex: 1; min-width: 0; white-space: nowrap;">データ書出</button>
-          <button class="btn-utility" onclick="importSaveData(document.getElementById('importDataInput').value)" style="flex: 1; min-width: 0; white-space: nowrap;">データ読込</button>
-        </div>
-        <textarea id="importDataInput" placeholder="ここにセーブ文字列を貼り付け" style="width:100%; height:45px; background:#090611; color:#fff; border:1px solid var(--border-strong); font-size: 0.65rem; padding: 6px; border-radius: 4px; resize: none; box-sizing: border-box;"></textarea>
-      </div>
-
-    </div>
+    <textarea id="importDataInput" placeholder="ここにセーブ文字列を貼り付け" style="width:100%; height:36px; background:#090611; color:#fff; border:1px solid var(--border-strong); font-size: 0.62rem; padding: 4px; border-radius: 4px; resize: none;"></textarea>
   </div>
-</div>
+  
   <div class="stat-scroller-box">
     <div class="stat-item-line"><span>この世界線の経過時間</span><span id="s-run-time">0.0s</span></div>
     <div class="stat-item-line"><span>全期間の総稼働時間</span><span id="s-total-time">0.0s</span></div>
@@ -982,7 +949,8 @@ body, button, input, select, textarea, [class*="game-"] {
 
   <div class="right-header">SYSTEM LOG (宇宙の因果履歴)</div>
   <div class="log-stream-box" id="logBox"></div>
- <!-- ① 専用のブラウザ警告モーダル（ページ読み込み時に自動で出る） -->
+
+<!-- ① 専用のブラウザ警告モーダル（ページ読み込み時に自動で出る） -->
 <div id="browserWarningModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:999999; align-items:center; justify-content:center;">
   <div style="background:var(--bg-panel, #1a1a1a); border:2px solid #ff4444; padding:25px; border-radius:10px; width:340px; text-align:center; box-shadow: 0 0 20px rgba(255,68,68,0.4);">
     <div style="font-size:1rem; font-weight:900; color:#ff4444; margin-bottom:12px;">⚠️ 推奨ブラウザのお知らせ</div>
@@ -1011,6 +979,43 @@ body, button, input, select, textarea, [class*="game-"] {
     <button class="btn-utility" onclick="toggleLangMenu()" style="width:100%; padding:6px;">閉じる</button>
   </div>
 </div>
+
+<!-- ③ 🎛️ 設定モーダルウィンドウ（中央ポップアップ） -->
+<div id="settingsModalOverlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 99999; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;">
+  <div style="background: rgba(15,10,25,0.98); border: 1px solid var(--border-strong, #444); border-radius: 8px; width: 100%; max-width: 440px; box-shadow: 0 8px 25px rgba(0,0,0,0.6); overflow: hidden; font-family: sans-serif; box-sizing: border-box;">
+    
+    <!-- モーダルヘッダー -->
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(10,6,20,0.9); border-bottom: 1px solid var(--border-weak, #333);">
+      <span style="font-size: 0.85rem; font-weight: bold; color: var(--color-upgrade, #4caf50);">⚙️ GAME SETTINGS (設定)</span>
+      <button onclick="toggleSettingsMenu()" style="background: none; border: none; color: #aaa; font-size: 1.1rem; cursor: pointer; padding: 0 4px;">✕</button>
+    </div>
+
+    <!-- モーダルコンテンツ -->
+    <div style="padding: 16px; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box;">
+      
+      <!-- ボタン行 1 -->
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; width: 100%;">
+        <button class="btn-utility" id="modalBgmBtn" onclick="toggleBGM()" style="flex: 1 1 130px; min-width: 0; color: var(--color-energy); border-color: var(--color-energy); font-weight: bold; white-space: nowrap;">BGM: OFF</button>
+        <button class="btn-utility" onclick="saveAndReloadGame()" style="flex: 1 1 150px; min-width: 0; color: var(--color-timeline); border-color: var(--color-timeline); white-space: nowrap;">保存して再読込</button>
+      </div>
+
+      <!-- ボタン行 2 -->
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; width: 100%;">
+        <button class="btn-utility" onclick="toggleLangMenu(); toggleSettingsMenu();" style="flex: 1 1 130px; min-width: 0; color: var(--color-upgrade); border-color: var(--color-upgrade); white-space: nowrap;">🌐 言語</button>
+        <button id="modalLightweightToggleBtn" onclick="toggleLightweightMode()" class="product-btn" style="flex: 1 1 130px; min-width: 0; padding: 6px 10px; background: #333; color: white; border: 1px solid #444; border-radius: 4px; cursor: pointer; font-size: 0.9rem; white-space: nowrap;">
+          ⚡ 軽量化切替
+        </button>
+      </div>
+
+      <!-- ボタン行 3: リセット -->
+      <div style="display: flex; width: 100%;">
+        <button class="btn-utility btn-danger" onclick="hardResetGame()" style="width: 100%; white-space: nowrap;">⚠️ リセット</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 </div>
 <div id="google_translate_element" style="display:none;"></div>
 <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
