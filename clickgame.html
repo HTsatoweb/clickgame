@@ -66,10 +66,12 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-energy);
 }
-/* Firefox (Floorp) 用スクロールバー設定（デフォで水色） */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-energy) rgba(0, 0, 0, 0.4);
+  /* Firefox (Floorp) 用スクロールバー設定（@supportsでFirefoxのみに限定） */
+@supports (-moz-appearance: none) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-energy) rgba(0, 0, 0, 0.4);
+  }
 }
 .column-left {
   flex: 1;
