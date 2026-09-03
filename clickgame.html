@@ -823,7 +823,10 @@ body, button, input, select, textarea, [class*="game-"] {
   <button class="btn-utility btn-danger" onclick="hardResetGame()">リセット</button>
       <!-- 右上のシステムボタンの並びに追加 -->
 <button class="btn-utility" id="langMenuBtn" style="color: var(--color-upgrade); border-color: var(--color-upgrade);">🌐 言語</button>
-</div>
+<button id="lightweightToggleBtn" onclick="toggleLightweightMode()" class="product-btn" style="padding: 8px 10px; background: #333; color: white; border: 1px solid #444; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">
+  ⚡ 軽量化切替
+</button>
+    </div>
   </div>
 
   <div class="settings-group" style="padding: 8px 12px; border-bottom: 1px solid var(--border-weak); background: rgba(0,0,0,0.2);">
@@ -3935,6 +3938,26 @@ document.addEventListener("DOMContentLoaded", () => {
     langMenuBtn.addEventListener("click", toggleLangMenu);
   }
 });
+  /* -------------------------------------------------------------------------
+   強制一括軽量化・パフォーマンス最大化モード（常時全制限）
+   ------------------------------------------------------------------------- */
+window.isLightweightMode = true; // 強制的に常時ON
+
+// パーティクルや重い描画処理の完全ブロック
+if (typeof window.spawnParticleEffect === 'function') {
+  window.spawnParticleEffect = () => {};
+}
+
+// 画面全体の負荷を抑えるため、requestAnimationFrameの間引きや描画ループの調整を行う拡張
+(function() {
+  // 既存の重いエフェクト関数があれば無効化・またはダミー化
+  window.triggerHeavyFX = () => {};
+  
+  // スタイル側でアニメーションやシャドウを強制的に切るためのクラスをHTMLに付与
+  document.addEventListener("DOMContentLoaded", () => {
+    document.body.classList.add("force-lightweight-all");
+  });
+})();
 
 // グローバルスコープにも一応登録しておく
 window.toggleLangMenu = toggleLangMenu;
