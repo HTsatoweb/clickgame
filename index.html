@@ -15,7 +15,7 @@
   --color-antimatter: #ff0055;
   --color-timeline: #9d4edd;
   --color-galaxy: #3a86ff;
-  --color-kimo: #39ff14; /* 狂気のエメラルドグリーンの毒々しさ */
+  --color-kimo: #39ff14;
   
   --text-main: #f4f4f5;
   --text-muted: #6b7280;
@@ -44,7 +44,7 @@ body {
   position: relative;
 }
 
-/* === 狂気の背景演出用レイヤー === */
+/* 狂気の背景演出 */
 .cyber-bg {
   position: absolute;
   inset: 0;
@@ -63,7 +63,6 @@ body.activated .cyber-bg {
   opacity: 1;
 }
 
-/* 歪むサイバーグリッド */
 .cyber-grid {
   position: absolute;
   width: 200%;
@@ -84,7 +83,6 @@ body.activated .cyber-bg {
   100% { transform: perspective(400px) rotateX(65deg) translateY(0) rotateZ(0deg); }
 }
 
-/* 不規則にうねるバイオ・粒子エフェクト */
 .particle {
   position: absolute;
   background: var(--color-kimo);
@@ -103,8 +101,8 @@ body.activated .cyber-bg {
   70% { transform: translateY(30px) translateX(-20px) scale(0.8) rotate(-45deg); opacity: 0.5; }
 }
 
-/* === 初回「脳髄を揺らす真っ黒待機画面」 === */
-.standby-screen {
+/* === ステップ1: 作者ロゴ演出画面 === */
+.author-screen {
   position: fixed;
   inset: 0;
   background: #000000;
@@ -113,53 +111,101 @@ body.activated .cyber-bg {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.standby-content {
+.author-logo-box {
   text-align: center;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.author-screen.show .author-logo-box {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.author-label {
+  font-size: 0.75rem;
+  letter-spacing: 6px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.author-name {
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: 4px;
+  background: linear-gradient(90deg, var(--color-kimo), var(--color-antimatter), var(--color-timeline));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 20px rgba(57, 255, 20, 0.6));
+  animation: author-glitch 3s infinite ease-in-out;
+}
+
+@keyframes author-glitch {
+  0%, 100% { filter: drop-shadow(0 0 20px rgba(57, 255, 20, 0.6)); }
+  50% { filter: drop-shadow(0 0 30px rgba(255, 0, 85, 0.8)) hue-rotate(45deg); }
+}
+
+/* === ステップ2: ライブラリ・システム仕様演出画面 === */
+.library-screen {
+  position: fixed;
+  inset: 0;
+  background: #000000;
+  z-index: 9990;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
 }
 
-.standby-text {
-  font-size: 0.9rem;
-  letter-spacing: 8px;
-  color: #ff0055;
+.library-box {
+  width: 85%;
+  max-width: 450px;
+  border: 1px solid var(--color-timeline);
+  background: rgba(5, 2, 12, 0.9);
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 0 35px rgba(157, 78, 221, 0.3);
+  text-align: left;
+}
+
+.library-title {
+  font-size: 0.8rem;
+  color: var(--color-timeline);
+  letter-spacing: 3px;
+  margin-bottom: 15px;
   text-transform: uppercase;
-  animation: text-pulse 1.2s infinite ease-in-out;
-  text-shadow: 0 0 10px rgba(255, 0, 85, 0.6);
+  border-bottom: 1px dashed rgba(157, 78, 221, 0.4);
+  padding-bottom: 8px;
 }
 
-@keyframes text-pulse {
-  0%, 100% { opacity: 0.3; transform: scale(0.98); filter: blur(1px); }
-  50% { opacity: 1; transform: scale(1.04); color: var(--color-kimo); text-shadow: 0 0 25px rgba(57, 255, 20, 0.8); filter: blur(0px); }
+.lib-line {
+  font-size: 0.7rem;
+  color: #a1a1aa;
+  margin: 6px 0;
+  opacity: 0;
+  transform: translateY(5px);
+  transition: all 0.2s ease;
 }
 
-/* 不気味に脈動するローディング・アイボール風ドット */
-.standby-dots span {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  background: var(--color-antimatter);
-  border-radius: 50%;
-  margin: 0 6px;
-  box-shadow: 0 0 12px var(--color-antimatter);
-  animation: biopulse 1s infinite ease-in-out both;
-}
-.standby-dots span:nth-child(1) { animation-delay: -0.4s; background: var(--color-antimatter); }
-.standby-dots span:nth-child(2) { animation-delay: -0.2s; background: var(--color-timeline); }
-.standby-dots span:nth-child(3) { animation-delay: 0s; background: var(--color-kimo); }
-
-@keyframes biopulse {
-  0%, 100% { transform: scale(0.4) rotate(0deg); opacity: 0.2; }
-  50% { transform: scale(1.4) rotate(180deg); opacity: 1; box-shadow: 0 0 20px currentColor; }
+.lib-line.active {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-/* === メインホームパネル（狂気受容体） === */
+.lib-line.highlight {
+  color: var(--color-energy);
+  text-shadow: 0 0 8px rgba(0, 255, 204, 0.5);
+}
+
+/* === ステップ3: メインホームパネル（自動でふわっと登場） === */
 .home-container {
   width: 90%;
   max-width: 500px;
@@ -172,14 +218,14 @@ body.activated .cyber-bg {
   position: relative;
   backdrop-filter: blur(16px);
   opacity: 0;
-  transform: scale(0.85) skew(0deg, 0deg);
+  transform: scale(0.85);
   transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
 }
 
 body.activated .home-container {
   opacity: 1;
-  transform: scale(1) skew(0deg, 0deg);
+  transform: scale(1);
   pointer-events: auto;
   animation: panel-glitch-idle 8s infinite ease-in-out;
 }
@@ -247,19 +293,6 @@ body.activated .home-container {
   box-shadow: 0 0 25px rgba(255, 0, 85, 0.2);
 }
 
-.btn-start::after {
-  content: '';
-  position: absolute;
-  top: -50%; left: -50%; width: 200%; height: 200%;
-  background: linear-gradient(60deg, transparent, rgba(255,0,85,0.5), transparent);
-  transform: translateX(-100%);
-  transition: transform 0.5s ease;
-}
-
-.btn-start:hover::after {
-  transform: translateX(100%);
-}
-
 .btn-start:hover {
   background: var(--color-kimo);
   color: #000;
@@ -281,7 +314,7 @@ body.activated .home-container {
   color: var(--text-muted);
 }
 
-/* === きもおい次元転移（ワープ・発狂）演出 === */
+/* ワープ演出 */
 .warp-overlay {
   position: fixed;
   inset: 0;
@@ -323,22 +356,26 @@ body.warping {
 </head>
 <body>
 
-<!-- 初期「不気味に脈動する真っ黒背景」画面 -->
-<div class="standby-screen" id="standbyScreen">
-  <div class="standby-content">
-    <div class="standby-text">ANOMALY DETECTED [ TOUCH TO AWAKEN ]</div>
-    <div class="standby-dots">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
+<div class="author-screen" id="authorScreen">
+  <div class="author-logo-box">
+    <div class="author-label">PRESENTS BY</div>
+    <div class="author-name">HTsatoweb</div>
   </div>
 </div>
 
-<!-- 狂気の次元転移閃光レイヤー -->
+<div class="library-screen" id="libraryScreen">
+  <div class="library-box">
+    <div class="library-title">SYSTEM SPEC & LIBRARIES</div>
+    <div class="lib-line" id="l1">> Core Engine: Vanilla JavaScript (ES6+)</div>
+    <div class="lib-line" id="l2">> Audio Subsystem: Web Audio API</div>
+    <div class="lib-line" id="l3">> Calculation Module: Decimal.js</div>
+    <div class="lib-line" id="l4">> Localization: Google Translate Module</div>
+    <div class="lib-line highlight" id="l5">> [READY] ALL MODULES VERIFIED.</div>
+  </div>
+</div>
+
 <div class="warp-overlay"></div>
 
-<!-- 背景の動的エフェクト -->
 <div class="cyber-bg">
   <div class="cyber-grid"></div>
   <div class="particle"></div>
@@ -352,15 +389,14 @@ body.warping {
   <div class="home-title">INFINITY MATRIX OMEGA</div>
   
   <div class="menu-list">
-    <button class="btn-menu btn-start hard" id="startHardBtn">▶ 難易度：難しい (MZ)</button>
-    <button class="btn-menu btn-start" id="startEasyBtn">▶ 難易度：簡単 (KN)</button>
+    <button class="btn-menu btn-start hard" id="startHardBtn">▶ 難易度：難しい (MZ) 新版</button>
+    <button class="btn-menu btn-start" id="startEasyBtn">▶ 難易度：簡単 (KN) 旧版</button>
   </div>
 
-  <div class="version-tag">BIOMASS OVERDRIVE v6.0</div>
+  <div class="version-tag">home v6.0</div>
 </div>
 
 <script>
-// Web Audio APIを用いたサウンドジェネレーター
 class KimoSoundManager {
   static initContext() {
     if (!this.audioCtx) {
@@ -372,6 +408,31 @@ class KimoSoundManager {
     }
   }
 
+  // 作者ロゴ登場時のサウンド
+  static playAuthorSound() {
+    try {
+      this.initContext();
+      const ctx = this.audioCtx;
+      const now = ctx.currentTime;
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(110, now);
+      osc.frequency.exponentialRampToValueAtTime(440, now + 1.2);
+
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.12, now + 0.3);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 1.5);
+    } catch(e) { console.log(e); }
+  }
+
+  // 本編起動用ブートサウンド
   static playBootSound(onFinished) {
     try {
       this.initContext();
@@ -406,32 +467,10 @@ class KimoSoundManager {
         osc.stop(now + 3.0);
       });
 
-      const weirdOsc = ctx.createOscillator();
-      const weirdGain = ctx.createGain();
-      
-      weirdOsc.type = 'triangle';
-      weirdOsc.frequency.setValueAtTime(330, now);
-      weirdOsc.frequency.exponentialRampToValueAtTime(1320, now + 1.0);
-      weirdOsc.frequency.exponentialRampToValueAtTime(660, now + 2.0);
-      weirdOsc.frequency.exponentialRampToValueAtTime(2640, now + 2.8);
-
-      weirdGain.gain.setValueAtTime(0.001, now);
-      weirdGain.gain.linearRampToValueAtTime(0.07, now + 0.2);
-      weirdGain.gain.linearRampToValueAtTime(0.02, now + 1.5);
-      weirdGain.gain.linearRampToValueAtTime(0.08, now + 2.5);
-      weirdGain.gain.linearRampToValueAtTime(0.001, now + 2.9);
-
-      weirdOsc.connect(weirdGain);
-      weirdGain.connect(ctx.destination);
-      weirdOsc.start(now);
-      weirdOsc.stop(now + 2.9);
-
       if (typeof onFinished === 'function') {
-        setTimeout(onFinished, 3000);
+        setTimeout(onFinished, 2500);
       }
-
     } catch (e) {
-      console.log('Boot sound error', e);
       if (typeof onFinished === 'function') onFinished();
     }
   }
@@ -442,7 +481,6 @@ class KimoSoundManager {
 
     try {
       const ctx = this.audioCtx;
-      
       const creepyChords = [
         [220, 233.08, 329.63],
         [174.61, 185.00, 261.63],
@@ -484,9 +522,7 @@ class KimoSoundManager {
       };
 
       playStep();
-    } catch (e) {
-      console.log('BGM error', e);
-    }
+    } catch (e) {}
   }
 
   static playWarpSound() {
@@ -512,31 +548,56 @@ class KimoSoundManager {
       
       osc.start(now);
       osc.stop(now + 0.7);
-    } catch (e) {
-      console.log('Warp sound error', e);
-    }
+    } catch (e) {}
   }
 }
 
-// タッチ/クリックで起動
-let hasBooted = false;
-document.getElementById('standbyScreen').addEventListener('click', () => {
-  if (hasBooted) return;
-  hasBooted = true;
+// === 自動オープニングアニメーションのシーケンス制御 ===
+window.addEventListener('DOMContentLoaded', () => {
+  const authorScreen = document.getElementById('authorScreen');
+  const libraryScreen = document.getElementById('libraryScreen');
 
-  const standby = document.getElementById('standbyScreen');
-  standby.style.opacity = '0';
-  standby.style.pointerEvents = 'none';
-
-  document.body.classList.add('activated');
-
+  // 1. ページ読み込み直後、作者ロゴを表示＋サウンド再生
   setTimeout(() => {
-    standby.remove();
-  }, 800);
+    authorScreen.classList.add('show');
+    KimoSoundManager.playAuthorSound();
+  }, 300);
 
-  KimoSoundManager.playBootSound(() => {
-    KimoSoundManager.startBGM();
-  });
+  // 2. 1.8秒後に作者ロゴを隠し、ライブラリ仕様画面に切り替え
+  setTimeout(() => {
+    authorScreen.style.opacity = '0';
+    authorScreen.style.pointerEvents = 'none';
+    
+    libraryScreen.style.opacity = '1';
+    libraryScreen.style.pointerEvents = 'auto';
+
+    // ライブラリのテキストを1行ずつ順に浮かばせる
+    ['l1', 'l2', 'l3', 'l4', 'l5'].forEach((id, idx) => {
+      setTimeout(() => {
+        document.getElementById(id).classList.add('active');
+      }, idx * 180);
+    });
+  }, 2200);
+
+  // 3. さらに3.5秒後（合計約5.7秒後）にライブラリ画面を消し、メインメニューへ自動移行
+  setTimeout(() => {
+    libraryScreen.style.opacity = '0';
+    libraryScreen.style.pointerEvents = 'none';
+
+    document.body.classList.add('activated');
+
+    // 本格的なBGMとブート音を起動
+    KimoSoundManager.playBootSound(() => {
+      KimoSoundManager.startBGM();
+    });
+
+    // 不要になったDOM要素を削除してメモリを軽くする
+    setTimeout(() => {
+      authorScreen.remove();
+      libraryScreen.remove();
+    }, 1000);
+
+  }, 5000);
 });
 
 // 難しいボタン（MZclickgame.htmlへ遷移）
