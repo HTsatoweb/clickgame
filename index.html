@@ -850,6 +850,16 @@ document.getElementById('startEasyBtn').addEventListener('click', (e) => {
     window.location.href = 'KNclickgame.html';
   }, 700);
 });
+  // カスタムチェックボックスをクリックしたときに確実にinputをトグルする
+document.querySelectorAll('.checkbox-label').forEach(label => {
+  const checkbox = label.querySelector('input[type="checkbox"]');
+  const customBox = label.querySelector('.custom-checkbox');
+
+  customBox.addEventListener('click', (e) => {
+    e.preventDefault(); // ラベル本来の挙動との競合を防ぐ
+    checkbox.checked = !checkbox.checked;
+  });
+});
 </script>
 
 </body>
