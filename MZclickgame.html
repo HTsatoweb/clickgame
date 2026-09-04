@@ -1934,7 +1934,7 @@ const DB_ACHIEVEMENTS = [
  */
 function saveAndReloadGame() {
   try {
-    localStorage.setItem(your_game_save_MZ_key, serializeGameState(game));
+    localStorage.setItem(STORAGE_KEY, serializeGameState(game));
     createToast("セーブ＆再読み込み", "データを保存し、宇宙を再同期しています...");
     pushLog("🔄 システム：データを保存して再読み込みを実行します。", "var(--color-timeline)");
     
@@ -2550,7 +2550,7 @@ function importSaveData(encodedData) {
     // JSONとして正しくパースできるか検証
     JSON.parse(decoded); 
 
-    localStorage.setItem(your_game_save_MZ_key, decoded);
+    localStorage.setItem(STORAGE_KEYy, decoded);
     
     createToast("インポート成功", "データを復元しました。ページを再読み込みします。");
     pushLog("📥 セーブデータをインポートしました。", "var(--color-energy)");
@@ -3531,7 +3531,7 @@ const STORAGE_KEY = 'your_game_save_MZ_key';
 
 function saveGameManual() {
   try {
-    localStorage.setItem(your_game_save_MZ_key, serializeGameState(game));
+    localStorage.setItem(STORAGE_KEY, serializeGameState(game));
     createToast("セーブ完了", "宇宙パラメータがLocalStoreへ永続保存されました。");
     pushLog("📁 システム：手動セーブが正常に書き込まれました。", "var(--color-energy)");
     window.ModAPI.hooks.onSave.forEach(cb => { try { cb({success: true}); } catch(e){} });
@@ -3598,7 +3598,7 @@ function executeCoreGameTick(currentTimestamp) {
 
   lastAutosaveTime += baseDeltaTime;
   if (lastAutosaveTime >= 15) {
-    localStorage.setItem(your_game_save_MZ_key, serializeGameState(game));
+    localStorage.setItem(STORAGE_KEY, serializeGameState(game));
     lastAutosaveTime = 0;
     const saveStatusElem = document.getElementById("s-save-status");
     if (saveStatusElem) {
