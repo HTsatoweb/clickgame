@@ -1151,7 +1151,9 @@ body, button, input, select, textarea, [class*="game-"] {
 
     <!-- モーダルコンテンツ -->
     <div style="padding: 16px; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box;">
-      
+      <div style="display: flex; width: 100%;">
+        <button class="btn-utility" onclick="location.href='index.html'" style="width: 100%; white-space: nowrap; color: var(--color-energy); border-color: var(--color-energy); cursor: pointer;">🏠 ホームに戻る</button>
+      </div>
       <!-- ボタン行 1 -->
       <div style="display: flex; gap: 8px; flex-wrap: wrap; width: 100%;">
         <button class="btn-utility" id="bgmBtn" onclick="toggleBGM()" style="color: var(--color-energy); border-color: var(--color-energy); font-weight: bold;">BGM: OFF</button>
@@ -1165,9 +1167,7 @@ body, button, input, select, textarea, [class*="game-"] {
   ⚡ 軽量化切替
 </button>
       </div>
-<div style="display: flex; width: 100%;">
-        <button class="btn-utility" onclick="location.href='index.html'" style="width: 100%; white-space: nowrap; color: var(--color-energy); border-color: var(--color-energy); cursor: pointer;">🏠 ホームに戻る</button>
-      </div>
+
       <!-- ボタン行 3: リセット -->
       <div style="display: flex; width: 100%;">
         <button class="btn-utility btn-danger" onclick="hardResetGame()" style="width: 100%; white-space: nowrap;">⚠️ リセット</button>
