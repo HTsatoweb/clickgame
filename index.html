@@ -150,7 +150,7 @@ body.activated .cyber-bg {
   50% { filter: drop-shadow(0 0 30px rgba(255, 0, 85, 0.8)) hue-rotate(45deg); }
 }
 
-/* === ステップ2: ライブラリ・システム仕様演出画面 === */
+/* === ステップ2: ライブラリ仕様演出画面 === */
 .library-screen {
   position: fixed;
   inset: 0;
@@ -205,7 +205,7 @@ body.activated .cyber-bg {
   text-shadow: 0 0 8px rgba(0, 255, 204, 0.5);
 }
 
-/* === ステップ3: メインホームパネル（自動でふわっと登場） === */
+/* === ステップ3: メインホームパネル（メニュー） === */
 .home-container {
   width: 90%;
   max-width: 500px;
@@ -293,6 +293,14 @@ body.activated .home-container {
   box-shadow: 0 0 25px rgba(255, 0, 85, 0.2);
 }
 
+.btn-reset {
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px solid var(--text-muted);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  padding: 14px;
+}
+
 .btn-start:hover {
   background: var(--color-kimo);
   color: #000;
@@ -306,12 +314,171 @@ body.activated .home-container {
   box-shadow: 0 0 50px rgba(255, 0, 85, 0.9), 0 0 100px rgba(157, 78, 221, 0.5);
 }
 
+.btn-reset:hover {
+  border-color: var(--color-antimatter);
+  color: var(--color-antimatter);
+  background: rgba(255, 0, 85, 0.05);
+}
+
 .version-tag {
   position: absolute;
   bottom: 12px;
   right: 18px;
   font-size: 0.6rem;
   color: var(--text-muted);
+}
+
+/* === セーブデータ初期化モーダル（カッコいいカスタムチェックボックス） === */
+.reset-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 10500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+
+.reset-modal.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.reset-modal-content {
+  width: 90%;
+  max-width: 400px;
+  background: rgba(15, 8, 25, 0.95);
+  border: 2px solid var(--color-antimatter);
+  border-radius: 12px;
+  padding: 30px 24px;
+  box-shadow: 0 0 40px rgba(255, 0, 85, 0.3);
+  text-align: left;
+}
+
+.reset-modal-title {
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--color-antimatter);
+  letter-spacing: 2px;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+}
+
+.reset-modal-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+/* カスタムチェックボックスのスタイリング */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 0.85rem;
+  color: var(--text-main);
+  cursor: pointer;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.checkbox-label:hover {
+  background: rgba(255, 0, 85, 0.05);
+  border-color: rgba(255, 0, 85, 0.4);
+}
+
+/* 標準チェックボックスを完全に非表示にする */
+.checkbox-label input[type="checkbox"] {
+  display: none;
+}
+
+/* サイバー風の自作カスタムチェックボックス（四角い枠） */
+.custom-checkbox {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--text-muted);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+/* チェックが入ったときの見た目 */
+.checkbox-label input[type="checkbox"]:checked + .custom-checkbox {
+  border-color: var(--color-antimatter);
+  background: rgba(255, 0, 85, 0.2);
+  box-shadow: 0 0 12px rgba(255, 0, 85, 0.6);
+}
+
+/* チェックマークのデザイン */
+.custom-checkbox::after {
+  content: '';
+  width: 5px;
+  height: 10px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) scale(0);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: 2px;
+}
+
+.checkbox-label input[type="checkbox"]:checked + .custom-checkbox::after {
+  transform: rotate(45deg) scale(1);
+}
+
+.reset-modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-modal-action {
+  flex: 1;
+  padding: 12px;
+  border-radius: 6px;
+  font-weight: 900;
+  font-size: 0.85rem;
+  cursor: pointer;
+  letter-spacing: 1px;
+  border: none;
+}
+
+.btn-execute {
+  background: var(--color-antimatter);
+  color: #fff;
+  box-shadow: 0 0 15px rgba(255, 0, 85, 0.4);
+}
+
+.btn-execute:hover {
+  background: #ff1a66;
+}
+
+.btn-cancel {
+  background: transparent;
+  border: 1px solid var(--text-muted);
+  color: var(--text-muted);
+}
+
+.btn-cancel:hover {
+  border-color: var(--text-main);
+  color: var(--text-main);
 }
 
 /* ワープ演出 */
@@ -391,9 +558,35 @@ body.warping {
   <div class="menu-list">
     <button class="btn-menu btn-start hard" id="startHardBtn">▶ 難易度：難しい (MZ) 新版</button>
     <button class="btn-menu btn-start" id="startEasyBtn">▶ 難易度：簡単 (KN) 旧版</button>
+    <button class="btn-menu btn-reset" id="openResetModalBtn">⚠ セーブデータ初期化</button>
   </div>
 
   <div class="version-tag">home v6.0</div>
+</div>
+
+<div class="reset-modal" id="resetModal">
+  <div class="reset-modal-content">
+    <div class="reset-modal-title">SAVE DATA RESET</div>
+    <div class="reset-modal-desc">消去したいセーブデータのモードを選択してください。チェックを入れたデータが完全に初期化されます。</div>
+    
+    <div class="checkbox-group">
+      <label class="checkbox-label">
+        <input type="checkbox" id="resetMzCheck">
+        <span class="custom-checkbox"></span>
+        難しい (MZ) [ 新版 ]
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" id="resetKnCheck">
+        <span class="custom-checkbox"></span>
+        簡単 (KN) [ 旧版 ]
+      </label>
+    </div>
+
+    <div class="reset-modal-actions">
+      <button class="btn-modal-action btn-execute" id="executeResetBtn">消去する</button>
+      <button class="btn-modal-action btn-cancel" id="cancelResetBtn">キャンセル</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -408,7 +601,6 @@ class KimoSoundManager {
     }
   }
 
-  // 作者ロゴ登場時のサウンド
   static playAuthorSound() {
     try {
       this.initContext();
@@ -429,10 +621,9 @@ class KimoSoundManager {
       gain.connect(ctx.destination);
       osc.start(now);
       osc.stop(now + 1.5);
-    } catch(e) { console.log(e); }
+    } catch(e) {}
   }
 
-  // 本編起動用ブートサウンド
   static playBootSound(onFinished) {
     try {
       this.initContext();
@@ -552,18 +743,15 @@ class KimoSoundManager {
   }
 }
 
-// === 自動オープニングアニメーションのシーケンス制御 ===
 window.addEventListener('DOMContentLoaded', () => {
   const authorScreen = document.getElementById('authorScreen');
   const libraryScreen = document.getElementById('libraryScreen');
 
-  // 1. ページ読み込み直後、作者ロゴを表示＋サウンド再生
   setTimeout(() => {
     authorScreen.classList.add('show');
     KimoSoundManager.playAuthorSound();
   }, 300);
 
-  // 2. 1.8秒後に作者ロゴを隠し、ライブラリ仕様画面に切り替え
   setTimeout(() => {
     authorScreen.style.opacity = '0';
     authorScreen.style.pointerEvents = 'none';
@@ -571,7 +759,6 @@ window.addEventListener('DOMContentLoaded', () => {
     libraryScreen.style.opacity = '1';
     libraryScreen.style.pointerEvents = 'auto';
 
-    // ライブラリのテキストを1行ずつ順に浮かばせる
     ['l1', 'l2', 'l3', 'l4', 'l5'].forEach((id, idx) => {
       setTimeout(() => {
         document.getElementById(id).classList.add('active');
@@ -579,19 +766,16 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }, 2200);
 
-  // 3. さらに3.5秒後（合計約5.7秒後）にライブラリ画面を消し、メインメニューへ自動移行
   setTimeout(() => {
     libraryScreen.style.opacity = '0';
     libraryScreen.style.pointerEvents = 'none';
 
     document.body.classList.add('activated');
 
-    // 本格的なBGMとブート音を起動
     KimoSoundManager.playBootSound(() => {
       KimoSoundManager.startBGM();
     });
 
-    // 不要になったDOM要素を削除してメモリを軽くする
     setTimeout(() => {
       authorScreen.remove();
       libraryScreen.remove();
@@ -600,7 +784,53 @@ window.addEventListener('DOMContentLoaded', () => {
   }, 5000);
 });
 
-// 難しいボタン（MZclickgame.htmlへ遷移）
+const resetModal = document.getElementById('resetModal');
+const openResetModalBtn = document.getElementById('openResetModalBtn');
+const cancelResetBtn = document.getElementById('cancelResetBtn');
+const executeResetBtn = document.getElementById('executeResetBtn');
+
+const resetMzCheck = document.getElementById('resetMzCheck');
+const resetKnCheck = document.getElementById('resetKnCheck');
+
+openResetModalBtn.addEventListener('click', () => {
+  resetMzCheck.checked = false;
+  resetKnCheck.checked = false;
+  resetModal.classList.add('active');
+});
+
+cancelResetBtn.addEventListener('click', () => {
+  resetModal.classList.remove('active');
+});
+
+resetModal.addEventListener('click', (e) => {
+  if (e.target === resetModal) {
+    resetModal.classList.remove('active');
+  }
+});
+
+executeResetBtn.addEventListener('click', () => {
+  let clearedCount = 0;
+
+  if (resetMzCheck.checked) {
+    localStorage.removeItem('your_game_save_MZ_key');
+    clearedCount++;
+  }
+
+  if (resetKnCheck.checked) {
+    localStorage.removeItem('your_game_save_KN_key');
+    clearedCount++;
+  }
+
+  if (clearedCount > 0) {
+    alert('選択されたセーブデータを初期化しました。');
+  } else {
+    alert('消去するモードが選択されていません。');
+    return;
+  }
+
+  resetModal.classList.remove('active');
+});
+
 document.getElementById('startHardBtn').addEventListener('click', (e) => {
   e.preventDefault();
   KimoSoundManager.playWarpSound();
@@ -611,7 +841,6 @@ document.getElementById('startHardBtn').addEventListener('click', (e) => {
   }, 700);
 });
 
-// 簡単ボタン（KNclickgame.htmlへ遷移）
 document.getElementById('startEasyBtn').addEventListener('click', (e) => {
   e.preventDefault();
   KimoSoundManager.playWarpSound();
