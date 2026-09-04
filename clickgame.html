@@ -16,6 +16,65 @@
   <meta name="google" content="notranslate">
 <title>インクリメンタル絶対神 — INFINITY MATRIX OMEGA — decimal.js 1e1000 ENDING —</title>
 <style>
+  #bootLoader {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(157,78,221,.18), transparent 42%),
+    radial-gradient(circle at 80% 75%, rgba(0,255,204,.12), transparent 45%),
+    #020106;
+  color: #f4f4f5;
+  font-family: Consolas, "Fira Code", monospace, system-ui;
+  transition: opacity .35s ease, visibility .35s ease;
+}
+#bootLoader.boot-done {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+#bootLoader .boot-title {
+  font-size: 0.85rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  margin-bottom: 18px;
+  background: linear-gradient(90deg, #fff, #00ffcc, #9d4edd, #ff0055);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+#bootLoader .boot-bar-wrap {
+  width: min(320px, 78vw);
+  height: 8px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 99px;
+  overflow: hidden;
+}
+#bootLoader .boot-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #00ffcc, #3a86ff, #9d4edd);
+  box-shadow: 0 0 12px rgba(0,255,204,.45);
+  transition: width .12s linear;
+}
+#bootLoader .boot-pct {
+  margin-top: 12px;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #00ffcc;
+  text-shadow: 0 0 16px rgba(0,255,204,.35);
+}
+#bootLoader .boot-sub {
+  margin-top: 8px;
+  font-size: 0.68rem;
+  letter-spacing: 1px;
+  color: #6b7280;
+}
 :root {
   --bg-main: #020106;
   --bg-panel: rgba(10, 6, 20, 0.9);
@@ -814,6 +873,90 @@ body, button, input, select, textarea, [class*="game-"] {
 </style>
 </head>
 <body>
+
+<!-- ★ ここから読み込み画面 -->
+<div id="bootLoader" aria-live="polite">
+  <div class="boot-title">INFINITY MATRIX BOOT</div>
+  <div class="boot-bar-wrap"><div class="boot-bar" id="bootBar"></div></div>
+  <div class="boot-pct" id="bootPct">0%</div>
+  <div class="boot-sub" id="bootSub">HTML を読み込み中...</div>
+</div>
+<script>
+(function () {
+  const bar = document.getElementById("bootBar");
+  const pctEl = document.getElementById("bootPct");
+  const sub = document.getElementById("bootSub");
+  const overlay = document.getElementById("bootLoader");
+  if (!overlay) return;
+
+  let shown = 0;
+  let finished = false;
+  const EXPECTED_CHARS = 240000;
+
+  function paint(n, label) {
+    if (finished) return;
+    shown = Math.max(shown, Math.min(100, Math.floor(n)));
+    if (bar) bar.style.width = shown + "%";
+    if (pctEl) pctEl.textContent = shown + "%";
+    if (label && sub) sub.textContent = label;
+  }
+
+  function estimate() {
+    let htmlPct = 8;
+    try {
+      const len = document.documentElement.innerHTML.length;
+      htmlPct = Math.min(78, Math.floor((len / EXPECTED_CHARS) * 78));
+    } catch (e) {}
+
+    let readyBonus = 0;
+    if (document.readyState === "interactive") readyBonus = 12;
+    if (document.readyState === "complete") readyBonus = 18;
+
+    let libBonus = 0;
+    if (typeof Decimal !== "undefined") libBonus = 6;
+
+    const scripts = document.scripts ? document.scripts.length : 0;
+    const scriptBonus = Math.min(4, scripts);
+
+    return Math.min(99, htmlPct + readyBonus + libBonus + scriptBonus);
+  }
+
+  const tick = setInterval(function () {
+    const state = document.readyState;
+    const label = state === "complete" ? "最終同期中..." :
+                  state === "interactive" ? "スクリプト初期化中..." :
+                  "HTML を読み込み中...";
+    paint(estimate(), label);
+  }, 80);
+
+  function finish() {
+    if (finished) return;
+    finished = true;
+    clearInterval(tick);
+    paint(100, "起動完了");
+    setTimeout(function () {
+      overlay.classList.add("boot-done");
+      setTimeout(function () {
+        if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      }, 400);
+    }, 220);
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    paint(Math.max(estimate(), 88), "DOM 構築完了");
+  });
+
+  window.addEventListener("load", function () {
+    paint(97, "リソース読み込み完了");
+    setTimeout(finish, 180);
+  });
+
+  setTimeout(function () {
+    if (!finished) finish();
+  }, 20000);
+})();
+</script>
+<!-- ★ ここまで読み込み画面 -->
 
 <div class="notification-center-container" id="toastHub"></div>
 
