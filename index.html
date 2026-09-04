@@ -229,6 +229,8 @@ body.activated .home-container {
   display: inline-block;
   border: none;
   outline: none;
+  position: relative;
+  overflow: hidden;
 }
 
 .btn-start {
@@ -236,8 +238,13 @@ body.activated .home-container {
   border: 2px solid var(--color-kimo);
   color: var(--color-kimo);
   box-shadow: 0 0 25px rgba(57, 255, 20, 0.2);
-  position: relative;
-  overflow: hidden;
+}
+
+.btn-start.hard {
+  border-color: var(--color-antimatter);
+  color: var(--color-antimatter);
+  background: linear-gradient(90deg, rgba(255, 0, 85, 0.1), rgba(157, 78, 221, 0.1));
+  box-shadow: 0 0 25px rgba(255, 0, 85, 0.2);
 }
 
 .btn-start::after {
@@ -258,6 +265,12 @@ body.activated .home-container {
   color: #000;
   box-shadow: 0 0 50px rgba(57, 255, 20, 0.9), 0 0 100px rgba(255, 0, 85, 0.5);
   transform: translateY(-3px) scale(1.02);
+}
+
+.btn-start.hard:hover {
+  background: var(--color-antimatter);
+  color: #fff;
+  box-shadow: 0 0 50px rgba(255, 0, 85, 0.9), 0 0 100px rgba(157, 78, 221, 0.5);
 }
 
 .version-tag {
@@ -339,14 +352,15 @@ body.warping {
   <div class="home-title">INFINITY MATRIX OMEGA</div>
   
   <div class="menu-list">
-    <button class="btn-menu btn-start" id="startBtn">▶ WORLD START (生体接続)</button>
+    <button class="btn-menu btn-start hard" id="startHardBtn">▶ 難易度：難しい (MZ)</button>
+    <button class="btn-menu btn-start" id="startEasyBtn">▶ 難易度：簡単 (KN)</button>
   </div>
 
   <div class="version-tag">BIOMASS OVERDRIVE v6.0</div>
 </div>
 
 <script>
-// Web Audio APIを用いた「きもおい（有機的で中毒性のある歪んだ）」サウンドジェネレーター
+// Web Audio APIを用いたサウンドジェネレーター
 class KimoSoundManager {
   static initContext() {
     if (!this.audioCtx) {
@@ -358,26 +372,22 @@ class KimoSoundManager {
     }
   }
 
-  // 起動時の約3秒間：脳がとろけるような変態的・うねる起動音
   static playBootSound(onFinished) {
     try {
       this.initContext();
       const ctx = this.audioCtx;
       const now = ctx.currentTime;
 
-      // 1. 生体パルス・うねり低音（デチューンを効かせた不協和音気味のノコギリ波）
       [55, 57.5, 110, 112].forEach((freq, index) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         const filter = ctx.createBiquadFilter();
 
         osc.type = index % 2 === 0 ? 'sawtooth' : 'square';
-        // 周波数がうねるように激しくモジュレーション
         osc.frequency.setValueAtTime(freq, now);
         osc.frequency.exponentialRampToValueAtTime(freq * 1.5, now + 1.5);
         osc.frequency.exponentialRampToValueAtTime(freq * 0.8, now + 3.0);
 
-        // フィルターでこもらせてから急に解放する（ぬるぬる感）
         filter.type = 'lowpass';
         filter.frequency.setValueAtTime(200, now);
         filter.frequency.linearRampToValueAtTime(1200, now + 1.5);
@@ -396,7 +406,6 @@ class KimoSoundManager {
         osc.stop(now + 3.0);
       });
 
-      // 2. 「きもおい」高音の粘着質グリッチスイープ（耳に残る変なピッチ変動）
       const weirdOsc = ctx.createOscillator();
       const weirdGain = ctx.createGain();
       
@@ -417,7 +426,6 @@ class KimoSoundManager {
       weirdOsc.start(now);
       weirdOsc.stop(now + 2.9);
 
-      // 3秒後にBGMへ移行
       if (typeof onFinished === 'function') {
         setTimeout(onFinished, 3000);
       }
@@ -428,7 +436,6 @@ class KimoSoundManager {
     }
   }
 
-  // クセになる、ちょっと不気味でリズミカルな生体BGMループ
   static startBGM() {
     if (this.bgmPlaying) return;
     this.bgmPlaying = true;
@@ -436,12 +443,11 @@ class KimoSoundManager {
     try {
       const ctx = this.audioCtx;
       
-      // マイナーコードをベースにした不気味なアルペジオ
       const creepyChords = [
-        [220, 233.08, 329.63], // A, Bb, E (不協和音の不気味さ)
-        [174.61, 185.00, 261.63], // F, F#, C
-        [130.81, 138.59, 196.00], // C, C#, G
-        [164.81, 174.61, 246.94]  // E, F, B
+        [220, 233.08, 329.63],
+        [174.61, 185.00, 261.63],
+        [130.81, 138.59, 196.00],
+        [164.81, 174.61, 246.94] 
       ];
 
       let chordIndex = 0;
@@ -456,7 +462,6 @@ class KimoSoundManager {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         
-        // 矩形波と正弦波を混ぜたような独特のチープ＆きもおい音色
         osc.type = noteIndex === 1 ? 'sawtooth' : 'sine';
         osc.frequency.setValueAtTime(freq * 1.5, now);
 
@@ -475,7 +480,6 @@ class KimoSoundManager {
           chordIndex = (chordIndex + 1) % creepyChords.length;
         }
 
-        // ちょっとクセになる中毒性のあるテンポ
         setTimeout(playStep, 200);
       };
 
@@ -485,7 +489,6 @@ class KimoSoundManager {
     }
   }
 
-  // 移動（ワープ）時の耳と脳を突くような狂気のグリッチ移動音
   static playWarpSound() {
     try {
       this.initContext();
@@ -493,7 +496,6 @@ class KimoSoundManager {
       const ctx = this.audioCtx;
       const now = ctx.currentTime;
 
-      // 脳を逆立てるような急激な高周波上昇＋ノイズ的アプローチ
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       
@@ -532,21 +534,30 @@ document.getElementById('standbyScreen').addEventListener('click', () => {
     standby.remove();
   }, 800);
 
-  // 狂気の起動音再生 ➔ 終わったらきもおいBGMへ
   KimoSoundManager.playBootSound(() => {
     KimoSoundManager.startBGM();
   });
 });
 
-// WORLD STARTボタン（移動音＆狂気ワープ発動）
-document.getElementById('startBtn').addEventListener('click', (e) => {
+// 難しいボタン（MZclickgame.htmlへ遷移）
+document.getElementById('startHardBtn').addEventListener('click', (e) => {
   e.preventDefault();
-
   KimoSoundManager.playWarpSound();
   document.body.classList.add('warping');
 
   setTimeout(() => {
-    window.location.href = 'clickgame.html';
+    window.location.href = 'MZclickgame.html';
+  }, 700);
+});
+
+// 簡単ボタン（KNclickgame.htmlへ遷移）
+document.getElementById('startEasyBtn').addEventListener('click', (e) => {
+  e.preventDefault();
+  KimoSoundManager.playWarpSound();
+  document.body.classList.add('warping');
+
+  setTimeout(() => {
+    window.location.href = 'KNclickgame.html';
   }, 700);
 });
 </script>
