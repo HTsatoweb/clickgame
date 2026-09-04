@@ -3201,161 +3201,135 @@ window.addEventListener("DOMContentLoaded", () => {
      メイン：updateDynamicCoreAndResourceVisuals
      - 308段階ごとに区切り、e308（exponent >= 308）以降は虹色
      ------------------------- */
-  window.updateDynamicCoreAndResourceVisuals = function(currentEnergy) {
-    const coreBtn = document.getElementById('coreTrigger');
-    const energyValElem = document.getElementById('v-energy');
-    if (!coreBtn || !energyValElem) return;
+window.updateDynamicCoreAndResourceVisuals = function(currentEnergy) {
+  const coreBtn = document.getElementById('coreTrigger');
+  const energyValElem = document.getElementById('v-energy');
+  if (!coreBtn || !energyValElem) return;
+  const productButtons = document.querySelectorAll('.shop-item-btn, .product-btn, .upg-btn, button[id*=shop], button[id*=buy]');
 
-    const productButtons = document.querySelectorAll('.shop-item-btn, .product-btn, .upg-btn, button[id*=shop], button[id*=buy]');
+  let exponent = 0;
+  try {
+    const dE = D(currentEnergy);
+    if (dE.gt(0) && dE.isFinite()) {
+      const rawExp = dE.log(10).toNumber();
+      exponent = Math.max(0, Math.min(1000, isFinite(rawExp) ? rawExp : 1000));
+    }
+  } catch (e) { exponent = 0; }
 
-    // currentEnergy を数値化して対数を取る
-    let exponent = 0;
+  let stage = 1;
+  if (exponent >= 1) stage = Math.floor(exponent);
+  stage = Math.max(1, Math.min(1000, stage));
+
+  const prev = lastState.get(coreBtn) || { stage: null, hue: null };
+  if (prev.stage === stage && exponent < 1000) return;
+
+  let hue = hueForStage(stage);
+  const t = (stage - 1) / 999;
+  const lightness = 75 - (t * 40);
+  const saturation = 70 + (t * 20);
+  const textColor = hsl(hue, saturation, lightness);
+  lastState.set(coreBtn, { stage: stage, hue: hue });
+
+  // e1000：終着の虹
+  if (exponent >= 1000) {
+    const rainbow = 'linear-gradient(90deg, #ffffff, #00f2fe, #ffea00, #ff0055, #9d4edd, #00ffcc, #ffffff)';
+    energyValElem.style.setProperty('background', rainbow, 'important');
+    energyValElem.style.setProperty('background-size', '500% 100%', 'important');
+    energyValElem.style.setProperty('background-clip', 'text', 'important');
+    energyValElem.style.setProperty('-webkit-background-clip', 'text', 'important');
+    energyValElem.style.setProperty('color', 'transparent', 'important');
+    energyValElem.style.setProperty('-webkit-text-fill-color', 'transparent', 'important');
+    energyValElem.style.setProperty('animation', 'rainbowFlowRightToLeft 0.8s linear infinite, rainbowFadeIn 0.8s ease-in-out', 'important');
+    energyValElem.style.setProperty('text-shadow', '0 0 70px rgba(255,255,255,0.95)', 'important');
+    coreBtn.style.setProperty('background', rainbow, 'important');
+    coreBtn.style.setProperty('background-size', '500% 100%', 'important');
+    coreBtn.style.setProperty('animation', 'rainbowFadeIn 0.8s ease-in-out, rainbowFlowRightToLeft 0.8s linear infinite, corePulse 1.0s ease-in-out infinite', 'important');
+    coreBtn.style.setProperty('box-shadow', '0 0 76px rgba(255,255,255,0.95)', 'important');
+    coreBtn.style.setProperty('border-width', '8px', 'important');
+    coreBtn.style.setProperty('border-color', '#ffffff', 'important');
+    productButtons.forEach(btn => {
+      try {
+        btn.style.setProperty('border-color', '#ffea00', 'important');
+        btn.style.setProperty('box-shadow', '0 0 22px rgba(255,234,0,0.45)', 'important');
+        btn.style.setProperty('background-color', 'rgba(255,255,255,0.10)', 'important');
+      } catch (e) {}
+    });
+    return;
+  }
+
+  // e308〜e999：色んな色
+  if (exponent >= 308) {
+    const c1 = hsl(hue, 90, 58);
+    const c2 = hsl((hue + 72) % 360, 88, 52);
+    const c3 = hsl((hue + 144) % 360, 92, 48);
+    const c4 = hsl((hue + 216) % 360, 86, 56);
+    const c5 = hsl((hue + 288) % 360, 90, 50);
+    const multi = 'linear-gradient(90deg, ' + c1 + ', ' + c2 + ', ' + c3 + ', ' + c4 + ', ' + c5 + ', ' + c1 + ')';
+    energyValElem.style.setProperty('background', multi, 'important');
+    energyValElem.style.setProperty('background-size', '280% 100%', 'important');
+    energyValElem.style.setProperty('background-clip', 'text', 'important');
+    energyValElem.style.setProperty('-webkit-background-clip', 'text', 'important');
+    energyValElem.style.setProperty('color', 'transparent', 'important');
+    energyValElem.style.setProperty('-webkit-text-fill-color', 'transparent', 'important');
+    energyValElem.style.setProperty('animation', 'none', 'important');
+    energyValElem.style.setProperty('text-shadow', '0 0 22px ' + hslaFromHsl(c1, 0.55), 'important');
+    coreBtn.style.setProperty('background', 'linear-gradient(135deg, ' + c1 + ' 0%, ' + c3 + ' 50%, ' + c5 + ' 100%)', 'important');
+    coreBtn.style.setProperty('border-color', c2, 'important');
+    coreBtn.style.setProperty('box-shadow', '0 0 34px ' + hslaFromHsl(c3, 0.6), 'important');
+    coreBtn.style.setProperty('border-width', '6px', 'important');
+    coreBtn.style.setProperty('animation', 'corePulse 1.2s ease-in-out infinite', 'important');
+    productButtons.forEach((btn, i) => {
+      const c = [c1, c2, c3, c4, c5][i % 5];
+      try {
+        btn.style.setProperty('border-color', c, 'important');
+        btn.style.setProperty('box-shadow', '0 0 12px ' + hslaFromHsl(c, 0.4), 'important');
+        btn.style.setProperty('background-color', hslaFromHsl(c, 0.10), 'important');
+      } catch (e) {}
+    });
+    return;
+  }
+
+  // e1〜e199：単色
+  if (stage < 200) {
+    energyValElem.style.setProperty('animation', 'none', 'important');
+    energyValElem.style.setProperty('background', 'none', 'important');
+    energyValElem.style.removeProperty('background-clip');
+    energyValElem.style.removeProperty('-webkit-background-clip');
+    energyValElem.style.setProperty('color', textColor, 'important');
+    energyValElem.style.setProperty('-webkit-text-fill-color', 'initial', 'important');
+    energyValElem.style.setProperty('text-shadow', `0 0 18px ${hslaFromHsl(textColor, 0.45)}`, 'important');
     try {
-      const dE = D(currentEnergy);
-      if (dE.gt(0) && dE.isFinite()) {
-        exponent = Math.max(0, Math.min(10000, dE.log(10).toNumber()));
-      }
-    } catch (e) { exponent = 0; }
-
-    // stage 計算（308段階で最大 308 まで振り分け）
-    let stage = 1;
-    if (exponent >= 1) {
-      // exponent (1 ～ 308) を 1 ～ 308 のステージにマッピング
-      stage = Math.floor((exponent - 1) * (308 / 308)) + 1;
-    }
-    stage = Math.max(1, Math.min(308, stage));
-
-    // 前回 state を取得
-    const prev = lastState.get(coreBtn) || { stage: null, hue: null };
-
-    // 同一段階中は何もしない（e308 以上の虹域は例外で常に適用）
-    if (prev.stage === stage && exponent < 308) return;
-
-    // 決定論的に hue を決定
-    let hue = hueForStage(stage);
-
-    // 明度・彩度（308段階に応じて変化）
-    const t = (stage - 1) / 307;
-    const lightness = 75 - (t * 40); // 75 -> 35
-    const saturation = 70 + (t * 20); // 70 -> 90
-
-    // 文字色（単色）とコア色は同じ
-    const textColor = hsl(hue, saturation, lightness);
-
-    // 保存（次回比較用）
-    lastState.set(coreBtn, { stage: stage, hue: hue });
-
-    // 🌟 e308 以上（虹域）処理（例外）
-    if (exponent >= 308) {
-      const rainbow = 'linear-gradient(90deg, #00f2fe, #4facfe, #00ffcc, #ffea00, #ff0055, #9d4edd, #00f2fe)';
-      energyValElem.style.setProperty('background', rainbow, 'important');
-      energyValElem.style.setProperty('background-size', '300% 100%', 'important');
-      energyValElem.style.setProperty('background-position', '100% 50%', 'important');
-      energyValElem.style.setProperty('background-clip', 'text', 'important');
-      energyValElem.style.setProperty('-webkit-background-clip', 'text', 'important');
-      energyValElem.style.setProperty('color', 'transparent', 'important');
-      energyValElem.style.setProperty('-webkit-text-fill-color', 'transparent', 'important');
-      energyValElem.style.setProperty('animation', 'rainbowFlowRightToLeft 3s linear infinite, rainbowFadeIn 0.8s ease-in-out', 'important');
-      energyValElem.style.setProperty('text-shadow', '0 0 30px rgba(255,255,255,0.85)', 'important');
-
-      coreBtn.style.setProperty('background', rainbow, 'important');
-      coreBtn.style.setProperty('background-size', '300% 100%', 'important');
-      coreBtn.style.setProperty('animation', 'rainbowFadeIn 0.8s ease-in-out, rainbowFlowRightToLeft 3s linear infinite', 'important');
-      coreBtn.style.setProperty('box-shadow', '0 0 36px rgba(255,255,255,0.9)', 'important');
-      coreBtn.style.setProperty('border-width', '6px', 'important');
-
-      productButtons.forEach(btn => {
-        try {
-          btn.style.setProperty('border-color', '#00f2fe', 'important');
-          btn.style.setProperty('box-shadow', '0 0 10px rgba(0,242,254,0.2)', 'important');
-          btn.style.setProperty('background-color', 'rgba(0,242,254,0.08)', 'important');
-        } catch (e) {}
-      });
-      return;
-    }
-
-    // stage < 200: 単色運用（文字とコアを同色に）
-    if (stage < 200) {
-      // 文字（単色）
-      energyValElem.style.setProperty('animation', 'none', 'important');
-      energyValElem.style.setProperty('background', 'none', 'important');
-      energyValElem.style.removeProperty('background-clip');
-      energyValElem.style.removeProperty('-webkit-background-clip');
-      energyValElem.style.setProperty('color', textColor, 'important');
-      energyValElem.style.setProperty('-webkit-text-fill-color', 'initial', 'important');
-      energyValElem.style.setProperty('text-shadow', `0 0 18px ${hslaFromHsl(textColor, 0.45)}`, 'important');
-
-      // コアを文字と同じ色にする
+      coreBtn.style.setProperty('background', 'none', 'important');
+      coreBtn.style.setProperty('border-color', textColor, 'important');
+      coreBtn.style.setProperty('box-shadow', `0 0 26px ${hslaFromHsl(textColor, 0.65)}`, 'important');
+      coreBtn.style.setProperty('border-width', '4px', 'important');
+      coreBtn.style.setProperty('animation', 'none', 'important');
+    } catch (e) {}
+    productButtons.forEach(btn => {
       try {
-        coreBtn.style.setProperty('background', 'none', 'important');
-        coreBtn.style.setProperty('border-color', textColor, 'important');
-        coreBtn.style.setProperty('box-shadow', `0 0 26px ${hslaFromHsl(textColor, 0.65)}`, 'important');
-        coreBtn.style.setProperty('border-width', '4px', 'important');
-        coreBtn.style.setProperty('animation', 'none', 'important');
-        
-        const coreSvg = coreBtn.querySelector && coreBtn.querySelector('svg');
-        if (coreSvg) {
-          const paths = coreSvg.querySelectorAll('path, circle, rect');
-          paths.forEach(p => {
-            try { p.style.setProperty('fill', textColor, 'important'); p.style.setProperty('stroke', textColor, 'important'); } catch (e) {}
-          });
-        }
+        btn.style.setProperty('border-color', textColor, 'important');
+        btn.style.setProperty('box-shadow', `0 0 12px ${hslaFromHsl(textColor, 0.45)}`, 'important');
+        btn.style.setProperty('background-color', hslaFromHsl(textColor, 0.06), 'important');
       } catch (e) {}
+    });
+    return;
+  }
 
-      // 商品ボタン群も同色で統一
-      productButtons.forEach(btn => {
-        try {
-          btn.style.setProperty('border-color', textColor, 'important');
-          btn.style.setProperty('box-shadow', `0 0 12px ${hslaFromHsl(textColor, 0.45)}`, 'important');
-          btn.style.setProperty('background-color', hslaFromHsl(textColor, 0.06), 'important');
-        } catch (e) {}
-      });
-
-      return;
-    }
-
-    // stage >= 200: 文字は単色維持、コアは文字色を基準に控えめなグラデーションを許可
-    {
-      energyValElem.style.setProperty('animation', 'none', 'important');
-      energyValElem.style.setProperty('background', 'none', 'important');
-      energyValElem.style.removeProperty('background-clip');
-      energyValElem.style.removeProperty('-webkit-background-clip');
-      energyValElem.style.setProperty('color', textColor, 'important');
-      energyValElem.style.setProperty('-webkit-text-fill-color', 'initial', 'important');
-      energyValElem.style.setProperty('text-shadow', `0 0 20px rgba(0,0,0,0.06)`, 'important');
-
-      const accent1 = hsl((hue + 60) % 360, Math.max(50, saturation - 5), Math.max(35, lightness - 8));
-      const accent2 = hsl((hue + 180) % 360, Math.max(50, saturation - 10), Math.max(30, lightness - 12));
-      try {
-        const coreGrad = `linear-gradient(135deg, ${textColor} 0%, ${accent1} 45%, ${accent2} 100%)`;
-        coreBtn.style.setProperty('background', coreGrad, 'important');
-        coreBtn.style.setProperty('border-color', textColor, 'important');
-        coreBtn.style.setProperty('box-shadow', `0 0 36px ${hslaFromHsl(textColor, 0.55)}`, 'important');
-        coreBtn.style.setProperty('border-width', '5px', 'important');
-        coreBtn.style.setProperty('animation', 'corePulse 1.2s ease-in-out infinite', 'important');
-      } catch (e) {}
-
-      const coreSvg = coreBtn.querySelector && coreBtn.querySelector('svg');
-      if (coreSvg) {
-        try {
-          const paths = coreSvg.querySelectorAll('path, circle, rect');
-          paths.forEach((p, i) => {
-            const c = (i % 3 === 0) ? textColor : (i % 3 === 1) ? accent1 : accent2;
-            try { p.style.setProperty('fill', c, 'important'); p.style.setProperty('stroke', c, 'important'); } catch (e) {}
-          });
-        } catch (e) {}
-      }
-
-      productButtons.forEach((btn, i) => {
-        const c = (i % 3 === 0) ? textColor : (i % 3 === 1) ? accent1 : accent2;
-        try {
-          btn.style.setProperty('border-color', textColor, 'important');
-          btn.style.setProperty('box-shadow', `0 0 14px ${hslaFromHsl(c, 0.45)}`, 'important');
-          btn.style.setProperty('background-color', hslaFromHsl(c, 0.12), 'important');
-        } catch (e) {}
-      });
-    }
-  };
+  // e200〜e307：コアがグラデーション
+  energyValElem.style.setProperty('animation', 'none', 'important');
+  energyValElem.style.setProperty('background', 'none', 'important');
+  energyValElem.style.removeProperty('background-clip');
+  energyValElem.style.removeProperty('-webkit-background-clip');
+  energyValElem.style.setProperty('color', textColor, 'important');
+  energyValElem.style.setProperty('-webkit-text-fill-color', 'initial', 'important');
+  const accent1 = hsl((hue + 60) % 360, Math.max(50, saturation - 5), Math.max(35, lightness - 8));
+  const accent2 = hsl((hue + 180) % 360, Math.max(50, saturation - 10), Math.max(30, lightness - 12));
+  coreBtn.style.setProperty('background', `linear-gradient(135deg, ${textColor} 0%, ${accent1} 45%, ${accent2} 100%)`, 'important');
+  coreBtn.style.setProperty('border-color', textColor, 'important');
+  coreBtn.style.setProperty('box-shadow', `0 0 36px ${hslaFromHsl(textColor, 0.55)}`, 'important');
+  coreBtn.style.setProperty('border-width', '5px', 'important');
+  coreBtn.style.setProperty('animation', 'corePulse 1.2s ease-in-out infinite', 'important');
+};
 
   /* -------------------------
      パーティクル（既存機能）
