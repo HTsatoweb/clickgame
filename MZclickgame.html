@@ -4333,41 +4333,62 @@ function playSettingSound() {
 
 /**
  * =========================================================================
- * Viewport Refresher & State Synchronization Interface
+ * Viewport Refresher & State Synchronization Interface (ページネーション対応版)
  * =========================================================================
  */
 function refreshUI() {
-  document.getElementById("v-energy").textContent = formatValue(game.energy);
-  document.getElementById("v-total-cps").textContent = formatValue(getTotalCps());
-  document.getElementById("v-click-power").textContent = "+" + formatValue(getClickPower());
+  const elEnergy = document.getElementById("v-energy");
+  if (elEnergy) elEnergy.textContent = formatValue(game.energy);
+  
+  const elCps = document.getElementById("v-total-cps");
+  if (elCps) elCps.textContent = formatValue(getTotalCps());
+  
+  const elClickPow = document.getElementById("v-click-power");
+  if (elClickPow) elClickPow.textContent = "+" + formatValue(getClickPower());
   
   if (game.antimatter > 0 || game.prestigeAmCount > 0) {
-    document.getElementById("group-am").style.display = "block";
-    document.getElementById("v-antimatter").textContent = game.antimatter.toLocaleString();
+    const groupAm = document.getElementById("group-am");
+    if (groupAm) groupAm.style.display = "block";
+    const vAntimatter = document.getElementById("v-antimatter");
+    if (vAntimatter) vAntimatter.textContent = game.antimatter.toLocaleString();
   }
   if (game.timeShards > 0 || game.prestigeTlCount > 0) {
-    document.getElementById("group-tl").style.display = "block";
-    document.getElementById("v-timeshards").textContent = game.timeShards.toLocaleString();
+    const groupTl = document.getElementById("group-tl");
+    if (groupTl) groupTl.style.display = "block";
+    const vTimeShards = document.getElementById("v-timeshards");
+    if (vTimeShards) vTimeShards.textContent = game.timeShards.toLocaleString();
   }
 
   const gainAm = getGainAntimatter();
-  document.getElementById("v-gain-am").textContent = `+${gainAm.toLocaleString()} AM`;
-  document.getElementById("btnResetAm").disabled = gainAm <= 0;
+  const vGainAm = document.getElementById("v-gain-am");
+  if (vGainAm) vGainAm.textContent = `+${gainAm.toLocaleString()} AM`;
+  const btnResetAm = document.getElementById("btnResetAm");
+  if (btnResetAm) btnResetAm.disabled = gainAm <= 0;
 
   const gainTl = getGainTimeShards();
-  document.getElementById("v-gain-tl").textContent = `+${gainTl.toLocaleString()} TS`;
-  document.getElementById("btnResetTl").disabled = gainTl <= 0;
+  const vGainTl = document.getElementById("v-gain-tl");
+  if (vGainTl) vGainTl.textContent = `+${gainTl.toLocaleString()} TS`;
+  const btnResetTl = document.getElementById("btnResetTl");
+  if (btnResetTl) btnResetTl.disabled = gainTl <= 0;
 
   const gainGx = getGainGalaxyNodes();
-  document.getElementById("v-gain-gx").textContent = `+${gainGx} GN`;
-  document.getElementById("btnResetGx").disabled = gainGx <= 0;
+  const vGainGx = document.getElementById("v-gain-gx");
+  if (vGainGx) vGainGx.textContent = `+${gainGx} GN`;
+  const btnResetGx = document.getElementById("btnResetGx");
+  if (btnResetGx) btnResetGx.disabled = gainGx <= 0;
 
+  // 施設（現在画面にある要素だけ更新）
   DB_FACTORIES.forEach(f => {
     const cost = getFactoryCost(f.id);
-    document.getElementById(`dom-fac-cost-${f.id}`).textContent = formatValue(cost);
-    document.getElementById(`dom-fac-count-${f.id}`).textContent = game.facCounts[f.id];
-    document.getElementById(`dom-fac-cps-${f.id}`).textContent = formatValue(getFactoryCps(f.id));
+    const domCost = document.getElementById(`dom-fac-cost-${f.id}`);
+    if (domCost) domCost.textContent = formatValue(cost);
     
+    const domCount = document.getElementById(`dom-fac-count-${f.id}`);
+    if (domCount) domCount.textContent = game.facCounts[f.id];
+    
+    const domCps = document.getElementById(`dom-fac-cps-${f.id}`);
+    if (domCps) domCps.textContent = formatValue(getFactoryCps(f.id));
+      
     const card = document.getElementById(`dom-fac-${f.id}`);
     if (card) {
       if (D(game.energy).gte(cost)) card.classList.remove("state-disabled");
@@ -4375,6 +4396,7 @@ function refreshUI() {
     }
   });
 
+  // 改良 (CONCEPT)
   DB_UPGRADES.forEach(u => {
     const lv = game.upgLevels[u.id];
     const cost = getUpgradeCost(u.id);
@@ -4382,18 +4404,21 @@ function refreshUI() {
     const labelCost = document.getElementById(`dom-upg-cost-${u.id}`);
     const labelLv = document.getElementById(`dom-upg-lv-${u.id}`);
 
-    labelLv.textContent = `${lv} / ${u.max}`;
-    if (lv >= u.max) {
-      card.className = "card-upgrade-node state-maxed";
-      labelCost.textContent = "MAX定着";
-    } else {
-      card.className = "card-upgrade-node";
-      labelCost.textContent = `${formatValue(cost)} E`;
-      if (D(game.energy).gte(cost)) card.classList.remove("state-disabled");
-      else card.classList.add("state-disabled");
+    if (labelLv) labelLv.textContent = `${lv} / ${u.max}`;
+    if (card && labelCost) {
+      if (lv >= u.max) {
+        card.className = "card-upgrade-node state-maxed";
+        labelCost.textContent = "MAX定着";
+      } else {
+        card.className = "card-upgrade-node";
+        labelCost.textContent = `${formatValue(cost)} E`;
+        if (D(game.energy).gte(cost)) card.classList.remove("state-disabled");
+        else card.classList.add("state-disabled");
+      }
     }
   });
 
+  // 反物質改良
   DB_AM_UPGRADES.forEach(au => {
     const lv = game.amUpgLevels[au.id];
     const cost = getAmUpgradeCost(au.id);
@@ -4401,18 +4426,21 @@ function refreshUI() {
     const labelCost = document.getElementById(`dom-amupg-cost-${au.id}`);
     const labelLv = document.getElementById(`dom-amupg-lv-${au.id}`);
 
-    labelLv.textContent = `${lv} / ${au.max}`;
-    if (lv >= au.max) {
-      card.className = "card-upgrade-node state-maxed";
-      labelCost.textContent = "結合最大";
-    } else {
-      card.className = "card-upgrade-node";
-      labelCost.textContent = `${cost} AM`;
-      if (game.antimatter >= cost) card.classList.remove("state-disabled");
-      else card.classList.add("state-disabled");
+    if (labelLv) labelLv.textContent = `${lv} / ${au.max}`;
+    if (card && labelCost) {
+      if (lv >= au.max) {
+        card.className = "card-upgrade-node state-maxed";
+        labelCost.textContent = "結合最大";
+      } else {
+        card.className = "card-upgrade-node";
+        labelCost.textContent = `${cost} AM`;
+        if (game.antimatter >= cost) card.classList.remove("state-disabled");
+        else card.classList.add("state-disabled");
+      }
     }
   });
 
+  // 時間律改良
   DB_TL_UPGRADES.forEach(tu => {
     const lv = game.tlUpgLevels[tu.id];
     const cost = getTlUpgradeCost(tu.id);
@@ -4420,46 +4448,62 @@ function refreshUI() {
     const labelCost = document.getElementById(`dom-tlupg-cost-${tu.id}`);
     const labelLv = document.getElementById(`dom-tlupg-lv-${tu.id}`);
 
-    labelLv.textContent = `${lv} / ${tu.max}`;
-    if (lv >= tu.max) {
-      card.className = "card-upgrade-node state-maxed";
-      labelCost.textContent = "超越完了";
-    } else {
-      card.className = "card-upgrade-node";
-      labelCost.textContent = `${cost} TS`;
-      if (game.timeShards >= cost) card.classList.remove("state-disabled");
-      else card.classList.add("state-disabled");
+    if (labelLv) labelLv.textContent = `${lv} / ${tu.max}`;
+    if (card && labelCost) {
+      if (lv >= tu.max) {
+        card.className = "card-upgrade-node state-maxed";
+        labelCost.textContent = "超越完了";
+      } else {
+        card.className = "card-upgrade-node";
+        labelCost.textContent = `${cost} TS`;
+        if (game.timeShards >= cost) card.classList.remove("state-disabled");
+        else card.classList.add("state-disabled");
+      }
     }
   });
 
   if (game.upgLevels[7] >= 1) {
-    document.getElementById("auto-locked-msg").style.display = "none";
-    document.getElementById("auto-unlocked-grid").style.display = "block";
+    const lockedMsg = document.getElementById("auto-locked-msg");
+    if (lockedMsg) lockedMsg.style.display = "none";
+    const unlockedGrid = document.getElementById("auto-unlocked-grid");
+    if (unlockedGrid) unlockedGrid.style.display = "block";
     if (game.tlUpgLevels[3] >= 1) {
-      document.getElementById("row-auto-prestige-am").style.display = "flex";
+      const rowAuto = document.getElementById("row-auto-prestige-am");
+      if (rowAuto) rowAuto.style.display = "flex";
     }
   }
 
-  document.getElementById("s-run-time").textContent = game.sessionTime.toFixed(1) + "s";
-  document.getElementById("s-total-time").textContent = game.totalTime.toFixed(1) + "s";
-  document.getElementById("s-clicks").textContent = game.totalClicks.toLocaleString();
-  document.getElementById("s-p-am").textContent = game.prestigeAmCount;
-  document.getElementById("s-p-tl").textContent = game.prestigeTlCount;
-  document.getElementById("s-galaxy-nodes").textContent = game.galaxyNodes;
+  const setRunTime = document.getElementById("s-run-time");
+  if (setRunTime) setRunTime.textContent = game.sessionTime.toFixed(1) + "s";
+  const setTotalTime = document.getElementById("s-total-time");
+  if (setTotalTime) setTotalTime.textContent = game.totalTime.toFixed(1) + "s";
+  const setClicks = document.getElementById("s-clicks");
+  if (setClicks) setClicks.textContent = game.totalClicks.toLocaleString();
+  const setPAm = document.getElementById("s-p-am");
+  if (setPAm) setPAm.textContent = game.prestigeAmCount;
+  const setPTl = document.getElementById("s-p-tl");
+  if (setPTl) setPTl.textContent = game.prestigeTlCount;
+  const setGalaxyNodes = document.getElementById("s-galaxy-nodes");
+  if (setGalaxyNodes) setGalaxyNodes.textContent = game.galaxyNodes;
   
   const amPerUnit = 100 + (game.amUpgLevels[0] * 50);
-  document.getElementById("s-mult-am").textContent = `+${(game.antimatter * amPerUnit).toLocaleString()}%`;
+  const setMultAm = document.getElementById("s-mult-am");
+  if (setMultAm) setMultAm.textContent = `+${(game.antimatter * amPerUnit).toLocaleString()}%`;
   
   const totalSpeedPercentage = (getGameSpeedMultiplier() * 100) - 100;
-  document.getElementById("s-mult-time").textContent = `+${totalSpeedPercentage.toFixed(1)}%`;
-  document.getElementById("s-mult-galaxy").textContent = `${(1.0 + game.galaxyNodes * 5.0).toFixed(1)}x`;
+  const setMultTime = document.getElementById("s-mult-time");
+  if (setMultTime) setMultTime.textContent = `+${totalSpeedPercentage.toFixed(1)}%`;
+  const setMultGalaxy = document.getElementById("s-mult-galaxy");
+  if (setMultGalaxy) setMultGalaxy.textContent = `${(1.0 + game.galaxyNodes * 5.0).toFixed(1)}x`;
 
   DB_ACHIEVEMENTS.forEach(ach => {
     if (!game.achievements.includes(ach.id) && ach.req()) {
       game.achievements.push(ach.id);
       createToast(`🏆 実績解除: ${ach.text}`, ach.desc);
       pushLog(`【実績獲得】 ${ach.text} - ${ach.desc}`, "var(--color-upgrade)");
-      window.ModAPI.hooks.onAchievement.forEach(cb => { try { cb({id: ach.id, text: ach.text}); } catch(e){} });
+      if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onAchievement) {
+        window.ModAPI.hooks.onAchievement.forEach(cb => { try { cb({id: ach.id, text: ach.text}); } catch(e){} });
+      }
     }
   });
 }
