@@ -727,65 +727,26 @@ input[type="password"],
 textarea {
     cursor: text;
 }
-  /* =========================================================================
- * 🌐 全世界対応ユニバーサルフォント定義（文字化け・フォント崩れ完全防止）
+/* =========================================================================
+ * ⚡ 超軽量・高速フォント定義（パフォーマンス改善版）
  * ========================================================================= */
 body, button, input, select, textarea, [class*="game-"] {
-  font-family: 
-    system-ui, 
-    -apple-system, 
-    "Segoe UI", 
-    Roboto, 
-    Helvetica, 
-    Arial, 
-    /* 日本語・CJK統合漢字（簡体字・繁体字・韓国語） */
-    "Hiragino Sans", 
-    "Meiryo", 
-    "Microsoft YaHei", 
-    "Microsoft JhengHei", 
-    "Malgun Gothic", 
-    "Apple SD Gothic Neo",
-    /* キリル文字圏（ロシア語・ウクライナ語など） */
-    "Ubuntu", 
-    "DejaVu Sans", 
-    /* アラビア語・ペルシャ語・ウルドゥー語 */
-    "Noto Sans Arabic", 
-    "Amiri", 
-    "Tahoma", 
-    /* デーヴァナーガリー文字（ヒンディー語・マラーティー語など） */
-    "Noto Sans Devanagari", 
-    /* ベンガル語 */
-    "Noto Sans Bengali", 
-    /* タイ語 */
-    "Noto Sans Thai", 
-    /* グルジア語 */
-    "Noto Sans Georgian", 
-    /* アルメニア語 */
-    "Noto Sans Armenian", 
-    /* ギリシャ語 */
-    "Noto Sans Symbols", 
-    /* ヘブライ語 */
-    "Noto Sans Hebrew", 
-    /* タミール語・テルグ語などの南インド系言語 */
-    "Noto Sans Tamil", 
-    "Noto Sans Telugu", 
-    "Noto Sans Kannada", 
-    "Noto Sans Malayalam", 
-    /* エチオピア・アムハラ語 */
-    "Noto Sans Ethiopic", 
-    /* クメール語（カンボジア） */
-    "Noto Sans Khmer", 
-    /* ミャンマー語 */
-    "Noto Sans Myanmar", 
-    /* フォールバック */
-    "Noto Sans", 
-    sans-serif !important;
+    font-family: 
+        system-ui, 
+        -apple-system, 
+        "Segoe UI", 
+        Roboto, 
+        "Helvetica Neue", 
+        Arial, 
+        "Hiragino Sans", 
+        "Meiryo", 
+        sans-serif;
+    /* !important を外し、無駄なフォント列挙を削ることで再描画を爆速化します */
 }
 
-/* RTL（右から左へ書く言語：アラビア語やペルシャ語など）のレイアウト自然化 */
 [dir="rtl"] {
-  direction: rtl;
-  text-align: right;
+    direction: rtl;
+    text-align: right;
 }
   /* =========================================================================
    ⚙️ 既存CSSに統合する中央モーダル & ボタン崩れ完全防止パッチ
