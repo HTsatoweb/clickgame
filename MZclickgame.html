@@ -695,18 +695,34 @@ button, .btn-action-prestige, .click-core-btn, .card-upgrade-node, .factory-line
   gap: 6px;
   width: 100%;
 }
-  /* =========================================================================
- * 🖱️ 最軽量版カスタムマウスカーソル
+ /* =========================================================================
+ * 🖱️ サイバー・SF風 カスタムマウスカーソル効果（すべて cursor.png 統一版）
  * ========================================================================= */
 
+/* 1. サイト全体のデフォルトカーソル */
 body {
     cursor: url('cursor.png') 16 16, default;
 }
 
-/* テキスト入力欄だけは文字選択用に標準カーソルに戻す */
+/* 2. ボタンやリンク、その他すべての要素に cursor.png を強制適用 */
+button, 
+.factory-linear-card, 
+.card-upgrade-node, 
+.click-core-btn,
+.tab-trigger-button,
+[onclick], 
+a,
+input[type="button"],
+input[type="submit"],
+label,
+* {
+    cursor: url('cursor.png') 16 16, default;
+}
+
+/* 3. 入力フィールドなど、テキストを選択させたい部分だけ標準のテキストカーソルにする場合 */
 input[type="text"], 
-input[type="email"], 
-input[type="password"], 
+input[type="email"],
+input[type="password"],
 textarea {
     cursor: text;
 }
