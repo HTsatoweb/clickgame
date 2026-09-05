@@ -695,34 +695,35 @@ button, .btn-action-prestige, .click-core-btn, .card-upgrade-node, .factory-line
   gap: 6px;
   width: 100%;
 }
- /* =========================================================================
- * 🖱️ サイバー・SF風 カスタムマウスカーソル効果（すべて cursor.png 統一版）
+  /* =========================================================================
+ * 🖱️ カスタムマウスカーソル効果（ボタン・UI対応版）
  * ========================================================================= */
 
-/* 1. サイト全体のデフォルトカーソル */
+/* 1. サイト全体のベース（基本はこれに継承される） */
 body {
     cursor: url('cursor.png') 16 16, default;
 }
 
-/* 2. ボタンやリンク、その他すべての要素に cursor.png を強制適用 */
+/* 2. クリックできるボタンや、独自でカーソルが変わりやすいUI要素に強制適用 */
 button, 
+a, 
+input[type="button"], 
+input[type="submit"], 
+input[type="image"],
+label,
+[role="button"],
 .factory-linear-card, 
 .card-upgrade-node, 
 .click-core-btn,
 .tab-trigger-button,
-[onclick], 
-a,
-input[type="button"],
-input[type="submit"],
-label,
-* {
-    cursor: url('cursor.png') 16 16, default;
+[onclick] {
+    cursor: url('cursor.png') 16 16, default !important;
 }
 
-/* 3. 入力フィールドなど、テキストを選択させたい部分だけ標準のテキストカーソルにする場合 */
+/* 3. 入力フィールドなど、テキストを選択させたい部分だけ標準に戻す */
 input[type="text"], 
-input[type="email"],
-input[type="password"],
+input[type="email"], 
+input[type="password"], 
 textarea {
     cursor: text;
 }
