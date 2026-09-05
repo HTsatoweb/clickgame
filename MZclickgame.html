@@ -2918,7 +2918,6 @@ function updateCurrentTabRender() {
     else if (activeTab.id === "tab-tl-layer") renderTlUpgrades();
     else if (activeTab.id === "tab-auto") renderAutomation();
 }
-
 /**
  * 1. 施設 (MATERIAL) の描画
  */
@@ -2928,15 +2927,26 @@ function renderFactories() {
         "containerFactories",
         "pagination-fac",
         "fac",
-        (factoryData, globalIndex) => {
+        (f, globalIndex) => {
             const el = document.createElement("div");
-            el.className = "factory-card";
-            const count = game.facCounts[globalIndex] || 0;
-            const cost = typeof getFactoryCost === "function" ? getFactoryCost(globalIndex) : 0;
+            el.id = `dom-fac-${f.id}`; // refreshUIで使われているID
+            el.className = "factory-card"; // お使いのカード用クラス
             
+            const count = game.facCounts[f.id] || 0;
+            const cost = typeof getFactoryCost === "function" ? getFactoryCost(f.id) : 0;
+            
+            // 元々のゲームのHTML構造に合わせてここに記述してください
             el.innerHTML = `
-                <div>${factoryData.name || "施設 #" + (globalIndex + 1)} (所持: ${count})</div>
-                <button onclick="buyFactory(${globalIndex})">購入 (コスト: ${cost})</button>
+                <div class="factory-info">
+                    <span class="factory-name">${f.name || "施設 #" + f.id}</span>
+                    <span id="dom-fac-count-${f.id}">${count}</span>
+                </div>
+                <div class="factory-stats">
+                    CPS: <span id="dom-fac-cps-${f.id}">${formatValue(getFactoryCps(f.id))}</span>
+                </div>
+                <button onclick="buyFactory(${f.id})">
+                    購入: <span id="dom-fac-cost-${f.id}">${formatValue(cost)}</span>
+                </button>
             `;
             return el;
         }
@@ -2952,14 +2962,23 @@ function renderUpgrades() {
         "containerUpgrades",
         "pagination-upg",
         "upg",
-        (upgData, globalIndex) => {
+        (u, globalIndex) => {
             const el = document.createElement("div");
-            el.className = "upgrade-card";
-            const level = game.upgLevels[globalIndex] || 0;
+            el.id = `dom-upg-${u.id}`; // refreshUIで使われているID
+            el.className = "card-upgrade-node"; // 元々のクラス
+            
+            const lv = game.upgLevels[u.id] || 0;
+            const cost = getUpgradeCost(u.id);
             
             el.innerHTML = `
-                <div>${upgData.name || "改良 #" + (globalIndex + 1)} (Lv: ${level})</div>
-                <button onclick="buyUpgrade(${globalIndex})">強化</button>
+                <div class="upgrade-title">${u.name || "改良 #" + u.id}</div>
+                <div class="upgrade-desc">${u.desc || ""}</div>
+                <div class="upgrade-footer">
+                    <span id="dom-upg-lv-${u.id}">${lv} / ${u.max}</span>
+                    <button onclick="buyUpgrade(${u.id})">
+                        <span id="dom-upg-cost-${u.id}">${formatValue(cost)} E</span>
+                    </button>
+                </div>
             `;
             return el;
         }
@@ -2975,14 +2994,22 @@ function renderAmUpgrades() {
         "containerAmUpgrades",
         "pagination-am",
         "am",
-        (amData, globalIndex) => {
+        (au, globalIndex) => {
             const el = document.createElement("div");
-            el.className = "upgrade-card";
-            const level = game.amUpgLevels[globalIndex] || 0;
+            el.id = `dom-amupg-${au.id}`;
+            el.className = "card-upgrade-node";
+            
+            const lv = game.amUpgLevels[au.id] || 0;
+            const cost = getAmUpgradeCost(au.id);
             
             el.innerHTML = `
-                <div>${amData.name || "反物質改良 #" + (globalIndex + 1)} (Lv: ${level})</div>
-                <button onclick="buyAmUpgrade(${globalIndex})">反物質で強化</button>
+                <div class="upgrade-title">${au.name || "反物質改良 #" + au.id}</div>
+                <div class="upgrade-footer">
+                    <span id="dom-amupg-lv-${au.id}">${lv} / ${au.max}</span>
+                    <button onclick="buyAmUpgrade(${au.id})">
+                        <span id="dom-amupg-cost-${au.id}">${cost} AM</span>
+                    </button>
+                </div>
             `;
             return el;
         }
@@ -2998,14 +3025,22 @@ function renderTlUpgrades() {
         "containerTlUpgrades",
         "pagination-tl",
         "tl",
-        (tlData, globalIndex) => {
+        (tu, globalIndex) => {
             const el = document.createElement("div");
-            el.className = "upgrade-card";
-            const level = game.tlUpgLevels ? (game.tlUpgLevels[globalIndex] || 0) : 0;
+            el.id = `dom-tlupg-${tu.id}`;
+            el.className = "card-upgrade-node";
+            
+            const lv = game.tlUpgLevels ? (game.tlUpgLevels[tu.id] || 0) : 0;
+            const cost = getTlUpgradeCost(tu.id);
             
             el.innerHTML = `
-                <div>${tlData.name || "時間律改良 #" + (globalIndex + 1)} (Lv: ${level})</div>
-                <button onclick="buyTlUpgrade(${globalIndex})">時間破片で強化</button>
+                <div class="upgrade-title">${tu.name || "時間律改良 #" + tu.id}</div>
+                <div class="upgrade-footer">
+                    <span id="dom-tlupg-lv-${tu.id}">${lv} / ${tu.max}</span>
+                    <button onclick="buyTlUpgrade(${tu.id})">
+                        <span id="dom-tlupg-cost-${tu.id}">${cost} TS</span>
+                    </button>
+                </div>
             `;
             return el;
         }
@@ -3017,7 +3052,6 @@ function renderTlUpgrades() {
  */
 function renderAutomation() {
     const autoData = window.DB_AUTOMATION || []; 
-    
     renderWithPagination(
         autoData,
         "containerAutomation",
@@ -3025,12 +3059,13 @@ function renderAutomation() {
         "auto",
         (autoItem, globalIndex) => {
             const el = document.createElement("div");
+            el.className = "card-upgrade-node";
             el.innerHTML = `<div>自動化機能 #${globalIndex + 1}</div>`;
             return el;
         }
     );
 }
-/**
+  /**
  * ==========================================================================================
  * VERIFIED 65+ COMPLETELY SEPARATED API ENDPOINTS ARCHITECTURE (NO ALTERATION ALLOWED)
  * ==========================================================================================
