@@ -1203,12 +1203,20 @@ function D(v) {
   if (v instanceof Decimal) return v;
   if (v === null || v === undefined || v === "") return new Decimal(0);
   if (typeof v === "number") {
-    if (!isFinite(v) || isNaN(v)) return new Decimal(0);
+    if (v === Infinity) return new Decimal("1e9000");
+    if (v === -Infinity || isNaN(v) || !isFinite(v)) return new Decimal(0);
+    if (Math.abs(v) >= 1e21) return new Decimal(v.toExponential());
     return new Decimal(v);
+  }
+  if (typeof v === "string") {
+    const s = String(v).trim();
+    if (!s) return new Decimal(0);
+    if (s === "Infinity" || s === "+Infinity") return new Decimal("1e9000");
+    if (s === "-Infinity" || s === "NaN") return new Decimal(0);
+    try { return new Decimal(s); } catch (e) { return new Decimal(0); }
   }
   try { return new Decimal(v); } catch (e) { return new Decimal(0); }
 }
-
 function energyGte(n) {
   try { return D(game && game.energy).gte(D(n)); } catch (e) { return false; }
 }
