@@ -45,7 +45,56 @@ body, button, input, textarea {
   box-sizing: border-box;
   font-family: 'Consolas', 'Fira Code', 'Courier New', monospace, system-ui;
 }
+/* =========================================================================
+ * 🖱️ サイバー・SF風 カスタムマウスカーソル効果
+ * ========================================================================= */
 
+/* 1. サイト全体の基本カーソルをスタイリッシュなポインターや十字などに変更 */
+body {
+    cursor: default;
+}
+
+/* 2. クリック可能なすべての要素（ボタン、カード、リンクなど）に専用のホバーカーソルを適用 */
+button, 
+.factory-linear-card, 
+.card-upgrade-node, 
+.click-core-btn,
+.tab-trigger-button,
+[onclick], 
+a {
+    cursor: pointer;
+}
+
+/* 3. 入力フィールドなどのテキスト選択カーソル */
+input[type="text"], textarea {
+    cursor: text;
+}
+
+/* 4. 【オプション演出】マウスに追従して光るネオン・レティクル（照準）カーソル */
+/* ※ もし追従カーソルを表示したい場合は、以下の #custom-cursor 要素をCSSに追加できます */
+#custom-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--color-energy);
+    border-radius: 50%;
+    pointer-events: none; /* 下層のクリックを邪魔しない */
+    transform: translate(-50%, -50%);
+    transition: transform 0.08s ease-out, width 0.15s, height 0.15s, background-color 0.15s, border-color 0.15s;
+    z-index: 2147483646; /* 最前面に配置 */
+    box-shadow: 0 0 10px rgba(0, 255, 204, 0.4);
+}
+
+/* ボタンやカードの上にマウスが乗ったときのカーソル変形演出 */
+body.cursor-hover #custom-cursor {
+    width: 28px;
+    height: 28px;
+    background-color: rgba(0, 255, 204, 0.15);
+    border-color: var(--color-upgrade);
+    box-shadow: 0 0 15px rgba(255, 234, 0, 0.5);
+}
 body {
   margin: 0;
   padding: 0;
@@ -1339,6 +1388,25 @@ window.addEventListener("load", () => {
             updateCurrentTabRender();
         }
     }, 100);
+});
+  document.addEventListener("DOMContentLoaded", () => {
+    // カスタムカーソル用エレメントの生成
+    const cursor = document.createElement("div");
+    cursor.id = "custom-cursor";
+    document.body.appendChild(cursor);
+
+    // マウス座標に追従
+    document.addEventListener("mousemove", (e) => {
+        cursor.style.left = `${e.clientX}px`;
+        cursor.style.top = `${e.clientY}px`;
+    });
+
+    // インタラクティブな要素にホバーしたときのクラス切り替え
+    const targets = document.querySelectorAll("button, .factory-linear-card, .card-upgrade-node, .click-core-btn, .tab-trigger-button, [onclick]");
+    targets.forEach(el => {
+        el.addEventListener("mouseenter", () => document.body.classList.add("cursor-hover"));
+        el.addEventListener("mouseleave", () => document.body.classList.remove("cursor-hover"));
+    });
 });
   /**
  * =========================================================================
