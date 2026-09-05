@@ -1028,40 +1028,56 @@ body, button, input, select, textarea, [class*="game-"] {
 
   <div class="center-content-viewport">
     
+    <!-- 1. MATERIAL (施設) -->
     <div class="tab-pane active" id="tab-fac">
       <div class="pane-heading">AUTOMATION INDUSTRIAL (自動製造ライン)</div>
       <div class="guide-text-block">エネルギーを自動生成するインフラ。数が多くなるほどインフレコストが跳ね上がる。</div>
       <div id="containerFactories"></div>
+      <!-- ページネーション用UI -->
+      <div class="pagination-container" id="pagination-fac" style="text-align: center; margin-top: 15px;"></div>
     </div>
 
+    <!-- 2. CONCEPT (改良) -->
     <div class="tab-pane" id="tab-upg">
       <div class="pane-heading">CONCEPT SYSTEM UPGRADES (システム改変)</div>
       <div class="upgrade-matrix-grid" id="containerUpgrades"></div>
+      <div class="pagination-container" id="pagination-upg" style="text-align: center; margin-top: 15px;"></div>
     </div>
 
+    <!-- 3. ANTIMATTER (反物質) -->
     <div class="tab-pane" id="tab-am-layer">
       <div class="pane-heading heading-am">ANTIMATTER REACTION (反物質パラメータ)</div>
       <div class="guide-text-block">保有する反物質 1 AM ごとに、全CPSに <b>+100%</b> の複利増幅がかかります（永続）。</div>
       <div class="upgrade-matrix-grid" id="containerAmUpgrades"></div>
+      <div class="pagination-container" id="pagination-am" style="text-align: center; margin-top: 15px;"></div>
     </div>
 
+    <!-- 4. TIME (時間律) -->
     <div class="tab-pane" id="tab-tl-layer">
       <div class="pane-heading heading-tl">CHRONO-MATRIX UPGRADES (時間歪曲フィールド)</div>
       <div class="guide-text-block">時間律の破片(Time Shards)は世界の時間軸そのものを加速します。1 TS ごとに<b>ゲーム全体の進行が +2% 加速</b>。</div>
       <div class="upgrade-matrix-grid" id="containerTlUpgrades"></div>
+      <div class="pagination-container" id="pagination-tl" style="text-align: center; margin-top: 15px;"></div>
     </div>
 
+    <!-- 5. AUTOMATION (自動化) -->
     <div class="tab-pane" id="tab-auto">
       <div class="pane-heading heading-gx">AUTOMATION ENGINE (全自動化思考コア)</div>
       <div class="guide-text-block">完全自動化の領域。「CONCEPT」タブ最下層の【マトリクスの深淵】の購入で全稼働します。</div>
       <div id="containerAutomation"></div>
+      <div class="pagination-container" id="pagination-auto" style="text-align: center; margin-top: 15px;"></div>
     </div>
-    <div class="tab-pane" id="tab-ach">
-  <div class="pane-heading" style="color: var(--color-upgrade);">ACHIEVEMENTS MATRIX (実績データベース)</div>
-  <div class="guide-text-block">宇宙の因果を紐解き、数々の条件を達成して称号を手に入れろ。<br>達成率: <span id="ach-progress-text">0 / 0</span> (<span id="ach-progress-percent">0%</span>)</div>
-  <div class="upgrade-matrix-grid" id="containerAchievements" style="display: flex; flex-direction: column; gap: 6px;"></div>
-</div>
 
+    <!-- 6. ACHIEVEMENTS (実績) ※そのまま -->
+    <div class="tab-pane" id="tab-ach">
+      <div class="pane-heading" style="color: var(--color-upgrade);">ACHIEVEMENTS MATRIX (実績データベース)</div>
+      <div class="guide-text-block">宇宙の因果を紐解き、数々の条件を達成して称号を手に入れろ。<br>達成率: <span id="ach-progress-text">0 / 0</span> (<span id="ach-progress-percent">0%</span>)</div>
+      <div class="upgrade-matrix-grid" id="containerAchievements" style="display: flex; flex-direction: column; gap: 6px;"></div>
+    </div>
+
+  </div>
+</div>
+  
   </div>
 </div>
 <div class="column-right">
@@ -2718,6 +2734,72 @@ function resetOwnedItems() {
     // プレイヤーが持っている指定のアイテム、または全アセットを0にする
     player.items[400].amount = 0; // または player.totalItems = 0; などゲームの変数に合わせて調整
     updateDisplay();
+}
+  // 各タブの現在のページを管理するオブジェクト
+const currentPages = {
+    fac: 1,
+    upg: 1,
+    am: 1,
+    tl: 1,
+    auto: 1
+};
+
+const ITEMS_PER_PAGE = 25;
+
+// 汎用ページネーション描画＆データスライス関数
+function renderPagedList(allData, containerId, paginationId, tabKey, renderItemCallback) {
+    const container = document.getElementById(containerId);
+    const paginationContainer = document.getElementById(paginationId);
+    
+    container.innerHTML = "";
+    paginationContainer.innerHTML = "";
+
+    const totalItems = allData.length;
+    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE) || 1;
+
+    // ページ番号のバリデーション
+    if (currentPages[tabKey] > totalPages) currentPages[tabKey] = totalPages;
+    if (currentPages[tabKey] < 1) currentPages[tabKey] = 1;
+
+    const start = (currentPages[tabKey] - 1) * ITEMS_PER_PAGE;
+    const end = start + ITEMS_PER_PAGE;
+    const pageItems = allData.slice(start, end);
+
+    // アイテムの描画
+    pageItems.forEach((item, index) => {
+        const element = renderItemCallback(item, start + index);
+        container.appendChild(element);
+    });
+
+    // ページネーションUI (← 番号 →) の生成
+    if (totalPages > 1) {
+        const prevButton = document.createElement("button");
+        prevButton.innerText = "←";
+        prevButton.disabled = currentPages[tabKey] === 1;
+        prevButton.onclick = () => {
+            if (currentPages[tabKey] > 1) {
+                currentPages[tabKey]--;
+                refreshCurrentTab(); // タブの再描画関数
+            }
+        };
+        paginationContainer.appendChild(prevButton);
+
+        const pageSpan = document.createElement("span");
+        pageSpan.innerText = ` ${currentPages[tabKey]} / ${totalPages} `;
+        pageSpan.style.margin = "0 10px";
+        paginationContainer.appendChild(pageSpan);
+
+        const nextButton = document.createElement("button");
+        nextButton.innerText = "→";
+        nextButton.disabled = currentPages[tabKey] === totalPages;
+        nextButton.onclick = () => {
+            if (currentPages[tabKey] < totalPages) {
+                currentPages[tabKey]++;
+                refreshCurrentTab();
+            }
+        };
+        paginationContainer.appendChild(nextButton);
+    }
 }
 /**
  * =========================================================================
