@@ -695,29 +695,40 @@ button, .btn-action-prestige, .click-core-btn, .card-upgrade-node, .factory-line
   gap: 6px;
   width: 100%;
 }
-  /* =========================================================================
- * 🖱️ サイバー・SF風 カスタムマウスカーソル効果（中心基準）
+/* =========================================================================
+ * 🖱️ サイバー・SF風 カスタムマウスカーソル効果（全要素一括適用）
  * ========================================================================= */
 
-/* 1. サイト全体の基本カーソル（中心を基準にする） */
+/* 1. サイト全体のデフォルトカーソル */
 body {
-    /* 16 16 は32x32px画像の中心座標です（16x16px画像なら 8 8 に変更） */
+    /* 16 16 は32x32px画像の中心座標（16x16px画像なら 8 8 に変更） */
     cursor: url('cursor.png') 16 16, default;
 }
 
-/* 2. ボタンやクリック可能な要素にマウスを乗せたときのカーソル */
+/* 2. ページ上のすべての要素にカスタムカーソルを強制適用 */
+* {
+    cursor: url('cursor.png') 16 16, default;
+}
+
+/* 3. ボタンやリンクなど「指差し（ポインター）」にしたい要素 */
 button, 
 .factory-linear-card, 
 .card-upgrade-node, 
 .click-core-btn,
 .tab-trigger-button,
 [onclick], 
-a {
+a,
+input[type="button"],
+input[type="submit"],
+label {
     cursor: url('pointer.png') 16 16, pointer;
 }
 
-/* 3. 入力フィールドなどのテキスト選択カーソル */
-input[type="text"], textarea {
+/* 4. 入力フィールドなど、テキストを選択させたい部分だけ標準のテキストカーソルに戻す場合 */
+input[type="text"], 
+input[type="email"],
+input[type="password"],
+textarea {
     cursor: text;
 }
   /* =========================================================================
