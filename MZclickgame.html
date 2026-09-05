@@ -2815,16 +2815,7 @@ function renderWithPagination(allData, containerId, paginationId, tabKey, create
         prevBtn.disabled = pageState[tabKey] === 1;
         prevBtn.onclick = () => {
             if (pageState[tabKey] > 1) {
-                pageState[tabKey]--;
-                updateCurrentTabRender(); // 全体の再描画関数を呼ぶ
-            }
-        };
-const prevBtn = document.createElement("button");
-        prevBtn.innerText = "←";
-        prevBtn.disabled = pageState[tabKey] === 1;
-        prevBtn.onclick = () => {
-            if (pageState[tabKey] > 1) {
-                // ▼ すでに定義されている効果音を鳴らす
+                // 効果音を鳴らす
                 if (typeof playSettingSound === "function") playSettingSound();
 
                 pageState[tabKey]--;
@@ -2841,7 +2832,7 @@ const prevBtn = document.createElement("button");
         nextBtn.disabled = pageState[tabKey] === totalPages;
         nextBtn.onclick = () => {
             if (pageState[tabKey] < totalPages) {
-                // ▼ すでに定義されている効果音を鳴らす
+                // 効果音を鳴らす
                 if (typeof playSettingSound === "function") playSettingSound();
 
                 pageState[tabKey]++;
