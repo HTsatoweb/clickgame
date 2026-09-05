@@ -45,25 +45,6 @@ body, button, input, textarea {
   box-sizing: border-box;
   font-family: 'Consolas', 'Fira Code', 'Courier New', monospace, system-ui;
 }
-/* =========================================================================
- * 🖱️ サイバー・SF風 カスタムマウスカーソル効果
- * ========================================================================= */
-body {
-    /* 0 0 はカーソルの左上を基準点にする指定です。もし中心にしたい場合は画像のサイズ（例: 16 16）を指定します */
-    cursor: url('cursor.png') 16 16, auto;
-}
-
-/* ボタンやリンクなどのホバー時 */
-button, 
-.factory-linear-card, 
-.card-upgrade-node, 
-.click-core-btn,
-.tab-trigger-button,
-[onclick], 
-a {
-    /* 指先などのアイコンの先端を合わせる場合は必要に応じて座標を調整してください */
-    cursor: url('pointer.png') 0 0, pointer;
-}
   /* Webkit (Edge, Chrome) 用スクロールバー設定 */
 ::-webkit-scrollbar {
   width: 6px;
