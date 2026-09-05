@@ -2819,6 +2819,18 @@ function renderWithPagination(allData, containerId, paginationId, tabKey, create
                 updateCurrentTabRender(); // 全体の再描画関数を呼ぶ
             }
         };
+const prevBtn = document.createElement("button");
+        prevBtn.innerText = "←";
+        prevBtn.disabled = pageState[tabKey] === 1;
+        prevBtn.onclick = () => {
+            if (pageState[tabKey] > 1) {
+                // ▼ すでに定義されている効果音を鳴らす
+                if (typeof playSettingSound === "function") playSettingSound();
+
+                pageState[tabKey]--;
+                updateCurrentTabRender();
+            }
+        };
 
         const pageInfo = document.createElement("span");
         pageInfo.innerText = ` ${pageState[tabKey]} / ${totalPages} `;
@@ -2829,6 +2841,9 @@ function renderWithPagination(allData, containerId, paginationId, tabKey, create
         nextBtn.disabled = pageState[tabKey] === totalPages;
         nextBtn.onclick = () => {
             if (pageState[tabKey] < totalPages) {
+                // ▼ すでに定義されている効果音を鳴らす
+                if (typeof playSettingSound === "function") playSettingSound();
+
                 pageState[tabKey]++;
                 updateCurrentTabRender();
             }
