@@ -2909,7 +2909,6 @@ const DEFAULT_GAME_STATE = JSON.stringify(game);
  * =========================================================================
  */
 function updateCurrentTabRender() {
-    // 今どのタブが表示されているか判定して、対応する描画関数を呼ぶ
     const activeTab = document.querySelector(".tab-pane.active");
     if (!activeTab) return;
 
@@ -2931,8 +2930,7 @@ function renderFactories() {
         "fac",
         (factoryData, globalIndex) => {
             const el = document.createElement("div");
-            el.className = "factory-card"; // お使いのクラス名に合わせて調整してください
-            // ここで施設の見た目（名前、レベル、購入ボタンなど）を組み立てる
+            el.className = "factory-card";
             const count = game.facCounts[globalIndex] || 0;
             const cost = typeof getFactoryCost === "function" ? getFactoryCost(globalIndex) : 0;
             
@@ -3016,11 +3014,8 @@ function renderTlUpgrades() {
 
 /**
  * 5. 自動化 (AUTOMATION) の描画
- * ※もし自動化タブもリスト形式であれば同様に適用できます
  */
 function renderAutomation() {
-    // 自動化タブに固有のデータ配列があればここに渡します。
-    // 例としてダミーの配列を置いています。必要に応じて書き換えてください。
     const autoData = window.DB_AUTOMATION || []; 
     
     renderWithPagination(
