@@ -695,33 +695,18 @@ button, .btn-action-prestige, .click-core-btn, .card-upgrade-node, .factory-line
   gap: 6px;
   width: 100%;
 }
-/* =========================================================================
- * 🖱️ サイバー・SF風 カスタムマウスカーソル効果（軽量化版）
+  /* =========================================================================
+ * 🖱️ 最軽量版カスタムマウスカーソル
  * ========================================================================= */
 
-/* 1. サイト全体のデフォルトカーソル（継承されるため * は不要） */
 body {
     cursor: url('cursor.png') 16 16, default;
 }
 
-/* 2. ボタンやリンクなど「指差し（ポインター）」にしたい要素 */
-button, 
-.factory-linear-card, 
-.card-upgrade-node, 
-.click-core-btn,
-.tab-trigger-button,
-[onclick], 
-a,
-input[type="button"],
-input[type="submit"],
-label {
-    cursor: url('pointer.png') 16 16, pointer;
-}
-
-/* 3. 入力フィールドなど、テキストを選択させたい部分 */
+/* テキスト入力欄だけは文字選択用に標準カーソルに戻す */
 input[type="text"], 
-input[type="email"],
-input[type="password"],
+input[type="email"], 
+input[type="password"], 
 textarea {
     cursor: text;
 }
