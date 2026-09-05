@@ -4596,6 +4596,21 @@ function switchMainTab(targetId) {
   const targetPane = document.getElementById(targetId);
   if (targetPane) targetPane.classList.add("active");
   if (event && event.target) event.target.classList.add("active");
+
+  // ==========================================
+  // ★ ここでタブごとの描画関数を呼び出す
+  // ==========================================
+  if (targetId === "tab-fac" && typeof renderFactories === "function") {
+    renderFactories();
+  } else if (targetId === "tab-upg" && typeof renderUpgrades === "function") {
+    renderUpgrades();
+  } else if (targetId === "tab-am-layer" && typeof renderAmUpgrades === "function") {
+    renderAmUpgrades();
+  } else if (targetId === "tab-tl-layer" && typeof renderTlUpgrades === "function") {
+    renderTlUpgrades();
+  } else if (targetId === "tab-auto" && typeof renderAutomation === "function") {
+    renderAutomation();
+  }
 }
 
 let stateSpaceKeyGuard = false;
