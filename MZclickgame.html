@@ -2903,7 +2903,138 @@ let game = {
 };
 
 const DEFAULT_GAME_STATE = JSON.stringify(game);
+/**
+ * =========================================================================
+ * ページネーション連動のためのタブ再描画ハンドラー
+ * =========================================================================
+ */
+function updateCurrentTabRender() {
+    // 今どのタブが表示されているか判定して、対応する描画関数を呼ぶ
+    const activeTab = document.querySelector(".tab-pane.active");
+    if (!activeTab) return;
 
+    if (activeTab.id === "tab-fac") renderFactories();
+    else if (activeTab.id === "tab-upg") renderUpgrades();
+    else if (activeTab.id === "tab-am-layer") renderAmUpgrades();
+    else if (activeTab.id === "tab-tl-layer") renderTlUpgrades();
+    else if (activeTab.id === "tab-auto") renderAutomation();
+}
+
+/**
+ * 1. 施設 (MATERIAL) の描画
+ */
+function renderFactories() {
+    renderWithPagination(
+        DB_FACTORIES,
+        "containerFactories",
+        "pagination-fac",
+        "fac",
+        (factoryData, globalIndex) => {
+            const el = document.createElement("div");
+            el.className = "factory-card"; // お使いのクラス名に合わせて調整してください
+            // ここで施設の見た目（名前、レベル、購入ボタンなど）を組み立てる
+            const count = game.facCounts[globalIndex] || 0;
+            const cost = typeof getFactoryCost === "function" ? getFactoryCost(globalIndex) : 0;
+            
+            el.innerHTML = `
+                <div>${factoryData.name || "施設 #" + (globalIndex + 1)} (所持: ${count})</div>
+                <button onclick="buyFactory(${globalIndex})">購入 (コスト: ${cost})</button>
+            `;
+            return el;
+        }
+    );
+}
+
+/**
+ * 2. システム改変 (CONCEPT) の描画
+ */
+function renderUpgrades() {
+    renderWithPagination(
+        DB_UPGRADES,
+        "containerUpgrades",
+        "pagination-upg",
+        "upg",
+        (upgData, globalIndex) => {
+            const el = document.createElement("div");
+            el.className = "upgrade-card";
+            const level = game.upgLevels[globalIndex] || 0;
+            
+            el.innerHTML = `
+                <div>${upgData.name || "改良 #" + (globalIndex + 1)} (Lv: ${level})</div>
+                <button onclick="buyUpgrade(${globalIndex})">強化</button>
+            `;
+            return el;
+        }
+    );
+}
+
+/**
+ * 3. 反物質 (ANTIMATTER) の描画
+ */
+function renderAmUpgrades() {
+    renderWithPagination(
+        DB_AM_UPGRADES,
+        "containerAmUpgrades",
+        "pagination-am",
+        "am",
+        (amData, globalIndex) => {
+            const el = document.createElement("div");
+            el.className = "upgrade-card";
+            const level = game.amUpgLevels[globalIndex] || 0;
+            
+            el.innerHTML = `
+                <div>${amData.name || "反物質改良 #" + (globalIndex + 1)} (Lv: ${level})</div>
+                <button onclick="buyAmUpgrade(${globalIndex})">反物質で強化</button>
+            `;
+            return el;
+        }
+    );
+}
+
+/**
+ * 4. 時間律 (TIME) の描画
+ */
+function renderTlUpgrades() {
+    renderWithPagination(
+        DB_TL_UPGRADES,
+        "containerTlUpgrades",
+        "pagination-tl",
+        "tl",
+        (tlData, globalIndex) => {
+            const el = document.createElement("div");
+            el.className = "upgrade-card";
+            const level = game.tlUpgLevels ? (game.tlUpgLevels[globalIndex] || 0) : 0;
+            
+            el.innerHTML = `
+                <div>${tlData.name || "時間律改良 #" + (globalIndex + 1)} (Lv: ${level})</div>
+                <button onclick="buyTlUpgrade(${globalIndex})">時間破片で強化</button>
+            `;
+            return el;
+        }
+    );
+}
+
+/**
+ * 5. 自動化 (AUTOMATION) の描画
+ * ※もし自動化タブもリスト形式であれば同様に適用できます
+ */
+function renderAutomation() {
+    // 自動化タブに固有のデータ配列があればここに渡します。
+    // 例としてダミーの配列を置いています。必要に応じて書き換えてください。
+    const autoData = window.DB_AUTOMATION || []; 
+    
+    renderWithPagination(
+        autoData,
+        "containerAutomation",
+        "pagination-auto",
+        "auto",
+        (autoItem, globalIndex) => {
+            const el = document.createElement("div");
+            el.innerHTML = `<div>自動化機能 #${globalIndex + 1}</div>`;
+            return el;
+        }
+    );
+}
 /**
  * ==========================================================================================
  * VERIFIED 65+ COMPLETELY SEPARATED API ENDPOINTS ARCHITECTURE (NO ALTERATION ALLOWED)
