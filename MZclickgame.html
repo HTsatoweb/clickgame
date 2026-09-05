@@ -2918,8 +2918,9 @@ function updateCurrentTabRender() {
     else if (activeTab.id === "tab-tl-layer") renderTlUpgrades();
     else if (activeTab.id === "tab-auto") renderAutomation();
 }
+
 /**
- * 1. 施設 (MATERIAL) の描画
+ * 1. 施設 (MATERIAL) の描画（CSSクラス完全一致版）
  */
 function renderFactories() {
     renderWithPagination(
@@ -2929,24 +2930,26 @@ function renderFactories() {
         "fac",
         (f, globalIndex) => {
             const el = document.createElement("div");
-            el.id = `dom-fac-${f.id}`; // refreshUIで使われているID
-            el.className = "factory-card"; // お使いのカード用クラス
+            el.id = `dom-fac-${globalIndex}`;
+            el.className = "factory-linear-card"; // スタイルシート適用のためのクラス
             
-            const count = game.facCounts[f.id] || 0;
-            const cost = typeof getFactoryCost === "function" ? getFactoryCost(f.id) : 0;
+            const count = game.facCounts[globalIndex] || 0;
+            const cost = typeof getFactoryCost === "function" ? getFactoryCost(globalIndex) : 0;
+            const name = (f && f.name) ? f.name : `施設 #${globalIndex + 1}`;
+            const desc = (f && f.desc) ? f.desc : "";
             
-            // 元々のゲームのHTML構造に合わせてここに記述してください
+            el.onclick = () => buyFactory(globalIndex);
+            
             el.innerHTML = `
-                <div class="factory-info">
-                    <span class="factory-name">${f.name || "施設 #" + f.id}</span>
-                    <span id="dom-fac-count-${f.id}">${count}</span>
+                <div class="fac-profile-left">
+                    <div class="fac-name-text">${name}</div>
+                    <div class="fac-desc-text">${desc}</div>
+                    <div class="fac-cost-text">コスト: <span id="dom-fac-cost-${globalIndex}">${formatValue(cost)}</span> E</div>
                 </div>
-                <div class="factory-stats">
-                    CPS: <span id="dom-fac-cps-${f.id}">${formatValue(getFactoryCps(f.id))}</span>
+                <div class="fac-profile-right">
+                    <div class="fac-qty-counter" id="dom-fac-count-${globalIndex}">${count}</div>
+                    <div class="fac-impact-rate">+<span id="dom-fac-cps-${globalIndex}">0</span>/s</div>
                 </div>
-                <button onclick="buyFactory(${f.id})">
-                    購入: <span id="dom-fac-cost-${f.id}">${formatValue(cost)}</span>
-                </button>
             `;
             return el;
         }
@@ -2954,7 +2957,7 @@ function renderFactories() {
 }
 
 /**
- * 2. システム改変 (CONCEPT) の描画
+ * 2. システム改変 (CONCEPT) の描画（CSSクラス完全一致版）
  */
 function renderUpgrades() {
     renderWithPagination(
@@ -2964,20 +2967,24 @@ function renderUpgrades() {
         "upg",
         (u, globalIndex) => {
             const el = document.createElement("div");
-            el.id = `dom-upg-${u.id}`; // refreshUIで使われているID
-            el.className = "card-upgrade-node"; // 元々のクラス
+            el.id = `dom-upg-${globalIndex}`;
+            el.className = "card-upgrade-node"; // スタイルシート適用のためのクラス
             
-            const lv = game.upgLevels[u.id] || 0;
-            const cost = getUpgradeCost(u.id);
+            const lv = game.upgLevels[globalIndex] || 0;
+            const max = (u && u.max) ? u.max : 1;
+            const name = (u && u.name) ? u.name : `改良 #${globalIndex + 1}`;
+            const desc = (u && u.desc) ? u.desc : "";
+            
+            el.onclick = () => buyUpgrade(globalIndex);
             
             el.innerHTML = `
-                <div class="upgrade-title">${u.name || "改良 #" + u.id}</div>
-                <div class="upgrade-desc">${u.desc || ""}</div>
-                <div class="upgrade-footer">
-                    <span id="dom-upg-lv-${u.id}">${lv} / ${u.max}</span>
-                    <button onclick="buyUpgrade(${u.id})">
-                        <span id="dom-upg-cost-${u.id}">${formatValue(cost)} E</span>
-                    </button>
+                <div>
+                    <div class="upg-meta-title">${name}</div>
+                    <div class="upg-meta-desc">${desc}</div>
+                </div>
+                <div class="upg-meta-footer">
+                    <span class="upg-meta-cost" id="dom-upg-cost-${globalIndex}">強化</span>
+                    <span class="upg-meta-lv" id="dom-upg-lv-${globalIndex}">${lv} / ${max}</span>
                 </div>
             `;
             return el;
@@ -2996,19 +3003,24 @@ function renderAmUpgrades() {
         "am",
         (au, globalIndex) => {
             const el = document.createElement("div");
-            el.id = `dom-amupg-${au.id}`;
+            el.id = `dom-amupg-${globalIndex}`;
             el.className = "card-upgrade-node";
             
-            const lv = game.amUpgLevels[au.id] || 0;
-            const cost = getAmUpgradeCost(au.id);
+            const lv = game.amUpgLevels[globalIndex] || 0;
+            const max = (au && au.max) ? au.max : 1;
+            const name = (au && au.name) ? au.name : `反物質改良 #${globalIndex + 1}`;
+            const desc = (au && au.desc) ? au.desc : "";
+            
+            el.onclick = () => buyAmUpgrade(globalIndex);
             
             el.innerHTML = `
-                <div class="upgrade-title">${au.name || "反物質改良 #" + au.id}</div>
-                <div class="upgrade-footer">
-                    <span id="dom-amupg-lv-${au.id}">${lv} / ${au.max}</span>
-                    <button onclick="buyAmUpgrade(${au.id})">
-                        <span id="dom-amupg-cost-${au.id}">${cost} AM</span>
-                    </button>
+                <div>
+                    <div class="upg-meta-title">${name}</div>
+                    <div class="upg-meta-desc">${desc}</div>
+                </div>
+                <div class="upg-meta-footer">
+                    <span class="upg-meta-cost" id="dom-amupg-cost-${globalIndex}">強化</span>
+                    <span class="upg-meta-lv" id="dom-amupg-lv-${globalIndex}">${lv} / ${max}</span>
                 </div>
             `;
             return el;
@@ -3027,19 +3039,24 @@ function renderTlUpgrades() {
         "tl",
         (tu, globalIndex) => {
             const el = document.createElement("div");
-            el.id = `dom-tlupg-${tu.id}`;
+            el.id = `dom-tlupg-${globalIndex}`;
             el.className = "card-upgrade-node";
             
-            const lv = game.tlUpgLevels ? (game.tlUpgLevels[tu.id] || 0) : 0;
-            const cost = getTlUpgradeCost(tu.id);
+            const lv = game.tlUpgLevels ? (game.tlUpgLevels[globalIndex] || 0) : 0;
+            const max = (tu && tu.max) ? tu.max : 1;
+            const name = (tu && tu.name) ? tu.name : `時間律改良 #${globalIndex + 1}`;
+            const desc = (tu && tu.desc) ? tu.desc : "";
+            
+            el.onclick = () => buyTlUpgrade(globalIndex);
             
             el.innerHTML = `
-                <div class="upgrade-title">${tu.name || "時間律改良 #" + tu.id}</div>
-                <div class="upgrade-footer">
-                    <span id="dom-tlupg-lv-${tu.id}">${lv} / ${tu.max}</span>
-                    <button onclick="buyTlUpgrade(${tu.id})">
-                        <span id="dom-tlupg-cost-${tu.id}">${cost} TS</span>
-                    </button>
+                <div>
+                    <div class="upg-meta-title">${name}</div>
+                    <div class="upg-meta-desc">${desc}</div>
+                </div>
+                <div class="upg-meta-footer">
+                    <span class="upg-meta-cost" id="dom-tlupg-cost-${globalIndex}">強化</span>
+                    <span class="upg-meta-lv" id="dom-tlupg-lv-${globalIndex}">${lv} / ${max}</span>
                 </div>
             `;
             return el;
@@ -3059,8 +3076,13 @@ function renderAutomation() {
         "auto",
         (autoItem, globalIndex) => {
             const el = document.createElement("div");
-            el.className = "card-upgrade-node";
-            el.innerHTML = `<div>自動化機能 #${globalIndex + 1}</div>`;
+            el.className = "automation-control-row";
+            el.innerHTML = `
+                <div class="auto-info-block">
+                    <span class="auto-name">自動化機能 #${globalIndex + 1}</span>
+                    <span class="auto-state-descr">自動稼働モジュール</span>
+                </div>
+            `;
             return el;
         }
     );
