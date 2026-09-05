@@ -871,6 +871,36 @@ body, button, input, select, textarea, [class*="game-"] {
   letter-spacing: 1px;
   color: #6b7280;
 }
+  /* ページネーションの見た目・レイアウト修復 */
+.pagination-container, [id^="pagination-"] {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin: 15px 0;
+    width: 100%;
+}
+
+[id^="pagination-"] button, .pagination-btn {
+    background: var(--bg-card, rgba(20, 14, 38, 0.6));
+    border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.12));
+    color: var(--text-main, #f4f4f5);
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+[id^="pagination-"] button:hover:not(:disabled) {
+    border-color: var(--color-energy, #00ffcc);
+    background: rgba(0, 255, 204, 0.1);
+}
+
+[id^="pagination-"] button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
 </style>
 </head>
 <body>
@@ -2920,7 +2950,7 @@ function updateCurrentTabRender() {
 }
 
 /**
- * 1. 施設 (MATERIAL) の描画（CSSクラス完全一致版）
+ * 1. 施設 (MATERIAL) の描画
  */
 function renderFactories() {
     renderWithPagination(
@@ -2931,14 +2961,15 @@ function renderFactories() {
         (f, globalIndex) => {
             const el = document.createElement("div");
             el.id = `dom-fac-${globalIndex}`;
-            el.className = "factory-linear-card"; // スタイルシート適用のためのクラス
+            el.className = "factory-linear-card";
             
             const count = game.facCounts[globalIndex] || 0;
             const cost = typeof getFactoryCost === "function" ? getFactoryCost(globalIndex) : 0;
             const name = (f && f.name) ? f.name : `施設 #${globalIndex + 1}`;
             const desc = (f && f.desc) ? f.desc : "";
             
-            el.onclick = () => buyFactory(globalIndex);
+            // 正しい購入関数 executeBuyFactory を呼ぶ
+            el.onclick = () => executeBuyFactory(globalIndex);
             
             el.innerHTML = `
                 <div class="fac-profile-left">
@@ -2957,7 +2988,7 @@ function renderFactories() {
 }
 
 /**
- * 2. システム改変 (CONCEPT) の描画（CSSクラス完全一致版）
+ * 2. システム改変 (CONCEPT) の描画
  */
 function renderUpgrades() {
     renderWithPagination(
@@ -2968,14 +2999,15 @@ function renderUpgrades() {
         (u, globalIndex) => {
             const el = document.createElement("div");
             el.id = `dom-upg-${globalIndex}`;
-            el.className = "card-upgrade-node"; // スタイルシート適用のためのクラス
+            el.className = "card-upgrade-node";
             
             const lv = game.upgLevels[globalIndex] || 0;
             const max = (u && u.max) ? u.max : 1;
             const name = (u && u.name) ? u.name : `改良 #${globalIndex + 1}`;
             const desc = (u && u.desc) ? u.desc : "";
             
-            el.onclick = () => buyUpgrade(globalIndex);
+            // 正しい購入関数 executeBuyUpgrade を呼ぶ
+            el.onclick = () => executeBuyUpgrade(globalIndex);
             
             el.innerHTML = `
                 <div>
@@ -3011,7 +3043,8 @@ function renderAmUpgrades() {
             const name = (au && au.name) ? au.name : `反物質改良 #${globalIndex + 1}`;
             const desc = (au && au.desc) ? au.desc : "";
             
-            el.onclick = () => buyAmUpgrade(globalIndex);
+            // 正しい購入関数 executeBuyAmUpgrade を呼ぶ
+            el.onclick = () => executeBuyAmUpgrade(globalIndex);
             
             el.innerHTML = `
                 <div>
@@ -3047,7 +3080,8 @@ function renderTlUpgrades() {
             const name = (tu && tu.name) ? tu.name : `時間律改良 #${globalIndex + 1}`;
             const desc = (tu && tu.desc) ? tu.desc : "";
             
-            el.onclick = () => buyTlUpgrade(globalIndex);
+            // 正しい購入関数 executeBuyTlUpgrade を呼ぶ
+            el.onclick = () => executeBuyTlUpgrade(globalIndex);
             
             el.innerHTML = `
                 <div>
