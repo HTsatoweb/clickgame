@@ -4350,19 +4350,23 @@ function toggleBGM() {
  * 効果音（SE）システム（Web Audio API版）
  * =========================================================================
  */
-let audioCtx = null;
+  let audioCtx = null;
 
 function getAudioContext() {
-  if (!audioCtx) {
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (AudioContext) {
-      audioCtx = new AudioContext();
+    if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) {
+            audioCtx = new AudioContext();
+        }
     }
-  }
-  if (audioCtx && audioCtx.state === 'suspended') {
-    audioCtx.resume();
-  }
-  return audioCtx;
+    
+    // ▼ 追加：サスペンド状態（一時停止・ブロック状態）なら強制的に復帰させる
+    if (audioCtx) {
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }
+    return audioCtx;
 }
 
 // 1. 警告音（不穏な高音のピピピッ）
