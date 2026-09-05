@@ -696,6 +696,31 @@ button, .btn-action-prestige, .click-core-btn, .card-upgrade-node, .factory-line
   width: 100%;
 }
   /* =========================================================================
+ * 🖱️ サイバー・SF風 カスタムマウスカーソル効果（中心基準）
+ * ========================================================================= */
+
+/* 1. サイト全体の基本カーソル（中心を基準にする） */
+body {
+    /* 16 16 は32x32px画像の中心座標です（16x16px画像なら 8 8 に変更） */
+    cursor: url('cursor.png') 16 16, default;
+}
+
+/* 2. ボタンやクリック可能な要素にマウスを乗せたときのカーソル */
+button, 
+.factory-linear-card, 
+.card-upgrade-node, 
+.click-core-btn,
+.tab-trigger-button,
+[onclick], 
+a {
+    cursor: url('pointer.png') 16 16, pointer;
+}
+
+/* 3. 入力フィールドなどのテキスト選択カーソル */
+input[type="text"], textarea {
+    cursor: text;
+}
+  /* =========================================================================
  * 🌐 全世界対応ユニバーサルフォント定義（文字化け・フォント崩れ完全防止）
  * ========================================================================= */
 body, button, input, select, textarea, [class*="game-"] {
