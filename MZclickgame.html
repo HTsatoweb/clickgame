@@ -5826,8 +5826,8 @@ document.addEventListener("DOMContentLoaded", () => {
     langMenuBtn.addEventListener("click", toggleLangMenu);
   }
 });
-  /* =========================================================================
-   ⚡ アニメーション・パーティクル・描画 限界軽量化機能（極限強化版）
+/* =========================================================================
+   ⚡ アニメーション・パーティクル・描画 限界軽量化機能（完全統合版）
    ========================================================================= */
 if (typeof window.isLightweightMode === 'undefined') {
   window.isLightweightMode = false; // 初期値はOFF（通常モードで起動）
@@ -5837,7 +5837,7 @@ if (typeof window.isLightweightMode === 'undefined') {
 if (typeof window.spawnParticleEffect === 'function' && !window.__originalSpawnParticle) {
   window.__originalSpawnParticle = window.spawnParticleEffect;
   window.spawnParticleEffect = function(type = "fireworks", originX = window.innerWidth / 2, originY = window.innerHeight / 2) {
-    if (window.isLightweightMode) return; // ONの時だけ完全にブロック
+    if (window.isLightweightMode) return;
     window.__originalSpawnParticle(type, originX, originY);
   };
 }
@@ -5851,41 +5851,54 @@ if (typeof window.triggerHeavyFX === 'function' && !window.__originalTriggerHeav
   };
 }
 
-// 浮遊するポップアップ数字（pop-float-number）の生成もON時は抑制するラップ
+// 浮遊するポップアップ数字の生成抑制
 if (typeof window.showFloatingNumber === 'function' && !window.__originalShowFloatingNumber) {
   window.__originalShowFloatingNumber = window.showFloatingNumber;
   window.showFloatingNumber = function(...args) {
-    if (window.isLightweightMode) return; // 描画負荷の高い文字浮遊を完全に防ぐ
+    if (window.isLightweightMode) return;
     window.__originalShowFloatingNumber(...args);
   };
 }
 
-// グローバルスコープの関数登録（存在する場合）
+// グローバルスコープの関数登録
 if (typeof toggleLangMenu === 'function') window.toggleLangMenu = toggleLangMenu;
 if (typeof setGameLanguage === 'function') window.setGameLanguage = setGameLanguage;
 if (typeof filterLanguages === 'function') window.filterLanguages = filterLanguages;
 
-// トグル切り替え関数（限界強化版）
+// トグル切り替え関数（完全統合・限界強化版）
 window.toggleLightweightMode = function() {
   window.isLightweightMode = !window.isLightweightMode;
   
   if (window.isLightweightMode) {
+    // 1. CSSによるアニメーション・影・背景描画の完全停止
     document.body.classList.add("force-lightweight-all");
-    // 軽量化ON時は、重いカスタムカーソルを即座に強制解除してブラウザ標準に戻し、負荷を完全にゼロにする
     document.body.style.cursor = "default";
+    
+    // 2. 重いDOMリアルタイム監視（MutationObserver）の強制切断
+    if (typeof translationObserver !== 'undefined' && translationObserver) {
+      translationObserver.disconnect();
+    }
   } else {
+    // 1. 通常モードへの復帰
     document.body.classList.remove("force-lightweight-all");
-    document.body.style.cursor = ""; // CSS側の設定（cursor.png）に復帰
+    document.body.style.cursor = "";
+    
+    // 2. リアルタイム翻訳監視の再開（必要な場合）
+    if (typeof initRealtimeTranslator === 'function') {
+      initRealtimeTranslator();
+    }
   }
   
+  // 通知とログ
   if (typeof createToast === "function") {
-    createToast("⚡ 限界軽量化", window.isLightweightMode ? "アニメーション・カーソル・負荷処理をすべて停止しました" : "通常モードに戻しました");
+    createToast("⚡ 限界軽量化", window.isLightweightMode ? "アニメーション・監視処理・カーソルをすべて停止しました" : "通常モードに戻しました");
   }
   
   if (typeof pushLog === "function") {
     pushLog(window.isLightweightMode ? "⚡ Lightweight mode: ULTRA (ON)" : "⚡ Lightweight mode: OFF", "var(--color-upgrade)");
   }
   
+  // ボタンの見た目更新
   const btn = document.getElementById("lightweightToggleBtn");
   if (btn) {
     btn.style.borderColor = window.isLightweightMode ? "var(--color-upgrade, #4caf50)" : "#444";
@@ -5906,6 +5919,9 @@ document.addEventListener("DOMContentLoaded", () => {
   if (window.isLightweightMode) {
     document.body.classList.add("force-lightweight-all");
     document.body.style.cursor = "default";
+    if (typeof translationObserver !== 'undefined' && translationObserver) {
+      translationObserver.disconnect();
+    }
   }
 });
   /* -------------------------------------------------------------------------
