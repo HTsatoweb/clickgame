@@ -1330,6 +1330,15 @@ document.addEventListener('contextmenu', function(e) {
   });
   
   e.target.dispatchEvent(clickEvent);
+  });
+// ゲームのロードや初期化がすべて完了した直後のタイミング（末尾など）
+window.addEventListener("load", () => {
+    // わずかに遅延させてDOMの準備を確実に完了させ、現在のアクティブタブを描画する
+    setTimeout(() => {
+        if (typeof updateCurrentTabRender === "function") {
+            updateCurrentTabRender();
+        }
+    }, 100);
 });
   /**
  * =========================================================================
@@ -2771,7 +2780,7 @@ const pageState = {
     tl: 1,
     auto: 1
 };
-const PER_PAGE = 25;
+const PER_PAGE = 50;
 
 // 汎用ページネーション描画関数
 function renderWithPagination(allData, containerId, paginationId, tabKey, createItemElement) {
