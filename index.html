@@ -667,10 +667,18 @@ body.warping .home-container {
 body.warping {
   animation: kimo-shake 0.7s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
+  .copyright {
+  position: fixed;   /* 画面に対して固定する */
+  left: 10px;        /* 左からの距離 */
+  bottom: 10px;      /* 下からの距離 */
+  font-size: 11px;   /* 小さめの文字サイズ */
+  color: #666;       /* 文字色（グレーなど） */
+  z-index: 9999;     /* 他の要素の下に隠れないように手前に表示 */
+}
 </style>
 </head>
 <body>
-
+<div class="copyright">&copy; 2026 HTsatoweb</div>
 <div class="author-screen" id="authorScreen">
   <div class="author-logo-box">
     <div class="author-label">PRESENTS BY</div>
