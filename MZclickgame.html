@@ -1493,10 +1493,18 @@ body.force-lightweight-all #eventOverlay.show .event-card {
   color: #000;
   box-shadow: 0 0 20px rgba(0, 255, 204, 0.6);
 }
+  .copyright {
+  position: fixed;   /* 画面に対して固定する */
+  left: 10px;        /* 左からの距離 */
+  bottom: 10px;      /* 下からの距離 */
+  font-size: 11px;   /* 小さめの文字サイズ */
+  color: #666;       /* 文字色（グレーなど） */
+  z-index: 9999;     /* 他の要素の下に隠れないように手前に表示 */
+}
 </style>
 </head>
 <body>
-
+<div class="copyright">&copy; 2026 HTsatoweb</div>
 <!-- ★ ここから読み込み画面 -->
 <div id="bootLoader" aria-live="polite">
   <div class="boot-title">INFINITY MATRIX BOOT</div>
