@@ -137,10 +137,18 @@
             h1 { font-size: 2.2rem !important; }
             p, h3 { font-size: 1rem !important; }
         }
+        .copyright {
+  position: fixed;   /* 画面に対して固定する */
+  left: 10px;        /* 左からの距離 */
+  bottom: 10px;      /* 下からの距離 */
+  font-size: 11px;   /* 小さめの文字サイズ */
+  color: #666;       /* 文字色（グレーなど） */
+  z-index: 9999;     /* 他の要素の下に隠れないように手前に表示 */
+}
     </style>
 </head>
 <body>
-
+<div class="copyright">&copy; 2026 HTsatoweb</div>
     <!-- 背景の星空・グラデーションレイヤー -->
     <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, #0a0a23 0%, #000 85%); z-index: 1; pointer-events: none;"></div>
 
