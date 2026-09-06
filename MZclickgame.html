@@ -10,7 +10,14 @@
     document.write('<script src="https://cdn.jsdelivr.net/npm/decimal.js@10.4.3/decimal.min.js"><\/script>');
   }
 </script>
-
+<script>
+  // ホーム画面を経由しているか（登録フラグがあるか）チェック
+  if (!localStorage.getItem('infinity_game_registered')) {
+    // 登録されていなければホーム画面へ強制送還
+    // ※ホーム画面のファイル名が「index.html」以外の場合は、下のファイル名を書き換えてください
+    window.location.replace('index.html');
+  }
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="google" content="notranslate">
