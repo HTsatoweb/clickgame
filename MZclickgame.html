@@ -1228,6 +1228,15 @@ body.force-lightweight-all .click-core-btn::after {
       <div style="display: flex; width: 100%;">
         <button class="btn-utility btn-danger" onclick="hardResetGame()" style="width: 100%; white-space: nowrap;">⚠️ リセット</button>
       </div>
+      <!-- 🌟 描画・パフォーマンス設定セクション（5段階対応） -->
+      <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-weak, #333); border-radius: 6px; padding: 10px; margin-top: 4px; box-sizing: border-box;">
+        <div style="font-size: 0.7rem; font-weight: bold; color: var(--text-muted, #aaa); margin-bottom: 6px; letter-spacing: 1px;">📺 描画品質（ウルトラ〜獄低）</div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; width: 100%;">
+          <button id="renderModeBtn" onclick="cycleRenderQuality()" class="btn-utility" style="flex: 1 1 100%; min-width: 0; color: #00ffcc; border-color: rgba(0,255,204,0.4); white-space: nowrap; font-weight: bold; text-align: center;">
+            描画品質: 高 (60fps)
+          </button>
+        </div>
+      </div>
 　　　
     </div>
   </div>
@@ -1352,6 +1361,44 @@ window.addEventListener("load", () => {
         }
     }, 100);
 });
+  // 描画品質の段階定義 ('ultra', 'high', 'mid', 'low', 'hell')
+if (typeof window.renderPreset === 'undefined') {
+  window.renderPreset = 'high';
+}
+
+const renderPresetsData = {
+  ultra: { label: '描画品質: ウルトラ (上限なし/フル)', color: '#ff0055', interval: 1, desc: '最高峰の滑らかさ。PCが燃えます。' },
+  high:  { label: '描画品質: 高 (60fps)', color: '#00ffcc', interval: 1, desc: '標準的な滑らかな動作。' },
+  mid:   { label: '描画品質: 中 (30fps)', color: '#3a86ff', interval: 2, desc: '少し負荷を抑えたバランス型。' },
+  low:   { label: '描画品質: 低 (20fps)', color: '#ffea00', interval: 3, desc: 'K70等の低スペ端末向けの省エネ。' },
+  hell:  { label: '描画品質: 獄低 (10fps・限界突破)', color: '#9d4edd', interval: 6, desc: '最低限の描画。カクつきを強制ねじ伏せ。' }
+};
+
+window.cycleRenderQuality = function() {
+  const keys = ['ultra', 'high', 'mid', 'low', 'hell'];
+  let currentIndex = keys.indexOf(window.renderPreset);
+  currentIndex = (currentIndex + 1) % keys.length;
+  window.renderPreset = keys[currentIndex];
+  
+  const current = renderPresetsData[window.renderPreset];
+  const btn = document.getElementById("renderModeBtn");
+  
+  if (btn) {
+    btn.textContent = current.label;
+    btn.style.color = current.color;
+    btn.style.borderColor = current.color;
+  }
+  
+  if (typeof createToast === "function") {
+    createToast(`⚙️ ${current.label}`, current.desc);
+  }
+  
+  // 外部から参照しやすいようにグローバルに更新間隔（フレームスキップ数）を保持
+  window.renderFrameInterval = current.interval;
+};
+
+// 初期化時に反映
+window.renderFrameInterval = renderPresetsData[window.renderPreset].interval;
   /**
  * =========================================================================
  * Extended Configuration Database Ecosystem (DEEP MASSIVE ARRAY ENHANCEMENT)
