@@ -4102,7 +4102,12 @@ function sanitizeGameData() {
   game.galaxyNodes = __sanitizeNumber(game.galaxyNodes, 0);
   game.totalTime = __sanitizeNumber(game.totalTime, 0);
 }
-
+// 保存されている神の名前を読み込んで表示に反映させる
+const savedName = localStorage.getItem('infinity_game_player_name');
+if (savedName) {
+  const nameSpan = document.getElementById('playerNameSpan');
+  if (nameSpan) nameSpan.textContent = savedName;
+}
 // 2. 状態更新フレーム毎のデータ整合性チェックラッパー
 function updateGameLoopSafetyWrapper() {
   try {
