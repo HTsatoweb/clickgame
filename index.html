@@ -6,7 +6,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>インクリメンタル絶対神 — HOME PORTAL —</title>
 <script>
-  // 他のサイトにiframeで埋め込まれているかを判定
   if (window.self !== window.top) {
     document.addEventListener("DOMContentLoaded", () => {
       document.body.innerHTML = `
@@ -42,14 +41,12 @@
               -webkit-text-fill-color: transparent;
               letter-spacing: 1px;
             ">ACCESS BLOCKED</h2>
-            
             <p style="
               font-size: 0.8rem;
               color: #bbb;
               margin: 0 0 20px 0;
               line-height: 1.5;
             ">あなたはこのゲームを読み込むことができません</p>
-            
             <a href="${window.self.location.href}" target="_top" style="
               display: inline-block;
               width: 100%;
@@ -110,7 +107,6 @@ body {
   position: relative;
 }
 
-/* 狂気の背景演出 */
 .cyber-bg {
   position: absolute;
   inset: 0;
@@ -167,7 +163,6 @@ body.activated .cyber-bg {
   70% { transform: translateY(30px) translateX(-20px) scale(0.8) rotate(-45deg); opacity: 0.5; }
 }
 
-/* === ステップ1: 作者ロゴ演出画面 === */
 .author-screen {
   position: fixed;
   inset: 0;
@@ -216,7 +211,6 @@ body.activated .cyber-bg {
   50% { filter: drop-shadow(0 0 30px rgba(255, 0, 85, 0.8)) hue-rotate(45deg); }
 }
 
-/* === ステップ2: ライブラリ仕様演出画面 === */
 .library-screen {
   position: fixed;
   inset: 0;
@@ -271,7 +265,6 @@ body.activated .cyber-bg {
   text-shadow: 0 0 8px rgba(0, 255, 204, 0.5);
 }
 
-/* === ステップ2.5: 名前入力画面 === */
 .name-screen {
   position: fixed;
   inset: 0;
@@ -360,7 +353,6 @@ body.activated .cyber-bg {
   box-shadow: 0 0 25px rgba(0, 255, 204, 0.8);
 }
 
-/* === ステップ3: メインホームパネル（メニュー） === */
 .home-container {
   width: 90%;
   max-width: 500px;
@@ -491,7 +483,6 @@ body.activated .home-container {
   color: var(--text-muted);
 }
 
-/* === セーブデータ初期化モーダル === */
 .reset-modal {
   position: fixed;
   inset: 0;
@@ -639,7 +630,6 @@ body.activated .home-container {
   color: var(--text-main);
 }
 
-/* ワープ演出 */
 .warp-overlay {
   position: fixed;
   inset: 0;
@@ -699,7 +689,6 @@ body.warping {
   </div>
 </div>
 
-<!-- 名前入力画面 -->
 <div class="name-screen" id="nameScreen">
   <div class="name-box">
     <div class="name-title">IDENTITY REGISTRATION</div>
@@ -727,17 +716,22 @@ body.warping {
   <div class="menu-list">
     <button class="btn-menu btn-start hard" id="startHardBtn">▶ 難易度：難しい (MZ) 新版</button>
     <button class="btn-menu btn-start" id="startEasyBtn">▶ 難易度：簡単 (KN) 旧版</button>
-    <button class="btn-menu btn-reset" id="openResetModalBtn">⚠ セーブデータ初期化</button>
+    <button class="btn-menu btn-reset" id="openResetModalBtn">⚠ セーブデータ初期化 / 設定</button>
   </div>
 
-  <div class="version-tag">home v6.0</div>
+  <div class="version-tag">home v6.1</div>
 </div>
 
 <div class="reset-modal" id="resetModal">
   <div class="reset-modal-content">
-    <div class="reset-modal-title">SAVE DATA RESET</div>
-    <div class="reset-modal-desc">消去したいセーブデータのモードを選択してください。チェックを入れたデータが完全に初期化されます。</div>
+    <div class="reset-modal-title">SYSTEM SETTINGS</div>
+    <div class="reset-modal-desc">セーブデータの初期化や、神の名の変更が行えます。</div>
     
+    <div style="margin-bottom: 20px;">
+      <button class="btn-modal-action" id="openNameChangeBtn" style="width: 100%; background: rgba(0, 255, 204, 0.1); border: 1px solid var(--color-energy); color: var(--color-energy); padding: 10px; font-size: 0.8rem; cursor: pointer;">⚙ 神の名前を変更する</button>
+    </div>
+
+    <div class="reset-modal-title" style="font-size: 0.85rem; margin-bottom: 10px;">SAVE DATA RESET</div>
     <div class="checkbox-group">
       <label class="checkbox-label">
         <input type="checkbox" id="resetMzCheck">
@@ -752,8 +746,8 @@ body.warping {
     </div>
 
     <div class="reset-modal-actions">
-      <button class="btn-modal-action btn-execute" id="executeResetBtn">消去する</button>
-      <button class="btn-modal-action btn-cancel" id="cancelResetBtn">キャンセル</button>
+      <button class="btn-modal-action btn-execute" id="executeResetBtn">チェック項目を消去</button>
+      <button class="btn-modal-action btn-cancel" id="cancelResetBtn">閉じる</button>
     </div>
   </div>
 </div>
@@ -920,44 +914,56 @@ window.addEventListener('DOMContentLoaded', () => {
   const submitNameBtn = document.getElementById('submitNameBtn');
   const displayGodName = document.getElementById('displayGodName').querySelector('span');
 
-  const savedGodName = localStorage.getItem('your_game_god_name');
+  const savedGodName = localStorage.getItem('infinity_game_player_name');
+  const hasRegistered = localStorage.getItem('infinity_game_registered');
+
   if (savedGodName) {
     godNameInput.value = savedGodName;
     displayGodName.textContent = savedGodName;
   }
 
-  setTimeout(() => {
-    authorScreen.classList.add('show');
-    KimoSoundManager.playAuthorSound();
-  }, 300);
-
-  setTimeout(() => {
-    authorScreen.style.opacity = '0';
-    authorScreen.style.pointerEvents = 'none';
-    
-    libraryScreen.style.opacity = '1';
-    libraryScreen.style.pointerEvents = 'auto';
-
-    ['l1', 'l2', 'l3', 'l4', 'l5'].forEach((id, idx) => {
-      setTimeout(() => {
-        document.getElementById(id).classList.add('active');
-      }, idx * 180);
-    });
-  }, 2200);
-
-  setTimeout(() => {
-    libraryScreen.style.opacity = '0';
-    libraryScreen.style.pointerEvents = 'none';
-
-    nameScreen.classList.add('active');
-    godNameInput.focus();
+  if (hasRegistered) {
+    // 2回目以降：名前入力をスキップして直接メイン画面へ
+    authorScreen.style.display = 'none';
+    libraryScreen.style.display = 'none';
+    nameScreen.style.display = 'none';
+    document.body.classList.add('activated');
+    KimoSoundManager.startBGM();
+  } else {
+    // 初回起動時のみの演出
+    setTimeout(() => {
+      authorScreen.classList.add('show');
+      KimoSoundManager.playAuthorSound();
+    }, 300);
 
     setTimeout(() => {
-      authorScreen.remove();
-      libraryScreen.remove();
-    }, 1000);
+      authorScreen.style.opacity = '0';
+      authorScreen.style.pointerEvents = 'none';
+      
+      libraryScreen.style.opacity = '1';
+      libraryScreen.style.pointerEvents = 'auto';
 
-  }, 5000);
+      ['l1', 'l2', 'l3', 'l4', 'l5'].forEach((id, idx) => {
+        setTimeout(() => {
+          document.getElementById(id).classList.add('active');
+        }, idx * 180);
+      });
+    }, 2200);
+
+    setTimeout(() => {
+      libraryScreen.style.opacity = '0';
+      libraryScreen.style.pointerEvents = 'none';
+
+      nameScreen.classList.add('active');
+      godNameInput.focus();
+
+      setTimeout(() => {
+        authorScreen.remove();
+        libraryScreen.remove();
+      }, 1000);
+
+    }, 5000);
+  }
 
   submitNameBtn.addEventListener('click', () => {
     let finalName = godNameInput.value.trim();
@@ -965,7 +971,8 @@ window.addEventListener('DOMContentLoaded', () => {
       finalName = "名無しの神";
     }
 
-    localStorage.setItem('your_game_god_name', finalName);
+    localStorage.setItem('infinity_game_player_name', finalName);
+    localStorage.setItem('infinity_game_registered', 'true');
     displayGodName.textContent = finalName;
 
     nameScreen.style.opacity = '0';
@@ -993,6 +1000,7 @@ const resetModal = document.getElementById('resetModal');
 const openResetModalBtn = document.getElementById('openResetModalBtn');
 const cancelResetBtn = document.getElementById('cancelResetBtn');
 const executeResetBtn = document.getElementById('executeResetBtn');
+const openNameChangeBtn = document.getElementById('openNameChangeBtn');
 
 const resetMzCheck = document.getElementById('resetMzCheck');
 const resetKnCheck = document.getElementById('resetKnCheck');
@@ -1010,6 +1018,17 @@ cancelResetBtn.addEventListener('click', () => {
 resetModal.addEventListener('click', (e) => {
   if (e.target === resetModal) {
     resetModal.classList.remove('active');
+  }
+});
+
+openNameChangeBtn.addEventListener('click', () => {
+  const currentName = localStorage.getItem('infinity_game_player_name') || "名無しの神";
+  const newName = prompt("新しい神の名前を入力してください：", currentName);
+  if (newName !== null) {
+    const finalName = newName.trim() || "名無しの神";
+    localStorage.setItem('infinity_game_player_name', finalName);
+    document.getElementById('displayGodName').querySelector('span').textContent = finalName;
+    alert(`神の名前を「${finalName}」に変更しました。`);
   }
 });
 
