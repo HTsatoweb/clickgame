@@ -938,6 +938,26 @@ body, button, input, select, textarea, [class*="game-"] {
   letter-spacing: 1px;
   color: #6b7280;
 }
+  .btn-fullscreen {
+  background: rgba(0, 255, 204, 0.1);
+  border: 1px solid rgba(0, 255, 204, 0.5);
+  color: #00ffcc;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 900;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);
+}
+
+.btn-fullscreen:hover {
+  background: #00ffcc;
+  color: #000;
+  box-shadow: 0 0 20px rgba(0, 255, 204, 0.6);
+}
 </style>
 </head>
 <body>
@@ -1135,6 +1155,7 @@ body, button, input, select, textarea, [class*="game-"] {
     <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
       <button class="btn-utility" onclick="saveGameManual()" style="white-space: nowrap;">手動セーブ</button>
       <button class="btn-utility" id="settingsMenuBtn" onclick="toggleSettingsMenu()" style="color: var(--color-upgrade); border-color: var(--color-upgrade); white-space: nowrap; font-weight: bold;">⚙️ 設定</button>
+      <button class="btn-fullscreen" id="fullscreenToggleBtn">⛶ 全画面切替</button>
     </div>
   </div>
 
@@ -1275,7 +1296,30 @@ document.addEventListener('click', () => {
   
   e.target.dispatchEvent(clickEvent);
 });
-  
+  const fullscreenBtn = document.getElementById('fullscreenToggleBtn');
+
+if (fullscreenBtn) {
+  fullscreenBtn.addEventListener('click', () => {
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      // 全画面にする
+      const elem = document.documentElement;
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen().catch(err => {});
+      } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen();
+      }
+      fullscreenBtn.textContent = '⛶ 元に戻す';
+    } else {
+      // 全画面を解除する
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      }
+      fullscreenBtn.textContent = '⛶ 全画面切替';
+    }
+  });
+}
   /**
  * =========================================================================
  * Extended Configuration Database Ecosystem (DEEP MASSIVE ARRAY ENHANCEMENT)
