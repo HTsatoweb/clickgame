@@ -1251,7 +1251,7 @@ body.force-lightweight-all .click-core-btn::after {
   
 /**
  * =========================================================================
- * decimal.js 高精度演算レイヤー（1e1000エンディング対応）
+ * decimal.js 高精度演算レイヤー（完全最適化・K70/HY対応版）
  * =========================================================================
  */
 (function initDecimalLayer() {
@@ -1259,29 +1259,35 @@ body.force-lightweight-all .click-core-btn::after {
     console.error("decimal.js が読み込まれていません。CDN/ローカルファイルを確認してください。");
     return;
   }
-  Decimal.set({ precision: 24, rounding: Decimal.ROUND_DOWN, toExpNeg: -6, toExpPos: 6 });
+  // 精度を24から少し落とす（16〜20程度でも放置ゲームなら十分軽く、計算爆速になります）
+  Decimal.set({ precision: 20, rounding: Decimal.ROUND_DOWN, toExpNeg: -6, toExpPos: 6 });
 })();
 
 const ENDING_ENERGY_THRESHOLD = "1e1000";
 
+// ⚡ 高速化・キャッシングを強化した D(v) 関数
+const zeroDecimal = new Decimal(0);
+const infinityDecimal = new Decimal("1e9000");
+
 function D(v) {
   if (v instanceof Decimal) return v;
-  if (v === null || v === undefined || v === "") return new Decimal(0);
+  if (v === 0 || v === "0" || v === null || v === undefined || v === "") return zeroDecimal;
+  
   if (typeof v === "number") {
-    // Infinity を 0 に変換すると、溢れた高額商品が無料でアンロックされる
-    if (v === Infinity) return new Decimal("1e9000");
-    if (v === -Infinity || isNaN(v) || !isFinite(v)) return new Decimal(0);
+    if (!isFinite(v) || isNaN(v)) return zeroDecimal;
+    if (v === Infinity) return infinityDecimal;
     if (Math.abs(v) >= 1e21) return new Decimal(v.toExponential());
     return new Decimal(v);
   }
+  
   if (typeof v === "string") {
-    const s = String(v).trim();
-    if (!s) return new Decimal(0);
-    if (s === "Infinity" || s === "+Infinity") return new Decimal("1e9000");
-    if (s === "-Infinity" || s === "NaN") return new Decimal(0);
-    try { return new Decimal(s); } catch (e) { return new Decimal(0); }
+    const s = v.trim();
+    if (!s || s === "NaN" || s === "-Infinity") return zeroDecimal;
+    if (s === "Infinity" || s === "+Infinity") return infinityDecimal;
+    try { return new Decimal(s); } catch (e) { return zeroDecimal; }
   }
-  try { return new Decimal(v); } catch (e) { return new Decimal(0); }
+  
+  try { return new Decimal(v); } catch (e) { return zeroDecimal; }
 }
 
 function energyGte(n) {
@@ -1290,7 +1296,7 @@ function energyGte(n) {
 
 function decMax0(v) {
   const d = D(v);
-  return d.isNeg() ? new Decimal(0) : d;
+  return d.isNeg() ? zeroDecimal : d;
 }
 
 function serializeGameState(state) {
@@ -1307,17 +1313,18 @@ function hydrateGameEnergy(state) {
   if (!Array.isArray(state.upgLevels)) state.upgLevels = [];
   if (!Array.isArray(state.amUpgLevels)) state.amUpgLevels = [];
   if (!Array.isArray(state.tlUpgLevels)) state.tlUpgLevels = [];
+  
   if (typeof DB_FACTORIES !== "undefined") {
-    state.facCounts = DB_FACTORIES.map((_, i) => Number(state.facCounts[i] ?? 0) || 0);
+    state.facCounts = DB_FACTORIES.map((_, i) => Number(state.facCounts[i] ?? 0) | 0);
   }
   if (typeof DB_UPGRADES !== "undefined") {
-    state.upgLevels = DB_UPGRADES.map((_, i) => Number(state.upgLevels[i] ?? 0) || 0);
+    state.upgLevels = DB_UPGRADES.map((_, i) => Number(state.upgLevels[i] ?? 0) | 0);
   }
   if (typeof DB_AM_UPGRADES !== "undefined") {
-    state.amUpgLevels = DB_AM_UPGRADES.map((_, i) => Number(state.amUpgLevels[i] ?? 0) || 0);
+    state.amUpgLevels = DB_AM_UPGRADES.map((_, i) => Number(state.amUpgLevels[i] ?? 0) | 0);
   }
   if (typeof DB_TL_UPGRADES !== "undefined") {
-    state.tlUpgLevels = DB_TL_UPGRADES.map((_, i) => Number(state.tlUpgLevels[i] ?? 0) || 0);
+    state.tlUpgLevels = DB_TL_UPGRADES.map((_, i) => Number(state.tlUpgLevels[i] ?? 0) | 0);
   }
   return state;
 }
@@ -1329,37 +1336,31 @@ function resetLayerArrays(keepUpg7) {
 }
 
 function toggleAuto(kind) {
-  if (kind === "fac") game.autoFacEnabled = !!(document.getElementById("chk-auto-fac") && document.getElementById("chk-auto-fac").checked);
-  if (kind === "upg") game.autoUpgEnabled = !!(document.getElementById("chk-auto-upg") && document.getElementById("chk-auto-upg").checked);
-  if (kind === "am") game.autoAmEnabled = !!(document.getElementById("chk-auto-am") && document.getElementById("chk-auto-am").checked);
-  if (kind === "pam") game.autoPrestigeAmEnabled = !!(document.getElementById("chk-auto-pam") && document.getElementById("chk-auto-pam").checked);
+  if (kind === "fac") game.autoFacEnabled = !!(document.getElementById("chk-auto-fac")?.checked);
+  if (kind === "upg") game.autoUpgEnabled = !!(document.getElementById("chk-auto-upg")?.checked);
+  if (kind === "am") game.autoAmEnabled = !!(document.getElementById("chk-auto-am")?.checked);
+  if (kind === "pam") game.autoPrestigeAmEnabled = !!(document.getElementById("chk-auto-pam")?.checked);
 }
 
-
+// ⚡ 右クリックイベントの負荷を軽減（無駄なMouseEvent生成を最小化）
 document.addEventListener('contextmenu', function(e) {
-  // ブラウザ本来の右クリックメニューを完全に阻止
   e.preventDefault();
-  
-  // 右クリックを通常の左クリック（click）イベントとして強制発火させる
-  const clickEvent = new MouseEvent('click', {
+  e.target.dispatchEvent(new MouseEvent('click', {
     bubbles: true,
     cancelable: true,
     view: window,
     button: 0,
     clientX: e.clientX,
     clientY: e.clientY
-  });
-  
-  e.target.dispatchEvent(clickEvent);
-  });
-// ゲームのロードや初期化がすべて完了した直後のタイミング（末尾など）
+  }));
+});
+
 window.addEventListener("load", () => {
-    // わずかに遅延させてDOMの準備を確実に完了させ、現在のアクティブタブを描画する
-    setTimeout(() => {
-        if (typeof updateCurrentTabRender === "function") {
-            updateCurrentTabRender();
-        }
-    }, 100);
+  setTimeout(() => {
+    if (typeof updateCurrentTabRender === "function") {
+      updateCurrentTabRender();
+    }
+  }, 100);
 });
   // 描画品質の段階定義 ('ultra', 'high', 'mid', 'low', 'hell')
 if (typeof window.renderPreset === 'undefined') {
