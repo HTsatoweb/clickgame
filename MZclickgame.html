@@ -1473,7 +1473,26 @@ body.force-lightweight-all #eventOverlay.show .event-card {
   outline-offset: 3px;
   box-shadow: 0 0 14px rgba(34,197,94,.45) !important;
 }
+.btn-fullscreen {
+  background: rgba(0, 255, 204, 0.1);
+  border: 1px solid rgba(0, 255, 204, 0.5);
+  color: #00ffcc;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 900;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);
+}
 
+.btn-fullscreen:hover {
+  background: #00ffcc;
+  color: #000;
+  box-shadow: 0 0 20px rgba(0, 255, 204, 0.6);
+}
 </style>
 </head>
 <body>
@@ -1772,6 +1791,7 @@ body.force-lightweight-all #eventOverlay.show .event-card {
       <input type="file" id="modFileSelector" accept=".js" style="display:none;" onchange="loadModFromFile(event)">
       <button class="btn-utility" onclick="document.getElementById('modFileSelector').click()">JSファイル選択</button>
       <button class="btn-utility" style="color:var(--color-energy); border-color:var(--color-energy);" onclick="loadModFromTextarea()">MODを適用</button>
+      <button class="btn-fullscreen" id="fullscreenToggleBtn">⛶ 全画面切替</button>
     </div>
   </div>
 
@@ -1913,6 +1933,7 @@ body.force-lightweight-all #eventOverlay.show .event-card {
 <script src="https://cdn.jsdelivr.net/npm/decimal.js@10.4.3/decimal.min.js"></script>
 <script src="https://unpkg.com/decimal.js@10.4.3/decimal.min.js"></script>
 <script>
+  
   // 画面がまだ全画面でない場合に、最初のタップ/クリックで全画面にする
 document.addEventListener('click', () => {
   if (!document.fullscreenElement && !document.webkitFullscreenElement) {
