@@ -993,10 +993,13 @@ body.force-lightweight-all .click-core-btn::after {
   line-height: .9;
   text-align: center;
   opacity: 0;
+  visibility: hidden;
   z-index: 3;
   white-space: nowrap;
   text-shadow: 0 6px 0 rgba(0,0,0,.35), 0 0 22px currentColor;
+  pointer-events: none;
 }
+#eventOverlay.show .event-stamp { visibility: visible; }
 #eventOverlay.show .event-stamp { animation: eventStampSlam 3.6s cubic-bezier(.12,1.35,.2,1) forwards; }
 #eventOverlay.show.lucky .event-stamp { color: #ffea00; }
 #eventOverlay.show.unlucky .event-stamp { color: #ff2d6a; }
@@ -1151,12 +1154,169 @@ body.force-lightweight-all .click-core-btn::after {
   text-shadow: 0 0 16px #00ffcc;
   opacity: 0;
 }
-#comboBanner.show { animation: comboPop .7s ease-out forwards; }
+
+#coreTrigger {
+  --combo-hue: 170;
+  box-shadow: 0 0 22px hsla(var(--combo-hue), 90%, 55%, .35), 0 0 0 2px hsla(var(--combo-hue), 90%, 60%, .35);
+  transition: box-shadow .15s linear, border-color .15s linear, filter .12s ease;
+}
+#coreTrigger.combo-hot {
+  animation: comboHueShift 1.2s linear infinite;
+}
+@keyframes comboHueShift {
+  0% { filter: hue-rotate(0deg) saturate(1.15); }
+  50% { filter: hue-rotate(40deg) saturate(1.35); }
+  100% { filter: hue-rotate(0deg) saturate(1.15); }
+}
+#eh-combo { color: hsl(var(--combo-hue, 50), 95%, 62%) !important; text-shadow: 0 0 8px hsla(var(--combo-hue, 50), 90%, 50%, .8); }
+#v-energy.fx-pop { animation: energyPop .22s ease-out; }
+@keyframes energyPop {
+  0% { transform: scale(1.08); filter: brightness(1.5); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+.resource-value { display: inline-block; }
+#comboBanner { display: none !important; }
+
 @keyframes comboPop {
   0% { opacity: 0; transform: translateX(-50%) scale(.6); }
   25% { opacity: 1; transform: translateX(-50%) scale(1.08); }
   100% { opacity: 0; transform: translateX(-50%) translateY(-12px) scale(1); }
 }
+
+
+button, .btn-action-prestige, .card-upgrade-node, .factory-linear-card, .tab-trigger-button, .btn-utility {
+  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease, filter .12s ease;
+}
+button:active, .btn-action-prestige:active, .card-upgrade-node:active, .factory-linear-card:active, .click-core-btn:active {
+  transform: scale(.96);
+  filter: brightness(1.25);
+}
+.fx-hit { animation: fxHitA .2s ease-out; }
+.fx-hit2 { animation: fxHitB .22s ease-out; }
+.fx-hit3 { animation: fxHitC .18s ease-out; }
+@keyframes fxHitA {
+  0% { transform: scale(.92); filter: brightness(1.6); }
+  55% { transform: scale(1.05); filter: brightness(1.2); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+@keyframes fxHitB {
+  0% { transform: scale(.95) rotate(-1.2deg); box-shadow: 0 0 0 0 rgba(0,255,204,.0); }
+  40% { transform: scale(1.06) rotate(.6deg); box-shadow: 0 0 18px rgba(0,255,204,.45); }
+  100% { transform: scale(1) rotate(0); }
+}
+@keyframes fxHitC {
+  0% { filter: brightness(1.8) saturate(1.3); transform: scale(.9); }
+  100% { filter: brightness(1); transform: scale(1); }
+}
+.click-core-btn.fx-hit, .click-core-btn.fx-hit2, .click-core-btn.fx-hit3 {
+  animation-duration: .16s;
+}
+.tab-trigger-button.active {
+  box-shadow: 0 0 12px rgba(255,234,0,.25);
+}
+
+/* extra fun motion (transform/opacity only) */
+.core-text-main { animation: coreTitlePulse 2.2s ease-in-out infinite; }
+@keyframes coreTitlePulse {
+  0%,100% { letter-spacing: 1px; text-shadow: 0 0 0 transparent; }
+  50% { letter-spacing: 3px; text-shadow: 0 0 12px rgba(0,255,204,.45); }
+}
+.click-core-btn::before { animation-duration: 18s; border-color: hsla(var(--combo-hue, 170), 80%, 60%, .4); }
+.click-core-btn::after { animation-duration: 12s; border-color: hsla(var(--combo-hue, 170), 80%, 55%, .28); }
+.factory-linear-card:hover:not(.state-disabled),
+.card-upgrade-node:hover:not(.state-disabled):not(.state-maxed) {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 8px 18px rgba(0,255,204,.12);
+}
+.tab-trigger-button { transition: transform .14s ease, box-shadow .14s ease, color .14s ease; }
+.tab-trigger-button:hover { transform: translateY(-1px); }
+.btn-action-prestige { animation: prestigeIdle 3.4s ease-in-out infinite; }
+@keyframes prestigeIdle {
+  0%,100% { filter: brightness(1); }
+  50% { filter: brightness(1.18); }
+}
+#eventOverlay.show .event-card {
+  animation: eventCardPop 3.6s cubic-bezier(.12,1.3,.2,1) forwards, eventCardGlow 0.8s ease-in-out infinite alternate;
+}
+@keyframes eventCardGlow {
+  from { filter: brightness(1); }
+  to { filter: brightness(1.18) saturate(1.15); }
+}
+.event-result-big { animation: resultBlink 0.45s ease-in-out infinite alternate; }
+@keyframes resultBlink {
+  from { transform: scale(1); }
+  to { transform: scale(1.06); }
+}
+body.force-lightweight-all .core-text-main,
+body.force-lightweight-all .btn-action-prestige,
+body.force-lightweight-all #eventOverlay.show .event-card {
+  animation: none !important;
+}
+
+
+
+.click-core-btn { position: relative; overflow: visible; }
+#tapPing {
+  position: absolute;
+  left: 50%;
+  top: 14%;
+  transform: translateX(-50%);
+  font-weight: 900;
+  font-size: clamp(1rem, 3.6vw, 1.4rem);
+  color: #00ffcc;
+  opacity: 0;
+  pointer-events: none;
+  text-shadow: 0 0 12px #00ffcc;
+  z-index: 5;
+}
+#tapPing.show { animation: tapPingUp .4s ease-out forwards; }
+@keyframes tapPingUp {
+  0% { opacity: 1; transform: translateX(-50%) translateY(10px) scale(.85); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-28px) scale(1.2); }
+}
+#coreTrigger.tap-ack {
+  animation: tapAck .15s ease-out;
+}
+@keyframes tapAck {
+  0% { transform: scale(.92); filter: brightness(1.8) saturate(1.25); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+@-moz-document url-prefix() {
+  #eventFxCanvas { image-rendering: auto; }
+  .click-core-btn::before, .click-core-btn::after { will-change: auto; }
+}
+
+
+#skillBar {
+  width: min(100%, 360px);
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+  margin: 8px auto 10px;
+}
+#skillBar button {
+  background: rgba(0,255,204,.08);
+  border: 1px solid rgba(0,255,204,.35);
+  color: #fff;
+  border-radius: 10px;
+  padding: 8px 4px 6px;
+  font-size: .68rem;
+  font-weight: 800;
+  cursor: pointer;
+  line-height: 1.25;
+}
+#skillBar button:disabled { opacity: .4; cursor: not-allowed; }
+#skillBar .sk-cd { display: block; font-size: .58rem; color: #ffea00; font-weight: 700; }
+#missionBox {
+  width: 100%;
+  margin: 0 0 8px;
+  padding: 7px 8px;
+  border: 1px solid rgba(255,234,0,.22);
+  border-radius: 8px;
+  font-size: .65rem;
+  color: #d4d4d8;
+}
+#missionBox b { color: #ffea00; }
 
 </style>
 </head>
@@ -1254,7 +1414,7 @@ body.force-lightweight-all .click-core-btn::after {
   <div class="event-flash-ring lucky" id="eventFlashRing"></div>
   <div class="event-shock s1"></div>
   <div class="event-shock s2"></div>
-  <div class="event-stamp" id="eventStamp">LUCKY!!</div>
+  <div class="event-stamp" id="eventStamp"></div>
   <div class="event-card lucky" id="eventCard">
     <div class="event-kicker" id="eventKicker">RANDOM EVENT</div>
     <div class="event-title-main" id="eventTitle">—</div>
@@ -1271,6 +1431,8 @@ body.force-lightweight-all .click-core-btn::after {
   <div class="eh-row"><span>FPS</span><span class="eh-val" id="eh-fps">--</span></div>
   <div class="eh-row"><span>COMBO</span><span class="eh-val" id="eh-combo">0</span></div>
   <div class="eh-row"><span>EVENTS</span><span class="eh-val" id="eh-events">0</span></div>
+  <div class="eh-row"><span>CRIT</span><span class="eh-val" id="eh-crit">0</span></div>
+  <div class="eh-row"><span>MISSION</span><span class="eh-val" id="eh-mission">0</span></div>
   <div class="eh-row" style="margin-top:6px;gap:4px;">
     <button type="button" id="eh-qbtn">画質切替</button>
     <button type="button" id="eh-hudbtn">HUD隠す</button>
@@ -1301,9 +1463,16 @@ body.force-lightweight-all .click-core-btn::after {
 
   <div class="click-core-container">
     <button class="click-core-btn" id="coreTrigger">
+      <span id="tapPing" aria-hidden="true"></span>
       <span class="core-text-main">TAP CORE</span>
       <span class="core-text-sub" id="v-click-power">+1.0</span>
     </button>
+    <div id="skillBar">
+      <button type="button" id="sk-fever">フィーバー<span class="sk-cd" id="sk-fever-cd">準備OK</span></button>
+      <button type="button" id="sk-shield">シールド<span class="sk-cd" id="sk-shield-cd">準備OK</span></button>
+      <button type="button" id="sk-call">イベント召喚<span class="sk-cd" id="sk-call-cd">準備OK</span></button>
+    </div>
+    <div id="missionBox">ミッション: <b id="missionText">コアを 30 回タップ</b></div>
   </div>
 
   <div class="prestige-wrapper">
@@ -6347,9 +6516,11 @@ document.addEventListener("DOMContentLoaded", () => {
 <script>
 /* ===== RANDOM COSMIC EVENT ENGINE (LOW-DOM / MOBILE) ===== */
 (function () {
+  const UA = navigator.userAgent || "";
+  const IS_GECKO = /Gecko\/|Firefox|Floorp|Waterfox|Goanna/i.test(UA) && !/Chrome\/|Chromium|Edg\//i.test(UA);
   const IS_MOBILE = (navigator.maxTouchPoints > 0 && Math.min(screen.width, screen.height) <= 920)
-    || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || "");
-  const LOW = IS_MOBILE || window.isLightweightMode || (typeof navigator.hardwareConcurrency === "number" && navigator.hardwareConcurrency <= 4);
+    || /Android|iPhone|iPad|iPod/i.test(UA);
+  const LOW = IS_MOBILE || IS_GECKO || window.isLightweightMode || (typeof navigator.hardwareConcurrency === "number" && navigator.hardwareConcurrency <= 4);
   const EVT = { cooldown: 0, nextIn: 18 + Math.random() * 22, active: [], lastId: null, lastBuffHTML: "" };
   window.__randomEventState = EVT;
   window.__perfFlags = { mobile: IS_MOBILE, low: LOW, fps: 60, worker: false };
@@ -6463,7 +6634,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (dt > 0 && dt < 250) fpsEma = fpsEma * 0.86 + (1000/dt) * 0.14;
     window.__perfFlags.fps = fpsEma;
     skipSpark = fpsEma < 38 || window.isLightweightMode;
-    if (canvas) canvas.style.opacity = (fpsEma < 26) ? "0" : "1";
+    if (canvas) canvas.style.opacity = "1";
   }
 
 
@@ -6471,7 +6642,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ---- one cheap canvas for small FX + float text ---- */
   const canvas = document.getElementById("eventFxCanvas");
-  const ctx = canvas ? canvas.getContext("2d", { alpha: true, desynchronized: true }) : null;
+  let ctx = null;
+  if (canvas) {
+    try { ctx = canvas.getContext("2d", { alpha: true, desynchronized: true }); } catch (e) { ctx = null; }
+    if (!ctx) { try { ctx = canvas.getContext("2d", { alpha: true }); } catch (e2) { ctx = null; } }
+  }
   const POOL = 64;
   const fx = new Array(POOL);
   for (let i = 0; i < POOL; i++) fx[i] = { on:0, x:0, y:0, vx:0, vy:0, life:0, max:0, r:0, color:"#fff", kind:0, text:"" };
@@ -6512,7 +6687,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const colors = kind === "unlucky" ? ["#ff0055","#ffffff","#ffea00"]
       : kind === "mixed" ? ["#9d4edd","#3a86ff","#ffffff"]
       : ["#ffea00","#00ffcc","#ffffff"];
-    let n = isClick ? (skipSpark ? 0 : 5) : (LOW ? 14 : 22);
+    let n = isClick ? (skipSpark ? 0 : 6) : (LOW ? 16 : 28);
     if (fxAlive > 48) n = Math.min(n, 3);
     const spread = isClick ? 90 : 200;
     for (let i = 0; i < n; i++) {
@@ -6588,6 +6763,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let lastPowKey = "";
   let lastPowStr = "+1";
+  window.pingTapCore = function(str) {
+    const coreEl = document.getElementById("coreTrigger");
+    const ping = document.getElementById("tapPing");
+    if (coreEl) {
+      coreEl.classList.remove("tap-ack");
+      requestAnimationFrame(function(){ coreEl.classList.add("tap-ack"); });
+    }
+    if (ping) {
+      ping.textContent = str || "TAP";
+      ping.classList.remove("show");
+      requestAnimationFrame(function(){ ping.classList.add("show"); });
+    }
+  };
   window.spawnClickFloater = function(x, y, power) {
     let str;
     try {
@@ -6599,15 +6787,16 @@ document.addEventListener("DOMContentLoaded", () => {
         str = lastPowStr;
       }
     } catch (e) { str = "+"; }
-    spawnText(x, y, str, "#00ffcc");
-    if (!window.isLightweightMode) burst(x, y, "click");
+    window.pingTapCore(str);
+    if (!skipSpark && fpsEma >= 32) spawnText(x, y, str, "#00ffcc");
+    if (!window.isLightweightMode && !skipSpark && fpsEma >= 38) burst(x, y, "click");
   };
 
   let energyTouchAt = 0;
   const energyEl = document.getElementById("v-energy");
   window.touchEnergyReadout = function() {
     const now = performance.now();
-    if (now - energyTouchAt < 80) return;
+    if (now - energyTouchAt < 32) return;
     energyTouchAt = now;
     try {
       if (energyEl) energyEl.textContent = formatValue(game.energy);
@@ -6836,7 +7025,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const kicks = KICK[kind] || KICK.mixed;
     const stamps = STAMP[kind] || STAMP.mixed;
     if (kick) kick.textContent = kicks[(Math.random()*kicks.length)|0];
-    if (stamp) stamp.textContent = stamps[(Math.random()*stamps.length)|0];
+    if (stamp) { stamp.style.visibility = 'visible'; stamp.textContent = stamps[(Math.random()*stamps.length)|0]; }
     if (title) title.textContent = ev.title;
     if (desc) desc.textContent = ev.desc;
     if (resultEl) resultEl.textContent = resultText || "";
@@ -6846,7 +7035,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (fpsEma >= 28) burst(window.innerWidth * 0.5, window.innerHeight * 0.46, kind);
     clearTimeout(overlay._tid);
-    overlay._tid = setTimeout(function(){ overlay.classList.remove("show"); }, 3700);
+    overlay._tid = setTimeout(function(){
+      overlay.classList.remove("show");
+      if (stamp) { stamp.textContent = ""; stamp.style.visibility = "hidden"; }
+    }, 3700);
   }
 
   function triggerRandomEvent(forceId) {
@@ -6859,7 +7051,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const ev = forceId ? (EVENTS.find(function(e){ return e.id===forceId; }) || pool[0]) : pool[(Math.random()*pool.length)|0];
     EVT.lastId = ev.id;
     let result = "";
-    try { result = ev.apply() || ""; } catch(e) {}
+    try {
+      if (window.EffectSystem && ES.shield && ev.kind === "unlucky") {
+        ES.shield = false;
+        result = "シールドで無効化！";
+        const sl = document.getElementById("sk-shield");
+        if (sl) sl.style.borderColor = "rgba(0,255,204,.35)";
+      } else {
+        result = ev.apply() || "";
+      }
+    } catch(e) {}
     showEventAnim(ev, result);
     playEventSound(ev.kind);
     if (typeof pushHist === 'function') pushHist(ev, result);
@@ -6899,6 +7100,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let buffAcc = 0;
   function onTick(dt) {
     noteFrame();
+    if (typeof tickSkills === "function") tickSkills(dt);
     hudAcc += dt;
     if (hudAcc >= 0.5) { hudAcc = 0; if (ehFps) ehFps.textContent = String(Math.round(fpsEma)); if (ES.quality === 'auto') applyQuality('auto'); }
     if (document.hidden) return;
@@ -6927,8 +7129,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ES.combo = (now - ES.comboAt < 420) ? (ES.combo + 1) : 1;
       ES.comboAt = now;
       showCombo(ES.combo);
-      if (ES.combo > 0 && ES.combo % 15 === 0 && EVT.cooldown <= 0) triggerRandomEvent();
-      else if (EVT.cooldown <= 0 && Math.random() < 0.018) triggerRandomEvent();
+      if (EVT.cooldown <= 0 && Math.random() < 0.016) triggerRandomEvent();
     }
   }, { capture: true, passive: true });
 
@@ -6950,7 +7151,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const forceLow = q === "low" || (q === "auto" && fpsEma < 36);
     const forceMid = q === "mid" || (q === "auto" && fpsEma < 50);
     skipSpark = forceLow || window.isLightweightMode;
-    if (canvas) canvas.style.opacity = forceLow ? "0" : "1";
+    skipSpark = forceLow || window.isLightweightMode;
     AudioBank.max = forceLow ? 1 : forceMid ? 2 : 4;
     const el = document.getElementById("eh-quality");
     if (el) el.textContent = q.toUpperCase();
@@ -6966,16 +7167,24 @@ document.addEventListener("DOMContentLoaded", () => {
     if (n) n.textContent = String(ES.events);
   }
   function showCombo(n) {
-    const b = document.getElementById("comboBanner");
     const c = document.getElementById("eh-combo");
     if (c) c.textContent = String(n);
-    if (!b || n < 8) return;
-    if (fpsEma < 30) return;
-    b.textContent = "COMBO x" + n;
-    b.classList.remove("show");
-    void b.offsetWidth;
-    b.classList.add("show");
-    if (n === 8 || n === 20 || n === 40) AudioBank.play("lucky", 1.05 + Math.min(n,40)*0.005);
+    let hue = 170;
+    if (n >= 40) hue = (n * 13) % 360;
+    else if (n >= 20) hue = 300;
+    else if (n >= 10) hue = 48;
+    else if (n >= 5) hue = 25;
+    document.documentElement.style.setProperty("--combo-hue", String(hue));
+    if (core) {
+      core.style.setProperty("--combo-hue", String(hue));
+      if (n >= 10) core.classList.add("combo-hot");
+      else core.classList.remove("combo-hot");
+    }
+    const evn = document.getElementById("v-energy");
+    if (evn && fpsEma >= 32 && n > 1) {
+      evn.classList.remove("fx-pop");
+      evn.classList.add("fx-pop");
+    }
   }
   const qbtn = document.getElementById("eh-qbtn");
   const hbtn = document.getElementById("eh-hudbtn");
@@ -6989,6 +7198,105 @@ document.addEventListener("DOMContentLoaded", () => {
     ES.hudOn = !ES.hudOn;
     hud.style.display = ES.hudOn ? "block" : "none";
   };
+
+
+  ES.shield = false;
+  ES.crits = 0;
+  ES.missionI = 0;
+  ES.missions = [
+    { n: 30, label: "コアを 30 回タップ" },
+    { n: 100, label: "コアを 100 回タップ" },
+    { n: 300, label: "コアを 300 回タップ" },
+    { n: 800, label: "コアを 800 回タップ" }
+  ];
+  const cd = { fever: 0, shield: 0, call: 0 };
+  function setCdLab(id, sec) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = sec > 0 ? Math.ceil(sec) + "s" : "準備OK";
+  }
+  function useSkill(name) {
+    if (cd[name] > 0) return;
+    if (name === "fever") {
+      addBuff("click", 2.8, 18, "フィーバー x2.8");
+      addBuff("speed", 1.4, 18, "フィーバー速度");
+      cd.fever = 70;
+      if (typeof createToast === "function") createToast("フィーバー", "18秒間タップが大きくなる！");
+      AudioBank.play("lucky", 1.1);
+    } else if (name === "shield") {
+      ES.shield = true;
+      cd.shield = 55;
+      const sl = document.getElementById("sk-shield");
+      if (sl) sl.style.borderColor = "#ffea00";
+      if (typeof createToast === "function") createToast("シールド", "次のアンラッキーを1回防ぐ");
+      AudioBank.play("mixed", 1);
+    } else if (name === "call") {
+      cd.call = 90;
+      const lucky = EVENTS.filter(function(e){ return e.kind === "lucky"; });
+      const ev = lucky[(Math.random()*lucky.length)|0];
+      triggerRandomEvent(ev.id);
+    }
+    const btn = document.getElementById("sk-" + name);
+    if (btn) btn.disabled = true;
+  }
+  const bf = document.getElementById("sk-fever");
+  const bs = document.getElementById("sk-shield");
+  const bc = document.getElementById("sk-call");
+  if (bf) bf.onclick = function(){ useSkill("fever"); };
+  if (bs) bs.onclick = function(){ useSkill("shield"); };
+  if (bc) bc.onclick = function(){ useSkill("call"); };
+
+  function tickSkills(dt) {
+    ["fever","shield","call"].forEach(function(k){
+      if (cd[k] > 0) {
+        cd[k] = Math.max(0, cd[k] - dt);
+        setCdLab("sk-" + k + "-cd", cd[k]);
+        const btn = document.getElementById("sk-" + k);
+        if (btn && cd[k] <= 0) btn.disabled = false;
+      }
+    });
+  }
+
+  function checkMission() {
+    const m = ES.missions[ES.missionI];
+    if (!m) return;
+    const clicks = (game && game.totalClicks) || 0;
+    const box = document.getElementById("missionText");
+    const hudm = document.getElementById("eh-mission");
+    if (box) box.textContent = m.label + "  (" + Math.min(clicks, m.n) + "/" + m.n + ")";
+    if (hudm) hudm.textContent = Math.min(clicks, m.n) + "/" + m.n;
+    if (clicks >= m.n) {
+      const g = (typeof cpsWorth === "function") ? cpsWorth(20) : 50;
+      try { game.energy = D(game.energy).add(g); } catch(e) {}
+      if (typeof createToast === "function") createToast("ミッション達成", m.label + "  +" + (typeof formatValue==="function"?formatValue(g):g) + " E");
+      ES.missionI = Math.min(ES.missionI + 1, ES.missions.length - 1);
+    }
+  }
+
+  const origClickFn = window.handleCoreClick;
+  if (typeof origClickFn === "function" && !window.__critWrapped) {
+    window.handleCoreClick = function(e) {
+      origClickFn(e);
+      if (Math.random() < 0.09) {
+        try {
+          const bonus = (typeof getClickPower === "function") ? D(getClickPower()).mul(2) : D(2);
+          game.energy = D(game.energy).add(bonus);
+          ES.crits++;
+          const ce = document.getElementById("eh-crit");
+          if (ce) ce.textContent = String(ES.crits);
+          if (typeof pingTapCore === "function") pingTapCore("CRIT +" + (typeof formatValue==="function"?formatValue(bonus):""));
+          AudioBank.play("lucky", 1.2);
+        } catch (err) {}
+      }
+      checkMission();
+    };
+    const coreBtn = document.getElementById("coreTrigger");
+    if (coreBtn) {
+      coreBtn.removeEventListener("click", origClickFn);
+      coreBtn.addEventListener("click", window.handleCoreClick);
+    }
+    window.__critWrapped = true;
+  }
 
   let hudAcc = 0;
   const ehFps = document.getElementById("eh-fps");
@@ -7017,6 +7325,22 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     } catch (e) {}
   }, 300);
+
+
+  document.addEventListener("pointerdown", function(e){
+    const t = e.target;
+    if (!t || !t.closest) return;
+    const el = t.closest("button, .card-upgrade-node, .factory-linear-card, .btn-action-prestige, .tab-trigger-button, .click-core-btn");
+    if (!el) return;
+    if (window.isLightweightMode || ES.quality === "low" || fpsEma < 26) return;
+    el.classList.remove("fx-hit","fx-hit2","fx-hit3");
+    const k = "fx-hit" + ["","2","3"][(Math.random()*3)|0];
+    el.classList.add(k);
+    if (ES.quality !== "low" && fpsEma >= 40 && typeof burst === "function") {
+      burst(e.clientX || (window.innerWidth/2), e.clientY || (window.innerHeight/2), "click");
+    }
+    if (AudioBank && el.id !== "coreTrigger") AudioBank.play("click", 0.98 + Math.random()*0.12);
+  }, {passive:true});
 
   document.addEventListener("visibilitychange", function(){
     if (document.hidden) {
