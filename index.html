@@ -753,6 +753,20 @@ body.warping {
 </div>
 
 <script>
+  // 画面がまだ全画面でない場合に、最初のタップ/クリックで全画面にする
+document.addEventListener('click', () => {
+  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen().catch(err => {
+        // ブラウザの仕様やセキュリティ制限で失敗した場合は無視
+        console.log("Fullscreen request denied or not allowed.");
+      });
+    } else if (elem.webkitRequestFullscreen) {
+      elem.webkitRequestFullscreen(); // Safariなどの旧プレフィックス対応
+    }
+  }
+}, { once: true }); // { once: true } にしているので、最初の一回クリックされたらこのイベントは終了します
 class KimoSoundManager {
   static initContext() {
     if (!this.audioCtx) {
@@ -1084,6 +1098,7 @@ document.querySelectorAll('.checkbox-label').forEach(label => {
     checkbox.checked = !checkbox.checked;
   });
 });
+  
 </script>
 
 </body>
