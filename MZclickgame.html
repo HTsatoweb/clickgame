@@ -1392,6 +1392,13 @@ body.force-lightweight-all #eventOverlay.show .event-card {
   cursor: pointer;
 }
 
+
+.pad-focus {
+  outline: 3px solid #22c55e !important;
+  outline-offset: 3px;
+  box-shadow: 0 0 14px rgba(34,197,94,.45) !important;
+}
+
 </style>
 </head>
 <body>
@@ -1539,6 +1546,8 @@ body.force-lightweight-all #eventOverlay.show .event-card {
       <span>STAR <b id="starPts">0</b></span>
       <button type="button" id="sk-theme">色替え</button>
       <button type="button" id="sk-burst">バースト</button>
+      <button type="button" id="sk-starshop">★交換</button>
+      <button type="button" id="sk-rumble">振動ON</button>
     </div>
     <div id="eventBuffBar"></div>
     <div id="effectHUD" aria-label="effect system">
@@ -1732,9 +1741,42 @@ body.force-lightweight-all #eventOverlay.show .event-card {
       <span style="font-size:.85rem; font-weight:bold; color:#00ffcc;">🎮 操作設定</span>
       <button type="button" onclick="toggleControlsMenu()" style="background:none;border:none;color:#aaa;font-size:1.1rem;cursor:pointer;">✕</button>
     </div>
-    <div style="padding:14px; display:flex; flex-direction:column; gap:8px; font-size:.72rem; color:#ddd;">
-      <div>キーボードと、Xbox / Switch Pro などのコントローラーに対応しています。ボタンを押して割り当てを変えてください。</div>
+    <div style="padding:14px; display:flex; flex-direction:column; gap:8px; font-size:.72rem; color:#ddd; max-height:78vh; overflow:auto;">
+      <div>キーボードと Xbox / Switch Pro などに対応。図の色と同じボタンです。項目を押すと割り当てを変えられます。</div>
       <div id="padStatus" style="color:#ffea00;">コントローラー: 未接続</div>
+      <div id="padProfileRow" style="display:flex;flex-wrap:wrap;gap:4px;">
+        <button type="button" class="btn-utility pad-prof" data-prof="auto">自動</button>
+        <button type="button" class="btn-utility pad-prof" data-prof="xbox">Xbox</button>
+        <button type="button" class="btn-utility pad-prof" data-prof="switch">Switch Pro</button>
+        <button type="button" class="btn-utility pad-prof" data-prof="joyl">Joy-Con L</button>
+        <button type="button" class="btn-utility pad-prof" data-prof="joyr">Joy-Con R</button>
+        <button type="button" class="btn-utility pad-prof" data-prof="joypair">Joy-Con 両方</button>
+      </div>
+      <div style="color:#94a3b8;font-size:.65rem;">Joy-Conは左右1本でも両方でも使えます。左スティックで移動、右のAで決定、Bで戻る。スティックは画面のその方向へ移動します。押し始め0.1秒は連打しません。</div>
+      <svg viewBox="0 0 260 150" width="100%" height="120" aria-label="controller diagram">
+        <rect x="40" y="38" width="180" height="78" rx="28" fill="#1a1228" stroke="#445"/>
+        <circle cx="86" cy="78" r="16" fill="#222" stroke="#666"/>
+        <rect x="80" y="62" width="12" height="8" fill="#e5e7eb"/>
+        <rect x="80" y="86" width="12" height="8" fill="#e5e7eb"/>
+        <rect x="70" y="74" width="8" height="12" fill="#e5e7eb"/>
+        <rect x="94" y="74" width="8" height="12" fill="#e5e7eb"/>
+        <circle cx="188" cy="92" r="9" fill="#22c55e"/><text x="188" y="95" text-anchor="middle" font-size="8" fill="#041">A</text>
+        <circle cx="206" cy="76" r="9" fill="#ef4444"/><text x="206" y="79" text-anchor="middle" font-size="8" fill="#fff">B</text>
+        <circle cx="170" cy="76" r="9" fill="#60a5fa"/><text x="170" y="79" text-anchor="middle" font-size="8" fill="#021">X</text>
+        <circle cx="188" cy="60" r="9" fill="#facc15"/><text x="188" y="63" text-anchor="middle" font-size="8" fill="#321">Y</text>
+        <rect x="70" y="28" width="28" height="8" rx="3" fill="#a78bfa"/>
+        <rect x="162" y="28" width="28" height="8" rx="3" fill="#fb7185"/>
+        <text x="84" y="24" text-anchor="middle" font-size="7" fill="#c4b5fd">L</text>
+        <text x="176" y="24" text-anchor="middle" font-size="7" fill="#fda4af">R</text>
+        <text x="130" y="136" text-anchor="middle" font-size="8" fill="#94a3b8">緑=決定 赤=戻る 紫=左タブ 桃=右タブ</text>
+      </svg>
+      <div style="line-height:1.5;">
+        十字 / スティック … UI移動<br>
+        <span style="color:#22c55e;">A 緑</span> … 決定 / フォーカス中のボタン<br>
+        <span style="color:#ef4444;">B 赤</span> … 戻る / メニューを閉じる<br>
+        <span style="color:#a78bfa;">L</span> / <span style="color:#fb7185;">R</span> … タブ切替<br>
+        START … 操作メニュー
+      </div>
       <div id="bindList"></div>
       <div style="display:flex; gap:6px; margin-top:6px;">
         <button type="button" class="btn-utility" id="bindResetBtn">初期設定に戻す</button>
@@ -5446,7 +5488,7 @@ window.addEventListener("DOMContentLoaded", () => {
   cronosPreviousTimestamp = performance.now();
   requestAnimationFrame(executeCoreGameTick);
 });
-  /**
+/**
  =========================================================================
  * 🌈 フルスペクトル・ダイナミック演出 & 粒子パーティクルシステム
  * （308段階区切り・e308以降は虹色グラデーション）
@@ -7537,12 +7579,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   const BIND_DEF = {
-    tap: { key: "Space", pad: 0 },
+    tap: { key: "Space", pad: 7 },
+    confirm: { key: "Enter", pad: 0 },
+    back: { key: "Escape", pad: 1 },
     fever: { key: "Digit1", pad: 2 },
     shield: { key: "Digit2", pad: 3 },
-    call: { key: "Digit3", pad: 1 }
+    call: { key: "Digit3", pad: 6 },
+    tabL: { key: "KeyQ", pad: 4 },
+    tabR: { key: "KeyE", pad: 5 },
+    menu: { key: "KeyM", pad: 9 }
   };
-  const BIND_LABEL = { tap: "コアを叩く", fever: "フィーバー", shield: "シールド", call: "イベント召喚" };
+  const BIND_LABEL = {
+    tap: "コア連打 (RT)",
+    confirm: "決定 (A 緑)",
+    back: "戻る (B 赤)",
+    fever: "フィーバー (X 青)",
+    shield: "シールド (Y 黄)",
+    call: "イベント召喚",
+    tabL: "左タブ (L 紫)",
+    tabR: "右タブ (R 桃)",
+    menu: "操作メニュー (START)"
+  };
+  function uiSfx(kind) {
+    if (window.isLightweightMode) return;
+    const map = { move: "click", ok: "lucky", back: "unlucky", tab: "mixed" };
+    AudioBank.play(map[kind] || "click", kind === "move" ? 1.35 : 1);
+  }
   function loadBinds() {
     try {
       const raw = localStorage.getItem("mz_controls_v1");
@@ -7577,22 +7639,12 @@ document.addEventListener("DOMContentLoaded", () => {
       };
     });
   }
-window.toggleControlsMenu = function() {
+  window.toggleControlsMenu = function() {
     const o = document.getElementById("controlsModalOverlay");
     if (!o) return;
     const show = o.style.display === "none" || o.style.display === "";
     o.style.display = show ? "flex" : "none";
-    if (show) {
-      renderBinds();
-      // モーダルが開いたとき、最初のボタンにフォーカスを当てる
-      setTimeout(function() {
-        const list = focusables();
-        if (list.length > 0) setFocus(list[0]);
-      }, 50);
-    } else {
-      // モーダルを閉じたときはメインのトリガーへ戻す
-      setFocus(document.getElementById("coreTrigger"));
-    }
+    if (show) renderBinds();
   };
   const rst = document.getElementById("bindResetBtn");
   if (rst) rst.onclick = function(){
@@ -7603,13 +7655,116 @@ window.toggleControlsMenu = function() {
   };
 
   const keyGuard = Object.create(null);
+  let focusEl = null;
+  function visibleEl(el) {
+    if (!el) return false;
+    const st = window.getComputedStyle(el);
+    if (st.display === "none" || st.visibility === "hidden") return false;
+    return el.getClientRects().length > 0;
+  }
+  function focusables() {
+    const modal = document.getElementById("controlsModalOverlay");
+    const set = document.getElementById("settingsModalOverlay");
+    let root = document;
+    if (modal && modal.style.display === "flex") root = modal;
+    else if (set && set.style.display === "flex") root = set;
+    const sel = "button, .factory-linear-card, .card-upgrade-node, .btn-action-prestige, .tab-trigger-button";
+    return Array.prototype.slice.call(root.querySelectorAll(sel)).filter(function(el){
+      return !el.disabled && visibleEl(el);
+    });
+  }
+  function setFocus(el) {
+    if (focusEl) focusEl.classList.remove("pad-focus");
+    focusEl = el || null;
+    if (!focusEl) return;
+    focusEl.classList.add("pad-focus");
+    try { focusEl.scrollIntoView({ block: "nearest", inline: "nearest" }); } catch (e) {}
+  }
+  function elCenter(el) {
+    const r = el.getBoundingClientRect();
+    return { x: r.left + r.width * 0.5, y: r.top + r.height * 0.5 };
+  }
+  function moveFocus(dir) {
+    const list = focusables();
+    if (!list.length) return;
+    if (dir === 1 || dir === -1) dir = dir < 0 ? "up" : "down";
+    let cur = (focusEl && list.indexOf(focusEl) >= 0) ? focusEl : list[0];
+    const c = elCenter(cur);
+    let best = null, bestScore = 1e12;
+    for (let i = 0; i < list.length; i++) {
+      const el = list[i];
+      if (el === cur) continue;
+      const t = elCenter(el);
+      const dx = t.x - c.x, dy = t.y - c.y;
+      let along = 0, side = 0;
+      if (dir === "right") { along = dx; side = Math.abs(dy); if (dx < 8) continue; }
+      else if (dir === "left") { along = -dx; side = Math.abs(dy); if (dx > -8) continue; }
+      else if (dir === "down") { along = dy; side = Math.abs(dx); if (dy < 8) continue; }
+      else { along = -dy; side = Math.abs(dx); if (dy > -8) continue; }
+      const score = along + side * 2.5;
+      if (score < bestScore) { bestScore = score; best = el; }
+    }
+    if (!best) return;
+    setFocus(best);
+    uiSfx("move");
+  }
+  const navHold = { dir: null, started: 0, last: 0 };
+  function navPulse(dir, pressed) {
+    const now = performance.now();
+    if (!pressed) {
+      if (navHold.dir === dir) navHold.dir = null;
+      return;
+    }
+    if (navHold.dir !== dir) {
+      navHold.dir = dir;
+      navHold.started = now;
+      navHold.last = now;
+      moveFocus(dir);
+      return;
+    }
+    if (now - navHold.started < 110) return;
+    const gap = (now - navHold.started < 500) ? 280 : 180;
+    if (now - navHold.last >= gap) {
+      navHold.last = now;
+      moveFocus(dir);
+    }
+  }
+  function activateFocus() {
+    const el = focusEl || document.getElementById("coreTrigger");
+    if (!el) return;
+    uiSfx("ok");
+    if (el.id === "coreTrigger") {
+      const fn = window.handleCoreClick || handleCoreClick;
+      if (typeof fn === "function") fn(null);
+      return;
+    }
+    try { el.click(); } catch (e) {}
+  }
+  function switchTabDir(dir) {
+    const tabs = Array.prototype.slice.call(document.querySelectorAll(".tab-trigger-button")).filter(visibleEl);
+    if (!tabs.length) return;
+    let i = tabs.findIndex(function(t){ return t.classList.contains("active"); });
+    i = (Math.max(0, i) + dir + tabs.length) % tabs.length;
+    uiSfx("tab");
+    tabs[i].click();
+    setFocus(tabs[i]);
+  }
   function doAction(act) {
     if (act === "tap") {
       const fn = window.handleCoreClick || handleCoreClick;
       if (typeof fn === "function") fn(null);
-    } else if (act === "fever" || act === "shield" || act === "call") {
-      useSkill(act);
-    }
+    } else if (act === "confirm") activateFocus();
+    else if (act === "back") {
+      uiSfx("back");
+      const c = document.getElementById("controlsModalOverlay");
+      const g = document.getElementById("settingsModalOverlay");
+      if (c && c.style.display === "flex") toggleControlsMenu();
+      else if (g && g.style.display === "flex") toggleSettingsMenu();
+      else setFocus(document.getElementById("coreTrigger"));
+    } else if (act === "fever" || act === "shield" || act === "call") useSkill(act);
+    else if (act === "tabL") switchTabDir(-1);
+    else if (act === "tabR") switchTabDir(1);
+    else if (act === "menu") toggleControlsMenu();
   }
   document.addEventListener("keydown", function(e){
     if (e.repeat) return;
@@ -7623,6 +7778,10 @@ window.toggleControlsMenu = function() {
     }
     const tag = (e.target && e.target.tagName) || "";
     if (tag === "INPUT" || tag === "TEXTAREA") return;
+    if (e.code === "ArrowUp") { e.preventDefault(); navPulse("up", true); return; }
+    if (e.code === "ArrowDown") { e.preventDefault(); navPulse("down", true); return; }
+    if (e.code === "ArrowLeft") { e.preventDefault(); navPulse("left", true); return; }
+    if (e.code === "ArrowRight") { e.preventDefault(); navPulse("right", true); return; }
     const acts = Object.keys(binds);
     for (let i=0;i<acts.length;i++) {
       if (binds[acts[i]].key === e.code) {
@@ -7637,14 +7796,81 @@ window.toggleControlsMenu = function() {
   document.addEventListener("keyup", function(e){
     const acts = Object.keys(binds);
     for (let i=0;i<acts.length;i++) if (binds[acts[i]].key === e.code) keyGuard[acts[i]] = false;
+    if (e.code.indexOf("Arrow") === 0) navPulse(e.code.replace("Arrow","").toLowerCase(), false);
   }, true);
 
   const padHeld = Object.create(null);
   let lastPadTap = 0;
+  let padProfile = "auto";
+  let rumbleOn = true;
+  let lastBuzz = 0;
+  function classifyPad(pad) {
+    const id = ((pad && pad.id) || "").toLowerCase();
+    if (id.indexOf("joy-con (l)") >= 0 || id.indexOf("joycon (l)") >= 0 || id.indexOf("joy-con left") >= 0) return "joyl";
+    if (id.indexOf("joy-con (r)") >= 0 || id.indexOf("joycon (r)") >= 0 || id.indexOf("joy-con right") >= 0) return "joyr";
+    if (id.indexOf("joy-con") >= 0 || id.indexOf("joycon") >= 0) return "joy";
+    if (id.indexOf("switch") >= 0 || id.indexOf("pro controller") >= 0 || id.indexOf("nintendo") >= 0) return "switch";
+    if (id.indexOf("xbox") >= 0 || id.indexOf("xinput") >= 0) return "xbox";
+    return "std";
+  }
+  function applyProfile(name) {
+    padProfile = name;
+    if (name === "switch" || name === "joyr" || name === "joypair") {
+      binds.confirm.pad = 1;
+      binds.back.pad = 0;
+      binds.fever.pad = 3;
+      binds.shield.pad = 2;
+      binds.tap.pad = 7;
+    } else if (name === "joyl") {
+      binds.confirm.pad = 0;
+      binds.back.pad = 1;
+      binds.tap.pad = 4;
+      binds.tabL.pad = 4;
+      binds.tabR.pad = 5;
+    } else if (name === "xbox") {
+      binds.confirm.pad = 0;
+      binds.back.pad = 1;
+      binds.fever.pad = 2;
+      binds.shield.pad = 3;
+      binds.tap.pad = 7;
+    }
+    saveBinds();
+    renderBinds();
+  }
+  function buzz(pad) {
+    if (!rumbleOn || !pad) return;
+    const now = performance.now();
+    if (now - lastBuzz < 140) return;
+    lastBuzz = now;
+    try {
+      const a = pad.vibrationActuator;
+      if (a && typeof a.playEffect === "function") {
+        a.playEffect("dual-rumble", { startDelay: 0, duration: 70, weakMagnitude: 0.5, strongMagnitude: 0.25 });
+      }
+    } catch (e) {}
+  }
+  document.querySelectorAll(".pad-prof").forEach(function(btn){
+    btn.onclick = function(){ applyProfile(btn.getAttribute("data-prof")); };
+  });
+  const rumbleBtn = document.getElementById("sk-rumble");
+  if (rumbleBtn) rumbleBtn.onclick = function(){
+    rumbleOn = !rumbleOn;
+    rumbleBtn.textContent = rumbleOn ? "振動ON" : "振動OFF";
+  };
+  const _act = activateFocus;
+  activateFocus = function() {
+    _act();
+    try {
+      const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+      for (let i=0;i<pads.length;i++) if (pads[i]) { buzz(pads[i]); break; }
+    } catch (e) {}
+  };
   function readPads() {
+    if (document.hidden) return;
     let pads = [];
     try { pads = navigator.getGamepads ? navigator.getGamepads() : []; } catch (e) {}
     let connected = 0;
+    const allDir = { up:false, down:false, left:false, right:false };
     for (let p=0;p<pads.length;p++) {
       const pad = pads[p];
       if (!pad) continue;
@@ -7660,6 +7886,29 @@ window.toggleControlsMenu = function() {
           }
         }
       } else {
+        const kind = classifyPad(pad);
+        const useJoyL = padProfile === "joyl" || padProfile === "joypair" || (padProfile === "auto" && kind === "joyl");
+        const dpad = useJoyL
+          ? [[0,"up"],[1,"down"],[2,"left"],[3,"right"],[12,"up"],[13,"down"],[14,"left"],[15,"right"]]
+          : [[12,"up"],[13,"down"],[14,"left"],[15,"right"]];
+        const dirOn = { up:false, down:false, left:false, right:false };
+        for (let d=0;d<dpad.length;d++) {
+          if (pad.buttons[dpad[d][0]] && pad.buttons[dpad[d][0]].pressed) dirOn[dpad[d][1]] = true;
+        }
+        let axX = pad.axes && pad.axes[0] || 0;
+        let axY = pad.axes && pad.axes[1] || 0;
+        if ((kind === "joyr" || padProfile === "joyr") && pad.axes && pad.axes.length > 3) {
+          if (Math.abs(axX)+Math.abs(axY) < 0.2) { axX = pad.axes[2] || 0; axY = pad.axes[3] || 0; }
+        }
+        const dead = 0.42;
+        if (axX < -dead) dirOn.left = true;
+        if (axX > dead) dirOn.right = true;
+        if (axY < -dead) dirOn.up = true;
+        if (axY > dead) dirOn.down = true;
+        if (dirOn.left) allDir.left = true;
+        if (dirOn.right) allDir.right = true;
+        if (dirOn.up) allDir.up = true;
+        if (dirOn.down) allDir.down = true;
         const acts = Object.keys(binds);
         for (let i=0;i<acts.length;i++) {
           const act = acts[i];
@@ -7668,7 +7917,7 @@ window.toggleControlsMenu = function() {
           const holdKey = p + ":" + act;
           if (act === "tap" && pressed) {
             const now = performance.now();
-            if (now - lastPadTap > 90) {
+            if (now - lastPadTap > 280) {
               lastPadTap = now;
               doAction("tap");
             }
@@ -7677,16 +7926,72 @@ window.toggleControlsMenu = function() {
             doAction(act);
           } else if (!pressed) padHeld[holdKey] = false;
         }
+        const tapExtra = (kind === "joyl" || kind === "joyr" || kind === "joy" || padProfile === "joypair")
+          ? [4,5,6,7] : [6,7];
+        for (let t=0;t<tapExtra.length;t++) {
+          if (pad.buttons[tapExtra[t]] && pad.buttons[tapExtra[t]].pressed) {
+            const now = performance.now();
+            if (now - lastPadTap > 280) { lastPadTap = now; doAction("tap"); }
+          }
+        }
       }
     }
+    navPulse("left", allDir.left);
+    navPulse("right", allDir.right);
+    navPulse("up", allDir.up);
+    navPulse("down", allDir.down);
     const st = document.getElementById("padStatus");
-    if (st) st.textContent = connected ? ("コントローラー: " + connected + " 台接続") : "コントローラー: 未接続";
+    if (st) {
+      const names = [];
+      for (let i=0;i<pads.length;i++) if (pads[i]) names.push(classifyPad(pads[i]));
+      if (padProfile === "auto" && names.indexOf("joyl") >= 0 && names.indexOf("joyr") >= 0) {
+        padProfile = "joypair";
+      }
+      st.textContent = connected
+        ? ("接続 " + connected + "台 / " + names.join(",") + " / 設定:" + padProfile)
+        : "コントローラー: 未接続";
+    }
   }
-  window.addEventListener("gamepadconnected", function(){
-    if (typeof createToast === "function") createToast("コントローラー", "接続されました");
+  window.addEventListener("gamepadconnected", function(ev){
+    const k = classifyPad(ev.gamepad);
+    if (padProfile === "auto") {
+      if (k === "joyl" || k === "joyr" || k === "joy") applyProfile("joypair");
+      else if (k === "switch") applyProfile("switch");
+    }
+    if (typeof createToast === "function") createToast("コントローラー", (ev.gamepad && ev.gamepad.id) || "接続");
   });
+
+  const shop = document.getElementById("sk-starshop");
+  if (shop) shop.onclick = function(){
+    if ((ES.stars || 0) < 3) {
+      if (typeof createToast === "function") createToast("★交換", "スターが3つ必要");
+      uiSfx("back");
+      return;
+    }
+    ES.stars -= 3;
+    const g = (typeof cpsWorth === "function") ? cpsWorth(40) : 100;
+    try { game.energy = D(game.energy).add(g); } catch(e) {}
+    const sr = document.getElementById("starPts");
+    if (sr) sr.textContent = String(ES.stars);
+    if (typeof createToast === "function") createToast("★交換", "+" + (typeof formatValue==="function"?formatValue(g):g) + " E");
+    uiSfx("ok");
+  };
+  try {
+    const day = new Date().toDateString();
+    if (localStorage.getItem("mz_login_day") !== day) {
+      localStorage.setItem("mz_login_day", day);
+      const days = (parseInt(localStorage.getItem("mz_login_n") || "0", 10) || 0) + 1;
+      localStorage.setItem("mz_login_n", String(days));
+      setTimeout(function(){
+        const g = (typeof cpsWorth === "function") ? cpsWorth(8 + days) : 20;
+        try { if (window.game) game.energy = D(game.energy).add(g); } catch(e) {}
+        if (typeof createToast === "function") createToast("ログインボーナス", days + "日目 +" + (typeof formatValue==="function"?formatValue(g):g) + " E");
+      }, 800);
+    }
+  } catch (e) {}
+
   try { paintMission(); } catch(e){}
-  setInterval(readPads, 50);
+  setInterval(readPads, 66);
 
   document.addEventListener("visibilitychange", function(){
     if (document.hidden) {
