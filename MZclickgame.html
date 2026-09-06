@@ -7269,7 +7269,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }, { capture: true, passive: true });
 
 
-  /* ===== 本格 EFFECT SYSTEM ===== */
+ /* ===== 本格 EFFECT SYSTEM ===== */
   const ES = {
     quality: "auto",
     combo: 0,
@@ -7286,7 +7286,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const forceLow = q === "low" || (q === "auto" && fpsEma < 36);
     const forceMid = q === "mid" || (q === "auto" && fpsEma < 50);
     skipSpark = forceLow || window.isLightweightMode;
-    skipSpark = forceLow || window.isLightweightMode;
+    // 重複していた2行目を削除しました
     AudioBank.max = forceLow ? 1 : forceMid ? 2 : 4;
     const el = document.getElementById("eh-quality");
     if (el) el.textContent = q.toUpperCase();
@@ -7294,6 +7294,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function pushHist(ev, result) {
     ES.events++;
     if (ev.kind === "lucky") ES.lucky++;
+    // インデント・空白に含まれていた全角スペースを半角に修正しました
     ES.hist.unshift((ev.kind === "lucky" ? "★ " : ev.kind === "unlucky" ? "▼ " : "◆ ") + ev.title + (result ? "  " + result : ""));
     if (ES.hist.length > 8) ES.hist.length = 8;
     const h = document.getElementById("eh-hist");
