@@ -5,6 +5,74 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>インクリメンタル絶対神 — HOME PORTAL —</title>
+  <script>
+  // 他のサイトにiframeで埋め込まれているかを判定
+  if (window.self !== window.top) {
+    // ページ読み込み完了時に警告画面に書き換える
+    document.addEventListener("DOMContentLoaded", () => {
+      document.body.innerHTML = `
+        <div style="
+          position: fixed;
+          inset: 0;
+          background: #020106;
+          color: #f4f4f5;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          font-family: 'Consolas', 'Fira Code', 'Courier New', monospace, system-ui;
+          z-index: 999999;
+          padding: 20px;
+          text-align: center;
+        ">
+          <div style="
+            background: rgba(20, 14, 38, 0.8);
+            border: 1px solid rgba(255, 0, 85, 0.35);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 0 30px rgba(255, 0, 85, 0.15);
+          ">
+            <h2 style="
+              font-size: 1rem;
+              font-weight: 900;
+              margin: 0 0 16px 0;
+              background: linear-gradient(90deg, #fff, #ff0055);
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+              letter-spacing: 1px;
+            ">ACCESS BLOCKED</h2>
+            
+            <p style="
+              font-size: 0.8rem;
+              color: #bbb;
+              margin: 0 0 20px 0;
+              line-height: 1.5;
+            ">あなたはこのゲームを読み込むことができません</p>
+            
+            <a href="${window.self.location.href}" target="_top" style="
+              display: inline-block;
+              width: 100%;
+              padding: 12px;
+              background: linear-gradient(90deg, #1b0a33, #2f1057);
+              border: 1px solid rgba(157, 78, 221, 0.5);
+              border-radius: 6px;
+              color: #fff;
+              font-size: 0.8rem;
+              font-weight: 900;
+              text-decoration: none;
+              letter-spacing: 1px;
+              box-shadow: 0 0 12px rgba(157, 78, 221, 0.25);
+              transition: all 0.15s;
+              box-sizing: border-box;
+            ">ゲームに飛ぶ</a>
+          </div>
+        </div>
+      `;
+    });
+  }
+</script>
 <style>
 :root {
   --bg-main: #020106;
