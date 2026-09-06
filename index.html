@@ -624,6 +624,17 @@ body.warping {
   <div class="home-title">INFINITY MATRIX OMEGA</div>
   
   <div class="menu-list">
+    <!-- プレイヤー名設定・表示エリア -->
+    <div style="margin-bottom: 15px; padding: 12px; background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 8px; text-align: center;">
+      <div id="menuPlayerDisplay" style="font-size: 0.95rem; color: #00f2fe; margin-bottom: 8px; font-weight: bold;">
+        プレイヤー: 読み込み中...
+      </div>
+      <div style="display: flex; gap: 8px; justify-content: center;">
+        <input type="text" id="playerNameInput" placeholder="名前を入力..." style="padding: 6px 10px; border-radius: 4px; border: 1px solid rgba(0, 242, 254, 0.5); background: #000; color: #fff; font-size: 0.85rem; width: 65%;">
+        <button id="savePlayerNameBtn" style="padding: 6px 12px; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #000; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.85rem;">保存</button>
+      </div>
+    </div>
+
     <button class="btn-menu btn-start hard" id="startHardBtn">▶ 難易度：難しい (MZ) 新版</button>
     <button class="btn-menu btn-start" id="startEasyBtn">▶ 難易度：簡単 (KN) 旧版</button>
     <button class="btn-menu btn-reset" id="openResetModalBtn">⚠ セーブデータ初期化</button>
@@ -631,7 +642,6 @@ body.warping {
 
   <div class="version-tag">home v6.0</div>
 </div>
-
 <div class="reset-modal" id="resetModal">
   <div class="reset-modal-content">
     <div class="reset-modal-title">SAVE DATA RESET</div>
@@ -658,6 +668,37 @@ body.warping {
 </div>
 
 <script>
+  const PLAYER_NAME_KEY = 'infinity_game_player_name';
+
+// 1. ページ読み込み時に保存された名前を反映する
+window.addEventListener('DOMContentLoaded', () => {
+    const savedName = localStorage.getItem(PLAYER_NAME_KEY);
+    const displayElem = document.getElementById('menuPlayerDisplay');
+    const inputElem = document.getElementById('playerNameInput');
+
+    if (savedName) {
+        if (displayElem) displayElem.innerText = `プレイヤー: ${savedName}`;
+        if (inputElem) inputElem.value = savedName;
+    } else {
+        if (displayElem) displayElem.innerText = `プレイヤー: あなた自身`;
+    }
+});
+
+// 2. 「保存」ボタンが押されたときの処理
+document.getElementById('savePlayerNameBtn').addEventListener('click', () => {
+    const inputElem = document.getElementById('playerNameInput');
+    const displayElem = document.getElementById('menuPlayerDisplay');
+    const newName = inputElem.value.trim();
+
+    if (newName !== "") {
+        // localStorageに保存（PCのシャットダウンや再起動後も保持されます）
+        localStorage.setItem(PLAYER_NAME_KEY, newName);
+        if (displayElem) displayElem.innerText = `プレイヤー: ${newName}`;
+        alert('名前を保存しました！');
+    } else {
+        alert('有効な名前を入力してください。');
+    }
+});
 class KimoSoundManager {
   static initContext() {
     if (!this.audioCtx) {
@@ -927,6 +968,15 @@ document.querySelectorAll('.checkbox-label').forEach(label => {
     e.preventDefault(); // ラベル本来の挙動との競合を防ぐ
     checkbox.checked = !checkbox.checked;
   });
+});
+  // メニュー画面側で保存された名前を読み込んで表示するコード
+window.addEventListener('DOMContentLoaded', () => {
+    const savedName = localStorage.getItem('infinity_game_player_name');
+    const menuNameElement = document.getElementById('menuPlayerName'); // 表示したい要素のID
+    
+    if (menuNameElement && savedName) {
+        menuNameElement.innerText = `プレイヤー: ${savedName}`;
+    }
 });
 </script>
 
