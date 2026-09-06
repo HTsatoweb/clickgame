@@ -75,6 +75,14 @@
     });
   }
 </script>
+  <script>
+  // ホーム画面を経由しているか（登録フラグがあるか）チェック
+  if (!localStorage.getItem('infinity_game_registered')) {
+    // 登録されていなければホーム画面へ強制送還
+    // ※ホーム画面のファイル名が「index.html」以外の場合は、下のファイル名を書き換えてください
+    window.location.replace('index.html');
+  }
+</script>
 <style>
 :root {
   --bg-main: #020106;
