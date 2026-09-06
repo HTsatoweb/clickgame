@@ -5,10 +5,9 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>インクリメンタル絶対神 — HOME PORTAL —</title>
-  <script>
+<script>
   // 他のサイトにiframeで埋め込まれているかを判定
   if (window.self !== window.top) {
-    // ページ読み込み完了時に警告画面に書き換える
     document.addEventListener("DOMContentLoaded", () => {
       document.body.innerHTML = `
         <div style="
@@ -21,7 +20,7 @@
           align-items: center;
           justify-content: center;
           font-family: 'Consolas', 'Fira Code', 'Courier New', monospace, system-ui;
-          z-index: 999999;
+          z-index: 99999;
           padding: 20px;
           text-align: center;
         ">
@@ -64,7 +63,6 @@
               text-decoration: none;
               letter-spacing: 1px;
               box-shadow: 0 0 12px rgba(157, 78, 221, 0.25);
-              transition: all 0.15s;
               box-sizing: border-box;
             ">ゲームに飛ぶ</a>
           </div>
@@ -273,6 +271,95 @@ body.activated .cyber-bg {
   text-shadow: 0 0 8px rgba(0, 255, 204, 0.5);
 }
 
+/* === ステップ2.5: 名前入力画面 === */
+.name-screen {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 1, 6, 0.95);
+  z-index: 9980;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+  backdrop-filter: blur(12px);
+}
+
+.name-screen.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.name-box {
+  width: 90%;
+  max-width: 420px;
+  background: var(--bg-panel);
+  border: 1px solid var(--color-energy);
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 0 40px rgba(0, 255, 204, 0.2);
+  text-align: center;
+}
+
+.name-title {
+  font-size: 1.1rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: var(--color-energy);
+  margin-bottom: 10px;
+  text-shadow: 0 0 10px rgba(0, 255, 204, 0.4);
+}
+
+.name-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 25px;
+  line-height: 1.5;
+}
+
+.name-input {
+  width: 100%;
+  padding: 14px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid rgba(0, 255, 204, 0.4);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 1rem;
+  text-align: center;
+  letter-spacing: 2px;
+  outline: none;
+  margin-bottom: 20px;
+  transition: all 0.2s;
+  user-select: text;
+}
+
+.name-input:focus {
+  border-color: var(--color-energy);
+  box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
+}
+
+.btn-name-submit {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(90deg, rgba(0, 255, 204, 0.2), rgba(58, 134, 255, 0.2));
+  border: 2px solid var(--color-energy);
+  border-radius: 6px;
+  color: var(--color-energy);
+  font-size: 0.9rem;
+  font-weight: 900;
+  cursor: pointer;
+  letter-spacing: 2px;
+  transition: all 0.2s;
+}
+
+.btn-name-submit:hover {
+  background: var(--color-energy);
+  color: #000;
+  box-shadow: 0 0 25px rgba(0, 255, 204, 0.8);
+}
+
 /* === ステップ3: メインホームパネル（メニュー） === */
 .home-container {
   width: 90%;
@@ -308,18 +395,26 @@ body.activated .home-container {
   font-size: 1.4rem;
   font-weight: 900;
   letter-spacing: 2px;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   background: linear-gradient(90deg, #fff, var(--color-kimo), var(--color-timeline), var(--color-antimatter));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   filter: drop-shadow(0 0 12px rgba(57,255,20,0.4));
 }
 
+.god-display {
+  font-size: 0.8rem;
+  color: var(--color-energy);
+  letter-spacing: 2px;
+  margin-bottom: 25px;
+  text-shadow: 0 0 8px rgba(0, 255, 204, 0.3);
+}
+
 .home-subtitle {
   font-size: 0.75rem;
   color: var(--text-muted);
   letter-spacing: 6px;
-  margin-bottom: 35px;
+  margin-bottom: 8px;
   text-transform: uppercase;
 }
 
@@ -396,7 +491,7 @@ body.activated .home-container {
   color: var(--text-muted);
 }
 
-/* === セーブデータ初期化モーダル（カッコいいカスタムチェックボックス） === */
+/* === セーブデータ初期化モーダル === */
 .reset-modal {
   position: fixed;
   inset: 0;
@@ -450,7 +545,6 @@ body.activated .home-container {
   margin-bottom: 25px;
 }
 
-/* カスタムチェックボックスのスタイリング */
 .checkbox-label {
   display: flex;
   align-items: center;
@@ -470,12 +564,10 @@ body.activated .home-container {
   border-color: rgba(255, 0, 85, 0.4);
 }
 
-/* 標準チェックボックスを完全に非表示にする */
 .checkbox-label input[type="checkbox"] {
   display: none;
 }
 
-/* サイバー風の自作カスタムチェックボックス（四角い枠） */
 .custom-checkbox {
   width: 20px;
   height: 20px;
@@ -489,14 +581,12 @@ body.activated .home-container {
   position: relative;
 }
 
-/* チェックが入ったときの見た目 */
 .checkbox-label input[type="checkbox"]:checked + .custom-checkbox {
   border-color: var(--color-antimatter);
   background: rgba(255, 0, 85, 0.2);
   box-shadow: 0 0 12px rgba(255, 0, 85, 0.6);
 }
 
-/* チェックマークのデザイン */
 .custom-checkbox::after {
   content: '';
   width: 5px;
@@ -609,6 +699,16 @@ body.warping {
   </div>
 </div>
 
+<!-- 名前入力画面 -->
+<div class="name-screen" id="nameScreen">
+  <div class="name-box">
+    <div class="name-title">IDENTITY REGISTRATION</div>
+    <div class="name-desc">降臨する絶対神の御名を入力してください。<br>(未入力の場合「名無しの神」になります)</div>
+    <input type="text" id="godNameInput" class="name-input" placeholder="神の名前を入力..." maxlength="20" value="名無しの神">
+    <button class="btn-name-submit" id="submitNameBtn">▶ 確定して起動する</button>
+  </div>
+</div>
+
 <div class="warp-overlay"></div>
 
 <div class="cyber-bg">
@@ -622,19 +722,9 @@ body.warping {
 <div class="home-container">
   <div class="home-subtitle">インクリメンタル絶対神</div>
   <div class="home-title">INFINITY MATRIX OMEGA</div>
+  <div class="god-display" id="displayGodName">GOD: <span>名無しの神</span></div>
   
   <div class="menu-list">
-    <!-- プレイヤー名設定・表示エリア -->
-    <div style="margin-bottom: 15px; padding: 12px; background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 8px; text-align: center;">
-      <div id="menuPlayerDisplay" style="font-size: 0.95rem; color: #00f2fe; margin-bottom: 8px; font-weight: bold;">
-        プレイヤー: 読み込み中...
-      </div>
-      <div style="display: flex; gap: 8px; justify-content: center;">
-        <input type="text" id="playerNameInput" placeholder="名前を入力..." style="padding: 6px 10px; border-radius: 4px; border: 1px solid rgba(0, 242, 254, 0.5); background: #000; color: #fff; font-size: 0.85rem; width: 65%;">
-        <button id="savePlayerNameBtn" style="padding: 6px 12px; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #000; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.85rem;">保存</button>
-      </div>
-    </div>
-
     <button class="btn-menu btn-start hard" id="startHardBtn">▶ 難易度：難しい (MZ) 新版</button>
     <button class="btn-menu btn-start" id="startEasyBtn">▶ 難易度：簡単 (KN) 旧版</button>
     <button class="btn-menu btn-reset" id="openResetModalBtn">⚠ セーブデータ初期化</button>
@@ -642,6 +732,7 @@ body.warping {
 
   <div class="version-tag">home v6.0</div>
 </div>
+
 <div class="reset-modal" id="resetModal">
   <div class="reset-modal-content">
     <div class="reset-modal-title">SAVE DATA RESET</div>
@@ -668,37 +759,6 @@ body.warping {
 </div>
 
 <script>
-  const PLAYER_NAME_KEY = 'infinity_game_player_name';
-
-// 1. ページ読み込み時に保存された名前を反映する
-window.addEventListener('DOMContentLoaded', () => {
-    const savedName = localStorage.getItem(PLAYER_NAME_KEY);
-    const displayElem = document.getElementById('menuPlayerDisplay');
-    const inputElem = document.getElementById('playerNameInput');
-
-    if (savedName) {
-        if (displayElem) displayElem.innerText = `プレイヤー: ${savedName}`;
-        if (inputElem) inputElem.value = savedName;
-    } else {
-        if (displayElem) displayElem.innerText = `プレイヤー: あなた自身`;
-    }
-});
-
-// 2. 「保存」ボタンが押されたときの処理
-document.getElementById('savePlayerNameBtn').addEventListener('click', () => {
-    const inputElem = document.getElementById('playerNameInput');
-    const displayElem = document.getElementById('menuPlayerDisplay');
-    const newName = inputElem.value.trim();
-
-    if (newName !== "") {
-        // localStorageに保存（PCのシャットダウンや再起動後も保持されます）
-        localStorage.setItem(PLAYER_NAME_KEY, newName);
-        if (displayElem) displayElem.innerText = `プレイヤー: ${newName}`;
-        alert('名前を保存しました！');
-    } else {
-        alert('有効な名前を入力してください。');
-    }
-});
 class KimoSoundManager {
   static initContext() {
     if (!this.audioCtx) {
@@ -855,6 +915,16 @@ class KimoSoundManager {
 window.addEventListener('DOMContentLoaded', () => {
   const authorScreen = document.getElementById('authorScreen');
   const libraryScreen = document.getElementById('libraryScreen');
+  const nameScreen = document.getElementById('nameScreen');
+  const godNameInput = document.getElementById('godNameInput');
+  const submitNameBtn = document.getElementById('submitNameBtn');
+  const displayGodName = document.getElementById('displayGodName').querySelector('span');
+
+  const savedGodName = localStorage.getItem('your_game_god_name');
+  if (savedGodName) {
+    godNameInput.value = savedGodName;
+    displayGodName.textContent = savedGodName;
+  }
 
   setTimeout(() => {
     authorScreen.classList.add('show');
@@ -879,11 +949,8 @@ window.addEventListener('DOMContentLoaded', () => {
     libraryScreen.style.opacity = '0';
     libraryScreen.style.pointerEvents = 'none';
 
-    document.body.classList.add('activated');
-
-    KimoSoundManager.playBootSound(() => {
-      KimoSoundManager.startBGM();
-    });
+    nameScreen.classList.add('active');
+    godNameInput.focus();
 
     setTimeout(() => {
       authorScreen.remove();
@@ -891,6 +958,35 @@ window.addEventListener('DOMContentLoaded', () => {
     }, 1000);
 
   }, 5000);
+
+  submitNameBtn.addEventListener('click', () => {
+    let finalName = godNameInput.value.trim();
+    if (!finalName) {
+      finalName = "名無しの神";
+    }
+
+    localStorage.setItem('your_game_god_name', finalName);
+    displayGodName.textContent = finalName;
+
+    nameScreen.style.opacity = '0';
+    nameScreen.style.pointerEvents = 'none';
+
+    document.body.classList.add('activated');
+
+    KimoSoundManager.playBootSound(() => {
+      KimoSoundManager.startBGM();
+    });
+
+    setTimeout(() => {
+      nameScreen.remove();
+    }, 600);
+  });
+
+  godNameInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      submitNameBtn.click();
+    }
+  });
 });
 
 const resetModal = document.getElementById('resetModal');
@@ -959,24 +1055,15 @@ document.getElementById('startEasyBtn').addEventListener('click', (e) => {
     window.location.href = 'KNclickgame.html';
   }, 700);
 });
-  // カスタムチェックボックスをクリックしたときに確実にinputをトグルする
+
 document.querySelectorAll('.checkbox-label').forEach(label => {
   const checkbox = label.querySelector('input[type="checkbox"]');
   const customBox = label.querySelector('.custom-checkbox');
 
   customBox.addEventListener('click', (e) => {
-    e.preventDefault(); // ラベル本来の挙動との競合を防ぐ
+    e.preventDefault();
     checkbox.checked = !checkbox.checked;
   });
-});
-  // メニュー画面側で保存された名前を読み込んで表示するコード
-window.addEventListener('DOMContentLoaded', () => {
-    const savedName = localStorage.getItem('infinity_game_player_name');
-    const menuNameElement = document.getElementById('menuPlayerName'); // 表示したい要素のID
-    
-    if (menuNameElement && savedName) {
-        menuNameElement.innerText = `プレイヤー: ${savedName}`;
-    }
 });
 </script>
 
