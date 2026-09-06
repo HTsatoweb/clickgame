@@ -5078,108 +5078,122 @@ window.updateDynamicCoreAndResourceVisuals = function(currentEnergy) {
   coreBtn.style.setProperty('animation', 'corePulse 1.2s ease-in-out infinite', 'important');
 };
 
-  /* -------------------------
-     パーティクル（既存機能）
-     ------------------------- */
-  window.spawnParticleEffect = function(type = "fireworks", originX = window.innerWidth / 2, originY = window.innerHeight / 2) {
-    const container = document.body;
-    const particleCount = type === "fireworks" ? 28 : 20;
-    const colorPool = ["#00f2fe","#4facfe","#00ffcc","#a8ff00","#ffea00","#ff758c","#ff0055","#9d4edd","#ffd166","#06d6a0","#118ab2","#073b4c","#f72585","#b5179e","#7209b7","#3a0ca3","#ffb4a2","#e5989b","#6a4c93","#2b2d42","#8ecae6","#219ebc","#ffb703","#fb8500"];
-    for (let i=0;i<particleCount;i++){
-      const el = document.createElement("div");
-      el.className = "floating-particle-unit";
-      let content = "";
-      if (type === "fireworks") content = ["✨","✦","✺","✶"][Math.floor(Math.random()*4)];
-      else if (type === "petals") content = ["🌸","🌺","❀"][Math.floor(Math.random()*3)];
-      else content = ["🎉","🎊","📎","🔷"][Math.floor(Math.random()*4)];
-      const chosenColor = colorPool[Math.floor(Math.random()*colorPool.length)];
-      el.innerHTML = content;
-      el.style.position = "fixed";
-      el.style.left = originX + (Math.random()*12 - 6) + "px";
-      el.style.top = originY + (Math.random()*12 - 6) + "px";
-      el.style.fontSize = (Math.random()*18 + 10) + "px";
-      el.style.color = chosenColor;
-      el.style.zIndex = "999999";
-      el.style.pointerEvents = "none";
-      el.style.textShadow = `0 0 8px ${hslaFromHsl(hslFromHexOrHsl(chosenColor), 0.6)}`;
-      container.appendChild(el);
-      const angle = Math.random()*Math.PI*2;
-      const distance = Math.random()*220 + 80;
-      const targetX = Math.cos(angle)*distance;
-      const targetY = Math.sin(angle)*distance - (type === "petals" ? -120 : 60);
-      const animation = el.animate([
-        { transform: 'translate(0,0) scale(0.3) rotate(0deg)', opacity: 1 },
-        { transform: `translate(${targetX}px, ${targetY}px) scale(${1 + Math.random()*0.8}) rotate(${Math.random()*720}deg)`, opacity: 0 }
-      ], { duration: Math.random()*1000 + 800, easing: 'cubic-bezier(0.22,1,0.36,1)' });
-      animation.onfinish = () => el.remove();
-    }
-    function hslFromHexOrHsl(col){
-      if (!col) return 'hsl(0,0%,100%)';
-      if (col.startsWith('hsl')) return col;
-      try {
-        let h = col.replace('#','');
-        if (h.length===3) h = h.split('').map(c=>c+c).join('');
-        const r = parseInt(h.substring(0,2),16), g = parseInt(h.substring(2,4),16), b = parseInt(h.substring(4,6),16);
-        const rf=r/255, gf=g/255, bf=b/255;
-        const max=Math.max(rf,gf,bf), min=Math.min(rf,gf,bf);
-        let hh=0, ss=0, ll=(max+min)/2;
-        if (max!==min){
-          const d=max-min;
-          ss = ll>0.5 ? d/(2-max-min) : d/(max+min);
-          switch(max){
-            case rf: hh = (gf-bf)/d + (gf<bf?6:0); break;
-            case gf: hh = (bf-rf)/d + 2; break;
-            case bf: hh = (rf-gf)/d + 4; break;
-          }
-          hh *= 60;
-        }
-        return `hsl(${Math.round(hh)}, ${Math.round(ss*100)}%, ${Math.round(ll*100)}%)`;
-      } catch(e){ return 'hsl(0,0%,100%)'; }
-    }
-  };
+ /* -------------------------
+    パーティクル（軽量化・最適化版）
+    ------------------------- */
+window.spawnParticleEffect = function(type = "fireworks", originX = window.innerWidth / 2, originY = window.innerHeight / 2) {
+  const container = document.body;
+  
+  // ★【軽量化】パーティクルの発生数を大幅に削減（花火10個、他6個）
+  const particleCount = type === "fireworks" ? 10 : 6;
+  
+  const colorPool = ["#00f2fe","#4facfe","#00ffcc","#a8ff00","#ffea00","#ff758c","#ff0055","#9d4edd","#ffd166","#06d6a0","#118ab2","#073b4c","#f72585","#b5179e","#7209b7","#3a0ca3","#ffb4a2","#e5989b","#6a4c93","#2b2d42","#8ecae6","#219ebc","#ffb703","#fb8500"];
+  
+  // 同時にDOMに存在できるパーティクルの上限を設けて過負荷を防ぐ
+  if (container.querySelectorAll('.floating-particle-unit').length > 30) return;
 
-  /* -------------------------
-     実績トーストフック（存在すれば差し替え）
-     ------------------------- */
-  try {
-    if (typeof createToast === 'function') {
-      const originalCreateToast = window.createToast;
-      window.createToast = function(title, desc) {
-        try { originalCreateToast(title, desc); } catch(e) {}
-        try { window.spawnParticleEffect('fireworks', window.innerWidth - 150, 80); } catch(e) {}
-        try { window.spawnParticleEffect('confetti', window.innerWidth - 200, 100); } catch(e) {}
-      };
-    }
-  } catch(e) {}
-
-  /* -------------------------
-     コアクリック時のパーティクルバインド
-     ------------------------- */
-  try {
-    const coreBtnElem = document.getElementById('coreTrigger');
-    if (coreBtnElem && !coreBtnElem.__visuals_click_bound) {
-      coreBtnElem.addEventListener('click', (e) => {
-        if (Math.random() < 0.75) window.spawnParticleEffect('fireworks', e.clientX, e.clientY);
-      });
-      coreBtnElem.__visuals_click_bound = true;
-    }
-  } catch(e) {}
-
-  /* -------------------------
-     自動ポーリング（任意）
-     ------------------------- */
-  if (!window.__visualsEnergyPoller) {
-    window.__visualsEnergyPoller = setInterval(() => {
-      try {
-        const energy = (typeof game !== 'undefined' && typeof game.energy !== 'undefined') ? game.energy : null;
-        if (energy !== null && typeof window.updateDynamicCoreAndResourceVisuals === 'function') {
-          window.updateDynamicCoreAndResourceVisuals(energy);
-        }
-      } catch(e) {}
-    }, 250);
+  for (let i = 0; i < particleCount; i++) {
+    const el = document.createElement("div");
+    el.className = "floating-particle-unit";
+    let content = "";
+    if (type === "fireworks") content = ["✨","✦","✺","✶"][Math.floor(Math.random()*4)];
+    else if (type === "petals") content = ["🌸","🌺","❀"][Math.floor(Math.random()*3)];
+    else content = ["🎉","🎊","🔷"][Math.floor(Math.random()*3)];
+    
+    const chosenColor = colorPool[Math.floor(Math.random()*colorPool.length)];
+    el.innerHTML = content;
+    el.style.position = "fixed";
+    el.style.left = originX + (Math.random()*10 - 5) + "px";
+    el.style.top = originY + (Math.random()*10 - 5) + "px";
+    el.style.fontSize = (Math.random()*14 + 10) + "px";
+    el.style.color = chosenColor;
+    el.style.zIndex = "999999";
+    el.style.pointerEvents = "none";
+    el.style.textShadow = `0 0 6px ${hslaFromHsl(hslFromHexOrHsl(chosenColor), 0.6)}`;
+    container.appendChild(el);
+    
+    const angle = Math.random()*Math.PI*2;
+    const distance = Math.random()*100 + 30;
+    const targetX = Math.cos(angle)*distance;
+    const targetY = Math.sin(angle)*distance - (type === "petals" ? -60 : 30);
+    
+    const animation = el.animate([
+      { transform: 'translate(0,0) scale(0.3) rotate(0deg)', opacity: 1 },
+      { transform: `translate(${targetX}px, ${targetY}px) scale(1) rotate(${Math.random()*360}deg)`, opacity: 0 }
+    ], { duration: Math.random()*500 + 400, easing: 'cubic-bezier(0.22,1,0.36,1)' });
+    
+    animation.onfinish = () => el.remove();
   }
-})();
-  /* -------------------------------------------------------------------------
+  
+  function hslFromHexOrHsl(col){
+    if (!col) return 'hsl(0,0%,100%)';
+    if (col.startsWith('hsl')) return col;
+    try {
+      let h = col.replace('#','');
+      if (h.length===3) h = h.split('').map(c=>c+c).join('');
+      const r = parseInt(h.substring(0,2),16), g = parseInt(h.substring(2,4),16), b = parseInt(h.substring(4,6),16);
+      const rf=r/255, gf=g/255, bf=b/255;
+      const max=Math.max(rf,gf,bf), min=Math.min(rf,gf,bf);
+      let hh=0, ss=0, ll=(max+min)/2;
+      if (max!==min){
+        const d=max-min;
+        ss = ll>0.5 ? d/(2-max-min) : d/(max+min);
+        switch(max){
+          case rf: hh = (gf-bf)/d + (gf<bf?6:0); break;
+          case gf: hh = (bf-rf)/d + 2; break;
+          case bf: hh = (rf-gf)/d + 4; break;
+        }
+        hh *= 60;
+      }
+      return `hsl(${Math.round(hh)}, ${Math.round(ss*100)}%, ${Math.round(ll*100)}%)`;
+    } catch(e){ return 'hsl(0,0%,100%)'; }
+  }
+};
+
+/* -------------------------
+    実績トーストフック
+    ------------------------- */
+try {
+  if (typeof createToast === 'function') {
+    const originalCreateToast = window.createToast;
+    window.createToast = function(title, desc) {
+      try { originalCreateToast(title, desc); } catch(e) {}
+      try { window.spawnParticleEffect('fireworks', window.innerWidth - 150, 80); } catch(e) {}
+    };
+  }
+} catch(e) {}
+
+/* -------------------------
+    コアクリック時のパーティクルバインド
+    ------------------------- */
+try {
+  const coreBtnElem = document.getElementById('coreTrigger');
+  if (coreBtnElem && !coreBtnElem.__visuals_click_bound) {
+    coreBtnElem.addEventListener('click', (e) => {
+      // ★【軽量化】発生確率を 75% から 20% に下げ、連打しても重くならないように制限
+      if (Math.random() < 0.20) {
+        window.spawnParticleEffect('fireworks', e.clientX, e.clientY);
+      }
+    });
+    coreBtnElem.__visuals_click_bound = true;
+  }
+} catch(e) {}
+
+/* -------------------------
+    自動ポーリング（エネルギー連動ビジュアル）
+    ------------------------- */
+if (!window.__visualsEnergyPoller) {
+  window.__visualsEnergyPoller = setInterval(() => {
+    try {
+      const energy = (typeof game !== 'undefined' && typeof game.energy !== 'undefined') ? game.energy : null;
+      if (energy !== null && typeof window.updateDynamicCoreAndResourceVisuals === 'function') {
+        window.updateDynamicCoreAndResourceVisuals(energy);
+      }
+    } catch(e) {}
+  }, 250);
+}
+
+/* -------------------------------------------------------------------------
    実績達成判定システムの初期化と定期チェック
    ------------------------------------------------------------------------- */
 if (typeof game !== "undefined") {
@@ -5222,12 +5236,12 @@ if (!window.__achievementPoller) {
     try {
       checkAchievements();
       
-      // ★ ここで常にエネルギーが Infinity になっていないか監視する
       if (typeof game !== 'undefined' && typeof game.energy !== 'undefined') {
-        checkInfinityMilestone(game.energy);
+        if (typeof checkInfinityMilestone === 'function') {
+          checkInfinityMilestone(game.energy);
+        }
       }
       
-      // 実績タブが開かれている場合はリアルタイムで画面を更新
       const achTab = document.getElementById('tab-ach');
       if (achTab && achTab.classList.contains('active') && typeof renderAchievementsList === 'function') {
         renderAchievementsList();
