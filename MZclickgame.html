@@ -7729,9 +7729,22 @@ document.addEventListener("DOMContentLoaded", () => {
       moveFocus(dir);
     }
   }
-  function activateFocus() {
+function activateFocus() {
     const el = focusEl || document.getElementById("coreTrigger");
     if (!el) return;
+    
+    // タブ切り替えボタンにフォーカスがある状態でAボタン（決定）を押した際、
+    // click()によって意図しないタブ移動や二重の切り替えが発生するのを防ぐガード
+    if (el.classList.contains("tab-trigger-button")) {
+      uiSfx("ok");
+      if (typeof el.onclick === "function") {
+        el.onclick();
+      } else {
+        el.click();
+      }
+      return;
+    }
+
     uiSfx("ok");
     if (el.id === "coreTrigger") {
       const fn = window.handleCoreClick || handleCoreClick;
