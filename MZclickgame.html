@@ -5431,7 +5431,7 @@ function executeCoreGameTick(currentTimestamp) {
 }
 
 /**
- * タブ切り替え処理（イベントオブジェクトを安全に受け取る仕様）＋コントローラーフォーカス追従修正
+ * タブ切り替え処理（イベントオブジェクトを安全に受け取る仕様）
  */
 function switchMainTab(targetId, clickEvent) {
   const panes = document.getElementsByClassName("tab-pane");
@@ -5459,22 +5459,6 @@ function switchMainTab(targetId, clickEvent) {
   } else if (targetId === "tab-auto" && typeof renderAutomation === "function") {
     renderAutomation();
   }
-
-  // タブ切り替え・再描画後にコントローラーのフォーカス表示が消失・ズレるのを防ぐため、新しいタブ内の要素へフォーカスを再同期
-  setTimeout(function() {
-    if (typeof focusables === "function" && typeof setFocus === "function") {
-      const list = focusables();
-      if (list.length > 0) {
-        // 新しく表示されたタブペイン内の要素を優先してフォーカス対象にする
-        const paneFocusables = targetPane ? list.filter(function(el) { return targetPane.contains(el); }) : [];
-        if (paneFocusables.length > 0) {
-          setFocus(paneFocusables[0]);
-        } else {
-          setFocus(list[0]);
-        }
-      }
-    }
-  }, 30);
 }
 
 // キーボードイベントの制御（スペースキー連打時の重複防止）
@@ -7729,22 +7713,9 @@ document.addEventListener("DOMContentLoaded", () => {
       moveFocus(dir);
     }
   }
-function activateFocus() {
+  function activateFocus() {
     const el = focusEl || document.getElementById("coreTrigger");
     if (!el) return;
-    
-    // タブ切り替えボタンにフォーカスがある状態でAボタン（決定）を押した際、
-    // click()によって意図しないタブ移動や二重の切り替えが発生するのを防ぐガード
-    if (el.classList.contains("tab-trigger-button")) {
-      uiSfx("ok");
-      if (typeof el.onclick === "function") {
-        el.onclick();
-      } else {
-        el.click();
-      }
-      return;
-    }
-
     uiSfx("ok");
     if (el.id === "coreTrigger") {
       const fn = window.handleCoreClick || handleCoreClick;
