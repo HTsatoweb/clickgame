@@ -1020,6 +1020,8 @@ body, button, input, select, textarea, [class*="game-"] {
 
 <div class="column-left">
   <div class="game-title">INFINITY MATRIX — OMEGA MULTI-LAYER OVERDRIVE API 65 簡単vr</div>
+  5 —</div>
+<div class="god-display" id="displayGodName" style="font-size: 0.8rem; color: #00ffcc; letter-spacing: 2px; margin-top: 4px; margin-bottom: 15px; text-shadow: 0 0 8px rgba(0, 255, 204, 0.3); text-align: center;">GOD: <span id="playerNameSpan">名無しの神</span></div>
 
  <div class="display-group">
   <div class="resource-label">ENERGY [物質エネルギー]</div>
@@ -1858,7 +1860,12 @@ function sanitizeGameData() {
   game.galaxyNodes = __sanitizeNumber(game.galaxyNodes, 0);
   game.totalTime = __sanitizeNumber(game.totalTime, 0);
 }
-
+// 保存されている神の名前を読み込んで表示に反映させる
+const savedName = localStorage.getItem('infinity_game_player_name');
+if (savedName) {
+  const nameSpan = document.getElementById('playerNameSpan');
+  if (nameSpan) nameSpan.textContent = savedName;
+}
 // 2. 状態更新フレーム毎のデータ整合性チェックラッパー
 function updateGameLoopSafetyWrapper() {
   try {
