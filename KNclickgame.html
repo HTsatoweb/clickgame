@@ -1245,6 +1245,20 @@ body, button, input, select, textarea, [class*="game-"] {
 <div id="google_translate_element" style="display:none;"></div>
 <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <script>
+  // 画面がまだ全画面でない場合に、最初のタップ/クリックで全画面にする
+document.addEventListener('click', () => {
+  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen().catch(err => {
+        // ブラウザの仕様やセキュリティ制限で失敗した場合は無視
+        console.log("Fullscreen request denied or not allowed.");
+      });
+    } else if (elem.webkitRequestFullscreen) {
+      elem.webkitRequestFullscreen(); // Safariなどの旧プレフィックス対応
+    }
+  }
+}, { once: true }); // { once: true } にしているので、最初の一回クリックされたらこのイベントは終了します
   document.addEventListener('contextmenu', function(e) {
   // ブラウザ本来の右クリックメニューを完全に阻止
   e.preventDefault();
@@ -1261,6 +1275,7 @@ body, button, input, select, textarea, [class*="game-"] {
   
   e.target.dispatchEvent(clickEvent);
 });
+  
   /**
  * =========================================================================
  * Extended Configuration Database Ecosystem (DEEP MASSIVE ARRAY ENHANCEMENT)
