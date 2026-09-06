@@ -583,8 +583,8 @@ body {
 
   /* タップコアのサイズを少しコンパクトに、押しやすく */
   .click-core-btn {
-    width: 130px;
-    height: 130px;
+    width: min(78vw, 280px);
+    height: min(78vw, 280px);
     margin: 0 auto;
   }
   
@@ -635,18 +635,20 @@ button, .btn-action-prestige, .click-core-btn, .card-upgrade-node, .factory-line
 /* タップコアコンテナ：画面幅が狭くなってもはみ出さず中央に収まるようにする */
 .click-core-container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   width: 100%;
-  padding: 10px 0;
+  padding: 8px 0 4px;
   box-sizing: border-box;
+  gap: 8px;
 }
 
 /* タップコアボタン本体：画面が小さい時は自動で少しコンパクトになる可変サイズ */
 .click-core-btn {
-  width: clamp(120px, 25vw, 160px);   /* 最小120px、最大160pxの間で画面に合わせて可変 */
-  height: clamp(120px, 25vw, 160px);
-  max-width: 100%;
+  width: clamp(220px, 42vw, 340px);
+  height: clamp(220px, 42vw, 340px);
+  max-width: 96%;
   border-radius: 50%;
   display: flex;
   flex-direction: column;
@@ -1059,15 +1061,17 @@ body.force-lightweight-all .click-core-btn::after {
 .event-card.unlucky .event-result-big { color: #ff6b9a; }
 .event-card.mixed .event-result-big { color: #d0a2ff; }
 #eventBuffBar {
-  position: fixed;
-  left: 8px;
-  bottom: 8px;
-  z-index: 90000;
+  position: relative;
+  left: auto;
+  bottom: auto;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   gap: 4px;
   pointer-events: none;
-  max-width: min(72vw, 260px);
+  width: min(100%, 360px);
+  max-width: 100%;
+  margin: 4px auto 0;
 }
 .event-buff-chip {
   background: rgba(8,4,20,.88);
@@ -1103,11 +1107,11 @@ body.force-lightweight-all .click-core-btn::after {
 }
 
 #effectHUD {
-  position: fixed;
-  right: 8px;
-  bottom: 8px;
-  z-index: 90010;
-  width: min(92vw, 240px);
+  position: relative;
+  right: auto;
+  bottom: auto;
+  z-index: 3;
+  width: min(100%, 360px);
   background: rgba(8,4,20,.88);
   border: 1px solid rgba(0,255,204,.28);
   border-radius: 10px;
@@ -1275,7 +1279,12 @@ body.force-lightweight-all #eventOverlay.show .event-card {
   100% { opacity: 0; transform: translateX(-50%) translateY(-28px) scale(1.2); }
 }
 #coreTrigger.tap-ack {
-  animation: tapAck .15s ease-out;
+  animation: tapAckPop .18s ease-out;
+}
+@keyframes tapAckPop {
+  0% { transform: scale(.88); filter: brightness(2) saturate(1.4); }
+  55% { transform: scale(1.06); filter: brightness(1.3); }
+  100% { transform: scale(1); filter: brightness(1); }
 }
 @keyframes tapAck {
   0% { transform: scale(.92); filter: brightness(1.8) saturate(1.25); }
@@ -1317,6 +1326,71 @@ body.force-lightweight-all #eventOverlay.show .event-card {
   color: #d4d4d8;
 }
 #missionBox b { color: #ffea00; }
+
+
+.click-core-container { flex-direction: column !important; align-items: center !important; }
+.click-core-btn {
+  width: clamp(225px, 58vw, 285px) !important;
+  height: clamp(225px, 58vw, 285px) !important;
+  max-width: 86vw !important;
+  border-radius: 50% !important;
+}
+.core-text-main { font-size: clamp(.85rem, 3.2vw, 1.05rem) !important; }
+.core-text-sub { font-size: clamp(.7rem, 2.5vw, .9rem) !important; }
+#skillBar { order: 2; width: min(100%, 360px); }
+#missionBox {
+  order: 3;
+  width: min(100%, 360px);
+  text-align: center;
+  background: rgba(255,234,0,.06);
+}
+#coreRank {
+  font-size: .62rem;
+  letter-spacing: .14em;
+  color: #a5f3fc;
+  margin-top: 4px;
+}
+
+
+@media (min-width: 1024px) {
+  .click-core-btn {
+    width: 165px !important;
+    height: 165px !important;
+  }
+  .core-text-main { font-size: .78rem !important; letter-spacing: .04em !important; }
+  .core-text-sub { font-size: .7rem !important; }
+  #coreRank { font-size: .55rem !important; }
+}
+#missionBox.done-flash { animation: missionFlash .45s ease-out; }
+@keyframes missionFlash {
+  0% { filter: brightness(2); transform: scale(1.03); }
+  100% { filter: brightness(1); transform: scale(1); }
+}
+#bindList button { width:100%; text-align:left; margin:3px 0; padding:7px 8px; }
+
+
+#funBar {
+  width: min(100%, 360px);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  font-size: .62rem;
+  color: #cbd5e1;
+  margin-top: 4px;
+}
+#funBar b { color: #ffea00; }
+#funBar button {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(0,255,204,.3);
+  color: #fff;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: .62rem;
+  font-weight: 800;
+  cursor: pointer;
+}
 
 </style>
 </head>
@@ -1422,23 +1496,9 @@ body.force-lightweight-all #eventOverlay.show .event-card {
     <div class="event-result-big" id="eventResult">—</div>
   </div>
 </div>
-<div id="eventBuffBar"></div>
+
 
 <div id="comboBanner"></div>
-<div id="effectHUD" aria-label="effect system">
-  <div class="eh-title">EFFECT SYSTEM</div>
-  <div class="eh-row"><span>QUALITY</span><span class="eh-val" id="eh-quality">AUTO</span></div>
-  <div class="eh-row"><span>FPS</span><span class="eh-val" id="eh-fps">--</span></div>
-  <div class="eh-row"><span>COMBO</span><span class="eh-val" id="eh-combo">0</span></div>
-  <div class="eh-row"><span>EVENTS</span><span class="eh-val" id="eh-events">0</span></div>
-  <div class="eh-row"><span>CRIT</span><span class="eh-val" id="eh-crit">0</span></div>
-  <div class="eh-row"><span>MISSION</span><span class="eh-val" id="eh-mission">0</span></div>
-  <div class="eh-row" style="margin-top:6px;gap:4px;">
-    <button type="button" id="eh-qbtn">画質切替</button>
-    <button type="button" id="eh-hudbtn">HUD隠す</button>
-  </div>
-  <div class="eh-hist" id="eh-hist">まだイベントなし</div>
-</div>
 
 
 
@@ -1466,6 +1526,7 @@ body.force-lightweight-all #eventOverlay.show .event-card {
       <span id="tapPing" aria-hidden="true"></span>
       <span class="core-text-main">TAP CORE</span>
       <span class="core-text-sub" id="v-click-power">+1.0</span>
+      <span id="coreRank">RANK 見習いコア</span>
     </button>
     <div id="skillBar">
       <button type="button" id="sk-fever">フィーバー<span class="sk-cd" id="sk-fever-cd">準備OK</span></button>
@@ -1473,6 +1534,27 @@ body.force-lightweight-all #eventOverlay.show .event-card {
       <button type="button" id="sk-call">イベント召喚<span class="sk-cd" id="sk-call-cd">準備OK</span></button>
     </div>
     <div id="missionBox">ミッション: <b id="missionText">コアを 30 回タップ</b></div>
+    <div id="funBar">
+      <span>SESSION <b id="sessTaps">0</b></span>
+      <span>STAR <b id="starPts">0</b></span>
+      <button type="button" id="sk-theme">色替え</button>
+      <button type="button" id="sk-burst">バースト</button>
+    </div>
+    <div id="eventBuffBar"></div>
+    <div id="effectHUD" aria-label="effect system">
+  <div class="eh-title">EFFECT SYSTEM</div>
+  <div class="eh-row"><span>QUALITY</span><span class="eh-val" id="eh-quality">AUTO</span></div>
+  <div class="eh-row"><span>FPS</span><span class="eh-val" id="eh-fps">--</span></div>
+  <div class="eh-row"><span>COMBO</span><span class="eh-val" id="eh-combo">0</span></div>
+  <div class="eh-row"><span>EVENTS</span><span class="eh-val" id="eh-events">0</span></div>
+  <div class="eh-row"><span>CRIT</span><span class="eh-val" id="eh-crit">0</span></div>
+  <div class="eh-row"><span>MISSION</span><span class="eh-val" id="eh-mission">0</span></div>
+  <div class="eh-row" style="margin-top:6px;gap:4px;">
+    <button type="button" id="eh-qbtn">画質切替</button>
+    <button type="button" id="eh-hudbtn">HUD隠す</button>
+  </div>
+  <div class="eh-hist" id="eh-hist">まだイベントなし</div>
+</div>
   </div>
 
   <div class="prestige-wrapper">
@@ -1571,6 +1653,7 @@ body.force-lightweight-all #eventOverlay.show .event-card {
     <span style="font-size: 0.72rem; color: var(--color-upgrade);">SYSTEM DATA (システム)</span>
     <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
       <button class="btn-utility" onclick="saveGameManual()" style="white-space: nowrap;">手動セーブ</button>
+      <button class="btn-utility" id="controlsMenuBtn" onclick="toggleControlsMenu()" style="color: var(--color-energy); border-color: var(--color-energy); white-space: nowrap; font-weight: bold;">🎮 操作</button>
       <button class="btn-utility" id="settingsMenuBtn" onclick="toggleSettingsMenu()" style="color: var(--color-upgrade); border-color: var(--color-upgrade); white-space: nowrap; font-weight: bold;">⚙️ 設定</button>
     </div>
   </div>
@@ -1642,6 +1725,25 @@ body.force-lightweight-all #eventOverlay.show .event-card {
 </div>
 
 <!-- ③ 🎛️ 設定モーダルウィンドウ（中央ポップアップ） -->
+
+<div id="controlsModalOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.75); z-index:100000; justify-content:center; align-items:center; padding:15px; box-sizing:border-box;">
+  <div style="background:rgba(15,10,25,.98); border:1px solid #444; border-radius:8px; width:100%; max-width:460px; overflow:hidden;">
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px solid #333;">
+      <span style="font-size:.85rem; font-weight:bold; color:#00ffcc;">🎮 操作設定</span>
+      <button type="button" onclick="toggleControlsMenu()" style="background:none;border:none;color:#aaa;font-size:1.1rem;cursor:pointer;">✕</button>
+    </div>
+    <div style="padding:14px; display:flex; flex-direction:column; gap:8px; font-size:.72rem; color:#ddd;">
+      <div>キーボードと、Xbox / Switch Pro などのコントローラーに対応しています。ボタンを押して割り当てを変えてください。</div>
+      <div id="padStatus" style="color:#ffea00;">コントローラー: 未接続</div>
+      <div id="bindList"></div>
+      <div style="display:flex; gap:6px; margin-top:6px;">
+        <button type="button" class="btn-utility" id="bindResetBtn">初期設定に戻す</button>
+        <button type="button" class="btn-utility" onclick="toggleControlsMenu()">閉じる</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="settingsModalOverlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 99999; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;">
   <div style="background: rgba(15,10,25,0.98); border: 1px solid var(--border-strong, #444); border-radius: 8px; width: 100%; max-width: 440px; box-shadow: 0 8px 25px rgba(0,0,0,0.6); overflow: hidden; font-family: sans-serif; box-sizing: border-box;">
     
@@ -5319,18 +5421,7 @@ function switchMainTab(targetId, clickEvent) {
 
 // キーボードイベントの制御（スペースキー連打時の重複防止）
 let stateSpaceKeyGuard = false;
-document.addEventListener("keydown", e => {
-  if (e.code === "Space") {
-    e.preventDefault();
-    if (!stateSpaceKeyGuard) { 
-      stateSpaceKeyGuard = true; 
-      if (typeof handleCoreClick === "function") handleCoreClick(null); 
-    }
-  }
-});
-document.addEventListener("keyup", e => { 
-  if (e.code === "Space") stateSpaceKeyGuard = false; 
-});
+/* Space tap is handled by the 操作設定 bind system to avoid double clicks */
 
 // アプリケーション初期化
 window.addEventListener("DOMContentLoaded", () => {
@@ -7064,6 +7155,7 @@ document.addEventListener("DOMContentLoaded", () => {
     showEventAnim(ev, result);
     playEventSound(ev.kind);
     if (typeof pushHist === 'function') pushHist(ev, result);
+    if (typeof checkMission === 'function') checkMission();
     const color = ev.kind === "unlucky" ? "var(--color-antimatter)" : ev.kind === "mixed" ? "var(--color-timeline)" : "var(--color-upgrade)";
     if (typeof createToast === "function") createToast(ev.title, result || ev.desc);
     if (typeof pushLog === "function") pushLog("イベント："+ev.title+" — "+(result || ev.desc), color);
@@ -7101,6 +7193,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function onTick(dt) {
     noteFrame();
     if (typeof tickSkills === "function") tickSkills(dt);
+    if (ES.burstCd > 0) ES.burstCd = Math.max(0, ES.burstCd - dt);
     hudAcc += dt;
     if (hudAcc >= 0.5) { hudAcc = 0; if (ehFps) ehFps.textContent = String(Math.round(fpsEma)); if (ES.quality === 'auto') applyQuality('auto'); }
     if (document.hidden) return;
@@ -7203,12 +7296,44 @@ document.addEventListener("DOMContentLoaded", () => {
   ES.shield = false;
   ES.crits = 0;
   ES.missionI = 0;
-  ES.missions = [
-    { n: 30, label: "コアを 30 回タップ" },
-    { n: 100, label: "コアを 100 回タップ" },
-    { n: 300, label: "コアを 300 回タップ" },
-    { n: 800, label: "コアを 800 回タップ" }
+  ES.missionCycle = 0;
+  ES.curMission = null;
+  function makeMission() {
+    ES.missionCycle++;
+    const lv = ES.missionCycle;
+    const clicks = (game && game.totalClicks) || 0;
+    const kinds = ["taps","combo","events","crits","energy"];
+    const kind = kinds[(lv - 1) % kinds.length];
+    if (kind === "taps") {
+      const need = 20 + lv * 10;
+      return { kind, need, start: clicks, label: "コアを " + need + " 回タップする", sec: 10 + lv };
+    }
+    if (kind === "combo") {
+      const need = Math.min(8 + lv, 40);
+      return { kind, need, start: 0, label: "コンボを " + need + " まで伸ばす", sec: 12 + lv };
+    }
+    if (kind === "events") {
+      const need = 1 + Math.floor(lv / 4);
+      return { kind, need, start: ES.events || 0, label: "イベントを " + need + " 回見る", sec: 14 + lv };
+    }
+    if (kind === "crits") {
+      const need = 2 + Math.floor(lv / 3);
+      return { kind, need, start: ES.crits || 0, label: "CRIT を " + need + " 回出す", sec: 14 + lv };
+    }
+    return { kind: "energy", need: 1, start: 0, label: "エネルギーをためてミッション報酬を受け取る", sec: 16 + lv };
+  }
+  ES.curMission = null;
+  const RANKS = [
+    [0,"見習いコア"],[50,"点火コア"],[200,"恒星コア"],[800,"銀河コア"],
+    [2500,"準星コア"],[8000,"特異コア"],[20000,"無限コア"],[60000,"終焉核"]
   ];
+  function updateRank() {
+    const clicks = (game && game.totalClicks) || 0;
+    let name = RANKS[0][1];
+    for (let i=0;i<RANKS.length;i++) if (clicks >= RANKS[i][0]) name = RANKS[i][1];
+    const el = document.getElementById("coreRank");
+    if (el) el.textContent = "RANK " + name;
+  }
   const cd = { fever: 0, shield: 0, call: 0 };
   function setCdLab(id, sec) {
     const el = document.getElementById(id);
@@ -7245,6 +7370,29 @@ document.addEventListener("DOMContentLoaded", () => {
   if (bf) bf.onclick = function(){ useSkill("fever"); };
   if (bs) bs.onclick = function(){ useSkill("shield"); };
   if (bc) bc.onclick = function(){ useSkill("call"); };
+  ES.sessionTaps = 0;
+  ES.stars = 0;
+  ES.theme = 170;
+  ES.burstCd = 0;
+  const th = document.getElementById("sk-theme");
+  const br = document.getElementById("sk-burst");
+  if (th) th.onclick = function(){
+    ES.theme = (ES.theme + 55) % 360;
+    document.documentElement.style.setProperty("--combo-hue", String(ES.theme));
+    if (core) core.style.setProperty("--combo-hue", String(ES.theme));
+  };
+  if (br) br.onclick = function(){
+    if (ES.burstCd > 0) return;
+    ES.burstCd = 40;
+    let n = 0;
+    const t = setInterval(function(){
+      n++;
+      const fn = window.handleCoreClick;
+      if (typeof fn === "function") fn(null);
+      if (n >= 8) clearInterval(t);
+    }, 70);
+    if (typeof createToast === "function") createToast("バースト", "8連タップ！");
+  };
 
   function tickSkills(dt) {
     ["fever","shield","call"].forEach(function(k){
@@ -7257,20 +7405,40 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function checkMission() {
-    const m = ES.missions[ES.missionI];
-    if (!m) return;
-    const clicks = (game && game.totalClicks) || 0;
+  function missionProgress(m) {
+    if (!m) return 0;
+    if (m.kind === "taps") return Math.max(0, ((game && game.totalClicks) || 0) - m.start);
+    if (m.kind === "combo") return ES.combo || 0;
+    if (m.kind === "events") return Math.max(0, (ES.events || 0) - m.start);
+    if (m.kind === "crits") return Math.max(0, (ES.crits || 0) - m.start);
+    if (m.kind === "energy") return 1;
+    return 0;
+  }
+  function paintMission() {
+    if (!ES.curMission) ES.curMission = makeMission();
+    const m = ES.curMission;
+    const now = missionProgress(m);
     const box = document.getElementById("missionText");
     const hudm = document.getElementById("eh-mission");
-    if (box) box.textContent = m.label + "  (" + Math.min(clicks, m.n) + "/" + m.n + ")";
-    if (hudm) hudm.textContent = Math.min(clicks, m.n) + "/" + m.n;
-    if (clicks >= m.n) {
-      const g = (typeof cpsWorth === "function") ? cpsWorth(20) : 50;
+    const txt = m.label + "  (" + Math.min(now, m.need) + "/" + m.need + ")";
+    if (box) box.textContent = txt;
+    if (hudm) hudm.textContent = Math.min(now, m.need) + "/" + m.need;
+  }
+  function checkMission() {
+    if (!ES.curMission) ES.curMission = makeMission();
+    paintMission();
+    const m = ES.curMission;
+    if (missionProgress(m) >= m.need) {
+      const g = (typeof cpsWorth === "function") ? cpsWorth(Math.min(90, m.sec || 16)) : 50;
       try { game.energy = D(game.energy).add(g); } catch(e) {}
-      if (typeof createToast === "function") createToast("ミッション達成", m.label + "  +" + (typeof formatValue==="function"?formatValue(g):g) + " E");
-      ES.missionI = Math.min(ES.missionI + 1, ES.missions.length - 1);
+      if (typeof createToast === "function") createToast("ミッション達成 #" + ES.missionCycle, m.label + "  +" + (typeof formatValue==="function"?formatValue(g):g) + " E");
+      const box = document.getElementById("missionBox");
+      if (box) { box.classList.remove("done-flash"); box.classList.add("done-flash"); }
+      AudioBank.play("lucky", 1.05);
+      ES.curMission = makeMission();
+      paintMission();
     }
+    updateRank();
   }
 
   const origClickFn = window.handleCoreClick;
@@ -7288,6 +7456,15 @@ document.addEventListener("DOMContentLoaded", () => {
           AudioBank.play("lucky", 1.2);
         } catch (err) {}
       }
+      ES.sessionTaps = (ES.sessionTaps || 0) + 1;
+      if (ES.sessionTaps % 50 === 0) {
+        ES.stars = (ES.stars || 0) + 1;
+        if (typeof createToast === "function") createToast("スター", "50タップで★+1");
+      }
+      const st = document.getElementById("sessTaps");
+      const sr = document.getElementById("starPts");
+      if (st) st.textContent = String(ES.sessionTaps);
+      if (sr) sr.textContent = String(ES.stars || 0);
       checkMission();
     };
     const coreBtn = document.getElementById("coreTrigger");
@@ -7341,6 +7518,149 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (AudioBank && el.id !== "coreTrigger") AudioBank.play("click", 0.98 + Math.random()*0.12);
   }, {passive:true});
+
+
+  const BIND_DEF = {
+    tap: { key: "Space", pad: 0 },
+    fever: { key: "Digit1", pad: 2 },
+    shield: { key: "Digit2", pad: 3 },
+    call: { key: "Digit3", pad: 1 }
+  };
+  const BIND_LABEL = { tap: "コアを叩く", fever: "フィーバー", shield: "シールド", call: "イベント召喚" };
+  function loadBinds() {
+    try {
+      const raw = localStorage.getItem("mz_controls_v1");
+      if (raw) return Object.assign({}, BIND_DEF, JSON.parse(raw));
+    } catch (e) {}
+    return JSON.parse(JSON.stringify(BIND_DEF));
+  }
+  let binds = loadBinds();
+  let waitingBind = null;
+  function saveBinds() {
+    try { localStorage.setItem("mz_controls_v1", JSON.stringify(binds)); } catch (e) {}
+  }
+  function padName(i) {
+    if (i === 0) return "A / 下ボタン";
+    if (i === 1) return "B / 右ボタン";
+    if (i === 2) return "X / 左ボタン";
+    if (i === 3) return "Y / 上ボタン";
+    return "ボタン " + i;
+  }
+  function renderBinds() {
+    const list = document.getElementById("bindList");
+    if (!list) return;
+    list.innerHTML = Object.keys(BIND_LABEL).map(function(act){
+      const b = binds[act] || BIND_DEF[act];
+      const wait = waitingBind === act ? "  → 入力待ち" : "";
+      return '<button type="button" data-bind="'+act+'">'+BIND_LABEL[act]+'<br>キー: '+(b.key||"-")+'  /  パッド: '+padName(b.pad)+wait+"</button>";
+    }).join("");
+    list.querySelectorAll("[data-bind]").forEach(function(btn){
+      btn.onclick = function(){
+        waitingBind = btn.getAttribute("data-bind");
+        btn.textContent = BIND_LABEL[waitingBind] + "  → キーかコントローラーを押す";
+      };
+    });
+  }
+  window.toggleControlsMenu = function() {
+    const o = document.getElementById("controlsModalOverlay");
+    if (!o) return;
+    const show = o.style.display === "none" || o.style.display === "";
+    o.style.display = show ? "flex" : "none";
+    if (show) renderBinds();
+  };
+  const rst = document.getElementById("bindResetBtn");
+  if (rst) rst.onclick = function(){
+    binds = JSON.parse(JSON.stringify(BIND_DEF));
+    saveBinds();
+    waitingBind = null;
+    renderBinds();
+  };
+
+  const keyGuard = Object.create(null);
+  function doAction(act) {
+    if (act === "tap") {
+      const fn = window.handleCoreClick || handleCoreClick;
+      if (typeof fn === "function") fn(null);
+    } else if (act === "fever" || act === "shield" || act === "call") {
+      useSkill(act);
+    }
+  }
+  document.addEventListener("keydown", function(e){
+    if (e.repeat) return;
+    if (waitingBind) {
+      e.preventDefault();
+      binds[waitingBind].key = e.code;
+      saveBinds();
+      waitingBind = null;
+      renderBinds();
+      return;
+    }
+    const tag = (e.target && e.target.tagName) || "";
+    if (tag === "INPUT" || tag === "TEXTAREA") return;
+    const acts = Object.keys(binds);
+    for (let i=0;i<acts.length;i++) {
+      if (binds[acts[i]].key === e.code) {
+        e.preventDefault();
+        if (!keyGuard[acts[i]]) {
+          keyGuard[acts[i]] = true;
+          doAction(acts[i]);
+        }
+      }
+    }
+  }, true);
+  document.addEventListener("keyup", function(e){
+    const acts = Object.keys(binds);
+    for (let i=0;i<acts.length;i++) if (binds[acts[i]].key === e.code) keyGuard[acts[i]] = false;
+  }, true);
+
+  const padHeld = Object.create(null);
+  let lastPadTap = 0;
+  function readPads() {
+    let pads = [];
+    try { pads = navigator.getGamepads ? navigator.getGamepads() : []; } catch (e) {}
+    let connected = 0;
+    for (let p=0;p<pads.length;p++) {
+      const pad = pads[p];
+      if (!pad) continue;
+      connected++;
+      if (waitingBind) {
+        for (let b=0;b<pad.buttons.length;b++) {
+          if (pad.buttons[b] && pad.buttons[b].pressed) {
+            binds[waitingBind].pad = b;
+            saveBinds();
+            waitingBind = null;
+            renderBinds();
+            break;
+          }
+        }
+      } else {
+        const acts = Object.keys(binds);
+        for (let i=0;i<acts.length;i++) {
+          const act = acts[i];
+          const idx = binds[act].pad;
+          const pressed = !!(pad.buttons[idx] && pad.buttons[idx].pressed);
+          const holdKey = p + ":" + act;
+          if (act === "tap" && pressed) {
+            const now = performance.now();
+            if (now - lastPadTap > 90) {
+              lastPadTap = now;
+              doAction("tap");
+            }
+          } else if (pressed && !padHeld[holdKey]) {
+            padHeld[holdKey] = true;
+            doAction(act);
+          } else if (!pressed) padHeld[holdKey] = false;
+        }
+      }
+    }
+    const st = document.getElementById("padStatus");
+    if (st) st.textContent = connected ? ("コントローラー: " + connected + " 台接続") : "コントローラー: 未接続";
+  }
+  window.addEventListener("gamepadconnected", function(){
+    if (typeof createToast === "function") createToast("コントローラー", "接続されました");
+  });
+  try { paintMission(); } catch(e){}
+  setInterval(readPads, 50);
 
   document.addEventListener("visibilitychange", function(){
     if (document.hidden) {
