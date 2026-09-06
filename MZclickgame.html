@@ -1913,7 +1913,20 @@ body.force-lightweight-all #eventOverlay.show .event-card {
 <script src="https://cdn.jsdelivr.net/npm/decimal.js@10.4.3/decimal.min.js"></script>
 <script src="https://unpkg.com/decimal.js@10.4.3/decimal.min.js"></script>
 <script>
-  
+  // 画面がまだ全画面でない場合に、最初のタップ/クリックで全画面にする
+document.addEventListener('click', () => {
+  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen().catch(err => {
+        // ブラウザの仕様やセキュリティ制限で失敗した場合は無視
+        console.log("Fullscreen request denied or not allowed.");
+      });
+    } else if (elem.webkitRequestFullscreen) {
+      elem.webkitRequestFullscreen(); // Safariなどの旧プレフィックス対応
+    }
+  }
+}, { once: true }); // { once: true } にしているので、最初の一回クリックされたらこのイベントは終了します
 /**
  * =========================================================================
  * decimal.js 高精度演算レイヤー（完全最適化・K70/HY対応版）
