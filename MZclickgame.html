@@ -1756,8 +1756,8 @@ body.force-lightweight-all #eventOverlay.show .event-card {
     <span style="font-size: 0.72rem; color: var(--color-upgrade);">SYSTEM DATA (システム)</span>
     <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
       <button class="btn-utility" onclick="saveGameManual()" style="white-space: nowrap;">手動セーブ</button>
-      <button class="btn-utility" id="controlsMenuBtn" onclick="toggleControlsMenu()" style="color: var(--color-energy); border-color: var(--color-energy); white-space: nowrap; font-weight: bold;">🎮 操作</button>
       <button class="btn-utility" id="settingsMenuBtn" onclick="toggleSettingsMenu()" style="color: var(--color-upgrade); border-color: var(--color-upgrade); white-space: nowrap; font-weight: bold;">⚙️ 設定</button>
+      <button class="btn-fullscreen" id="fullscreenToggleBtn">⛶ 全画面切替</button>
     </div>
   </div>
 
@@ -1791,7 +1791,6 @@ body.force-lightweight-all #eventOverlay.show .event-card {
       <input type="file" id="modFileSelector" accept=".js" style="display:none;" onchange="loadModFromFile(event)">
       <button class="btn-utility" onclick="document.getElementById('modFileSelector').click()">JSファイル選択</button>
       <button class="btn-utility" style="color:var(--color-energy); border-color:var(--color-energy);" onclick="loadModFromTextarea()">MODを適用</button>
-      <button class="btn-fullscreen" id="fullscreenToggleBtn">⛶ 全画面切替</button>
     </div>
   </div>
 
@@ -1922,7 +1921,7 @@ body.force-lightweight-all #eventOverlay.show .event-card {
           </button>
         </div>
       </div>
-　　　
+　　　<button class="btn-utility" id="controlsMenuBtn" onclick="toggleControlsMenu()" style="color: var(--color-energy); border-color: var(--color-energy); white-space: nowrap; font-weight: bold;">🎮 操作</button>
     </div>
   </div>
 </div>
