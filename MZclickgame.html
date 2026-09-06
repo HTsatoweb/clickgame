@@ -5389,7 +5389,7 @@ function executeCoreGameTick(currentTimestamp) {
 }
 
 /**
- * タブ切り替え処理（イベントオブジェクトを安全に受け取る仕様）
+ * タブ切り替え処理（イベントオブジェクトを安全に受け取る仕様）＋コントローラーフォーカス追従修正
  */
 function switchMainTab(targetId, clickEvent) {
   const panes = document.getElementsByClassName("tab-pane");
@@ -5417,6 +5417,22 @@ function switchMainTab(targetId, clickEvent) {
   } else if (targetId === "tab-auto" && typeof renderAutomation === "function") {
     renderAutomation();
   }
+
+  // タブ切り替え・再描画後にコントローラーのフォーカス表示が消失・ズレるのを防ぐため、新しいタブ内の要素へフォーカスを再同期
+  setTimeout(function() {
+    if (typeof focusables === "function" && typeof setFocus === "function") {
+      const list = focusables();
+      if (list.length > 0) {
+        // 新しく表示されたタブペイン内の要素を優先してフォーカス対象にする
+        const paneFocusables = targetPane ? list.filter(function(el) { return targetPane.contains(el); }) : [];
+        if (paneFocusables.length > 0) {
+          setFocus(paneFocusables[0]);
+        } else {
+          setFocus(list[0]);
+        }
+      }
+    }
+  }, 30);
 }
 
 // キーボードイベントの制御（スペースキー連打時の重複防止）
@@ -5430,7 +5446,7 @@ window.addEventListener("DOMContentLoaded", () => {
   cronosPreviousTimestamp = performance.now();
   requestAnimationFrame(executeCoreGameTick);
 });
-/**
+  /**
  =========================================================================
  * 🌈 フルスペクトル・ダイナミック演出 & 粒子パーティクルシステム
  * （308段階区切り・e308以降は虹色グラデーション）
@@ -7561,12 +7577,22 @@ document.addEventListener("DOMContentLoaded", () => {
       };
     });
   }
-  window.toggleControlsMenu = function() {
+window.toggleControlsMenu = function() {
     const o = document.getElementById("controlsModalOverlay");
     if (!o) return;
     const show = o.style.display === "none" || o.style.display === "";
     o.style.display = show ? "flex" : "none";
-    if (show) renderBinds();
+    if (show) {
+      renderBinds();
+      // モーダルが開いたとき、最初のボタンにフォーカスを当てる
+      setTimeout(function() {
+        const list = focusables();
+        if (list.length > 0) setFocus(list[0]);
+      }, 50);
+    } else {
+      // モーダルを閉じたときはメインのトリガーへ戻す
+      setFocus(document.getElementById("coreTrigger"));
+    }
   };
   const rst = document.getElementById("bindResetBtn");
   if (rst) rst.onclick = function(){
