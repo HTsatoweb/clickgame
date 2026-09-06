@@ -190,8 +190,11 @@
         </p>
 
         <h3 style="color: #ffea00; font-size: 1.5rem; margin-top: 60px; margin-bottom: 15px; text-shadow: 0 0 10px #ffea00;">【 開発・制作協力 】</h3>
-        <p style="font-size: 1.15rem; line-height: 2.0; color: #bbb; margin-bottom: 60px;">
-          プレイヤー：あなた自身<br>
+       <!-- エンディングクレジット内の適当な場所（例: タイトルの下や制作協力のあたり）に名前表示枠を追加 -->
+<p id="playerNameDisplay" style="font-size: 1.2rem; color: #00f2fe; margin-bottom: 20px; text-shadow: 0 0 10px #00f2fe; font-weight: bold;">
+    プレイヤー：<span id="currentName">読み込み中...</span>
+</p>
+          <p style="font-size: 1.15rem; line-height: 2.0; color: #bbb; margin-bottom: 60px;">
           システム：htsatoweb<br>
           そして遊んでくれたすべての心に感謝を。
         </p>
@@ -336,6 +339,29 @@ window.addEventListener('click', () => {
     }
     startEpicBGM();
 }, { once: true });
+        // --- プレイヤー名の管理 (localStorage連携) ---
+const STORAGE_KEY = 'infinity_game_player_name';
+
+// 名前を読み込んで画面に反映する関数
+function loadPlayerName() {
+    const savedName = localStorage.getItem(STORAGE_KEY);
+    const nameSpan = document.getElementById('currentName');
+    
+    if (savedName) {
+        if (nameSpan) nameSpan.innerText = savedName;
+        return savedName;
+    } else {
+        // 初回などで名前がない場合のデフォルト値
+        const defaultName = "あなた自身";
+        if (nameSpan) nameSpan.innerText = defaultName;
+        return defaultName;
+    }
+}
+
+// ページ読み込み時に名前を適用
+window.addEventListener('DOMContentLoaded', () => {
+    loadPlayerName();
+});
 </script>
 </body>
 </html>
