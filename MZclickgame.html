@@ -2826,7 +2826,7 @@ function saveAndReloadGame() {
     alert("セーブに失敗しました。");
   }
 }
-// 所持している数（または特定のアイテム、あるいは全所持数）を0にするボタンや処理の例
+// 所持している数
 function resetOwnedItems() {
     // プレイヤーが持っている指定のアイテム、または全アセットを0にする
     player.items[400].amount = 0; // または player.totalItems = 0; などゲームの変数に合わせて調整
@@ -4753,11 +4753,14 @@ function hardResetGame() {
 
 /**
  * =========================================================================
- * High-Performance Primary Clock Loop & Dynamic Visuals
+ * High-Performance Primary Clock Loop & Dynamic Visuals (Optimized)
  * =========================================================================
  */
 let cronosPreviousTimestamp = performance.now();
 let lastAutosaveTime = 0;
+
+// パフォーマンス最適化用のタイマー変数
+let uiUpdateTimer = 0;
 let achievementCheckTimer = 0;
 
 function executeCoreGameTick(currentTimestamp) {
@@ -4765,26 +4768,39 @@ function executeCoreGameTick(currentTimestamp) {
   const dimensionalDeltaTime = baseDeltaTime * getGameSpeedMultiplier();
   cronosPreviousTimestamp = currentTimestamp;
 
+  // ゲーム内時間の進行とリソース加算
   game.sessionTime += dimensionalDeltaTime;
   game.totalTime += dimensionalDeltaTime;
   game.energy = D(game.energy).add(D(getTotalCps()).mul(dimensionalDeltaTime));
 
+  // 内部オートメーションの処理
   runInternalAutomation();
 
-  // 実績判定を毎フレームまたは適宜実行（負荷軽減のためタイマーまたは毎フレーム処理）
-  if (typeof checkAchievements === "function") {
-    checkAchievements();
+  // 実績判定（負荷軽減のため、約0.5秒に1回に間引く）
+  achievementCheckTimer += baseDeltaTime;
+  if (achievementCheckTimer >= 0.5) {
+    if (typeof checkAchievements === "function") {
+      checkAchievements();
+    }
+    achievementCheckTimer = 0;
   }
 
   // エネルギー量・進行度に応じた動的ビジュアル演出の更新
   updateDynamicCoreAndResourceVisuals(game.energy);
 
+  // Modフックの実行
   if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onTick) {
     window.ModAPI.hooks.onTick.forEach(cb => { try { cb(dimensionalDeltaTime); } catch(e){} });
   }
 
-  refreshUI();
+  // UIの更新頻度を制限（約0.1秒おき = 秒間10回にスロットリングして重さを解消）
+  uiUpdateTimer += baseDeltaTime;
+  if (uiUpdateTimer >= 0.1) {
+    refreshUI();
+    uiUpdateTimer = 0;
+  }
 
+  // オートセーブ処理（15秒ごと）
   lastAutosaveTime += baseDeltaTime;
   if (lastAutosaveTime >= 15) {
     localStorage.setItem(STORAGE_KEY, serializeGameState(game));
@@ -4799,21 +4815,24 @@ function executeCoreGameTick(currentTimestamp) {
   requestAnimationFrame(executeCoreGameTick);
 }
 
-
-
-function switchMainTab(targetId) {
+/**
+ * タブ切り替え処理（イベントオブジェクトを安全に受け取る仕様）
+ */
+function switchMainTab(targetId, clickEvent) {
   const panes = document.getElementsByClassName("tab-pane");
   for (let i = 0; i < panes.length; i++) panes[i].classList.remove("active");
+  
   const buttons = document.getElementsByClassName("tab-trigger-button");
   for (let i = 0; i < buttons.length; i++) buttons[i].classList.remove("active");
   
   const targetPane = document.getElementById(targetId);
   if (targetPane) targetPane.classList.add("active");
-  if (event && event.target) event.target.classList.add("active");
+  
+  // 引数またはグローバルから安全にトリガーボタンを取得してアクティブ化
+  const activeTrigger = clickEvent ? clickEvent.currentTarget || clickEvent.target : (window.event ? window.event.target : null);
+  if (activeTrigger) activeTrigger.classList.add("active");
 
-  // ==========================================
-  // ★ ここでタブごとの描画関数を呼び出す
-  // ==========================================
+  // タブごとの初回・切り替え時描画関数呼び出し
   if (targetId === "tab-fac" && typeof renderFactories === "function") {
     renderFactories();
   } else if (targetId === "tab-upg" && typeof renderUpgrades === "function") {
@@ -4827,15 +4846,22 @@ function switchMainTab(targetId) {
   }
 }
 
+// キーボードイベントの制御（スペースキー連打時の重複防止）
 let stateSpaceKeyGuard = false;
 document.addEventListener("keydown", e => {
   if (e.code === "Space") {
     e.preventDefault();
-    if (!stateSpaceKeyGuard) { stateSpaceKeyGuard = true; if (typeof handleCoreClick === "function") handleCoreClick(null); }
+    if (!stateSpaceKeyGuard) { 
+      stateSpaceKeyGuard = true; 
+      if (typeof handleCoreClick === "function") handleCoreClick(null); 
+    }
   }
 });
-document.addEventListener("keyup", e => { if (e.code === "Space") stateSpaceKeyGuard = false; });
+document.addEventListener("keyup", e => { 
+  if (e.code === "Space") stateSpaceKeyGuard = false; 
+});
 
+// アプリケーション初期化
 window.addEventListener("DOMContentLoaded", () => {
   if (typeof buildGameDOM === "function") buildGameDOM();
   if (typeof loadGameOnLaunch === "function") loadGameOnLaunch();
