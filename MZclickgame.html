@@ -12,10 +12,14 @@
 </script>
 <script>
   // ホーム画面を経由しているか（登録フラグがあるか）チェック
+  // スタンドアロン再生時はフラグを自動セット（元のホーム誘導は index.html があるときだけ）
   if (!localStorage.getItem('infinity_game_registered')) {
-    // 登録されていなければホーム画面へ強制送還
-    // ※ホーム画面のファイル名が「index.html」以外の場合は、下のファイル名を書き換えてください
-    window.location.replace('index.html');
+    try {
+      if (typeof location !== 'undefined' && /index\.html$/i.test(location.pathname)) {
+        /* stay */
+      }
+      localStorage.setItem('infinity_game_registered', 'standalone-pack');
+    } catch (e) {}
   }
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -7196,10 +7200,13 @@ document.addEventListener("DOMContentLoaded", () => {
     { id:"recycle", kind:"mixed", title:"リサイクル", desc:"少し失って、そのあと生産が上がる。",
       apply(){ const l=pctEnergy(0.05); subEnergySafe(l); addBuff("cps", 1.9, 20, "CPS x1.9"); return "-"+formatValue(l)+" E と CPS x1.9 / 20秒"; } }
   ];
+  // Extra events are appended by Omega Feature Pack (see tail). Keep array mutable.
+  try { window.__GAME_EVENTS = EVENTS; } catch(e) {}
+
 
   function addBuff(type, mul, dur, label) {
     EVT.active.push({ type, mul, until: nowSec() + dur, label });
-    if (EVT.active.length > 5) EVT.active.splice(0, EVT.active.length - 5);
+    if (EVT.active.length > 8) EVT.active.splice(0, EVT.active.length - 8);
     renderBuffs();
   }
   function liveMult(type) {
@@ -8107,6 +8114,493 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       try { if (AudioBank.ctx && AudioBank.ctx.state === "suspended") AudioBank.ctx.resume(); } catch(e){}
     }
+  });
+})();
+</script>
+
+
+<!-- ===== OMEGA FEATURE PACK (append-only / original layout colors kept) ===== -->
+<style id="omegaFeaturePackCss">
+  #playView{
+    width:min(100%,360px);
+    margin:8px auto 0;
+    background:rgba(8,4,20,.88);
+    border:1px solid rgba(0,255,204,.28);
+    border-radius:10px;
+    padding:8px 9px 8px;
+    font-size:.62rem;
+    color:#d4d4d8;
+    contain:layout style;
+    position:relative;
+    z-index:3;
+  }
+  #playView .pv-title{
+    font-weight:900;letter-spacing:.12em;color:#00ffcc;margin-bottom:6px;
+    display:flex;justify-content:space-between;align-items:center;gap:8px;
+  }
+  #playView .pv-title b{color:#ffea00;font-weight:900;letter-spacing:.08em}
+  #playView .pv-row{display:flex;justify-content:space-between;gap:8px;margin:2px 0}
+  #playView .pv-val{color:#ffea00;font-weight:700}
+  #playView .pv-bar{
+    height:8px;border-radius:99px;background:rgba(255,255,255,.08);
+    border:1px solid rgba(0,255,204,.2);overflow:hidden;margin:4px 0 6px;
+  }
+  #playView .pv-bar > i{
+    display:block;height:100%;width:0%;
+    background:linear-gradient(90deg,#00ffcc,#ffea00,#3a86ff);
+    box-shadow:0 0 10px rgba(0,255,204,.45);
+  }
+  #playView .pv-dop{
+    height:8px;border-radius:99px;background:rgba(255,234,0,.08);
+    border:1px solid rgba(255,234,0,.28);overflow:hidden;margin:2px 0 6px;
+  }
+  #playView .pv-dop > i{
+    display:block;height:100%;width:0%;
+    background:linear-gradient(90deg,#ffea00,#00ffcc);
+  }
+  #playView .pv-chipwrap{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+  #playView .pv-chip{
+    border:1px solid rgba(0,255,204,.28);background:rgba(0,0,0,.28);
+    color:#f4f4f5;border-radius:8px;padding:3px 6px;font-size:.58rem;
+  }
+  #playView .pv-chip.bad{border-color:rgba(255,0,85,.45)}
+  #playView .pv-log{
+    margin-top:5px;max-height:64px;overflow:hidden;color:#9ca3af;line-height:1.35;
+  }
+  #pvOrbs{
+    position:fixed;inset:0;pointer-events:none;z-index:40;
+  }
+  #pvOrbs .pv-orb{
+    position:absolute;width:22px;height:22px;border-radius:50%;
+    pointer-events:auto;cursor:pointer;
+    box-shadow:0 0 12px currentColor;
+    border:1px solid rgba(255,255,255,.35);
+    transform:translate(-50%,-50%);
+  }
+  #pvOrbs .pv-orb.lucky{background:radial-gradient(circle at 30% 30%,#fff,#00ffcc 45%,#003 80%);color:#00ffcc}
+  #pvOrbs .pv-orb.unlucky{background:radial-gradient(circle at 30% 30%,#fff,#ff0055 45%,#200 80%);color:#ff0055}
+  #pvToast{
+    position:fixed;left:12px;bottom:12px;z-index:60;width:min(280px,46vw);
+    pointer-events:none;display:flex;flex-direction:column;gap:4px;
+  }
+  #pvToast .pvt{
+    background:rgba(8,4,20,.92);border:1px solid rgba(0,255,204,.3);
+    color:#f4f4f5;border-radius:8px;padding:6px 8px;font-size:.62rem;
+    animation:pvIn .18s ease-out;
+  }
+  #pvToast .pvt.bad{border-color:rgba(255,0,85,.45)}
+  @keyframes pvIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @media (max-width:820px){
+    #pvToast{left:8px;right:8px;width:auto;bottom:8px}
+    #playView{width:min(100%,360px)}
+  }
+</style>
+<script>
+(function OmegaFeaturePack(){
+  "use strict";
+  function ready(fn){
+    if (document.readyState === "complete" || document.readyState === "interactive") setTimeout(fn, 0);
+    else document.addEventListener("DOMContentLoaded", fn);
+  }
+
+  const LUCKY = [
+    ["aurora_petal","オーロラ花弁","空の花びらがエネルギーになる"],
+    ["comet_ribbon","彗星リボン","尾をつかんで加速した"],
+    ["lucky_dice","幸運ダイス","出目が最高値だった"],
+    ["prism_rain","プリズム雨","光の粒がコアに降り注ぐ"],
+    ["nova_smile","ノヴァスマイル","星がこちらを見てくれた"],
+    ["core_polish","コア磨き","表面が輝いてタップが伸びる"],
+    ["factory_song","工場の歌","ラインが鼻歌で速くなる"],
+    ["wind_gift","恒星風の贈り物","風がエネルギーを運んだ"],
+    ["crystal_drop","結晶ドロップ","端数がきれいに結晶化した"],
+    ["echo_bonus","残響ボーナス","前のタップがもう一度鳴る"],
+    ["gold_orbit","ゴールド軌道","軌道が金色に揃った"],
+    ["tap_carnival","タップカーニバル","指先がお祭りになる"],
+    ["line_spark","ライン火花","配線が弾けるほど元気"],
+    ["chrono_gift","時間の贈りもの","一秒がちょっと太った"],
+    ["star_mail","星の郵便","小包がエネルギー入り"],
+    ["soft_overclock","やさしい過負荷","壊れない範囲で出力アップ"],
+    ["harmony_plus","ハーモニー+","音が揃って全体が伸びる"],
+    ["cache_bloom","キャッシュ開花","計算の端数が花になる"],
+    ["galaxy_wink","銀河ウインク","遠くが瞬いて応援"],
+    ["blue_print","青写真発見","古い図面が役立つ"],
+    ["meteor_catch","流星キャッチ","流れ星を両手で受けた"],
+    ["pulse_wave","パルスウェーブ","波が施設をなでる"],
+    ["crit_kiss","クリットキス","会心が連続しやすい"],
+    ["shield_charge","シールド充填","守りが少し貯まる"],
+    ["fever_seed","フィーバーの種","熱気が芽を出す"],
+    ["combo_glue","コンボのり","連鎖が切れにくくなる"],
+    ["watt_balloon","ワット風船","エネルギーがふくらむ"],
+    ["neon_lane","ネオンレーン","生産路が光の道になる"],
+    ["time_skiplet","小さな早送り","時間がちょこっと跳ぶ"],
+    ["orb_garden","オーブ庭園","光の球が芽吹く"],
+    ["spark_encore","スパークアンコール","火花がもう一回"],
+    ["lucky_route","幸運ルート","最短コースが見えた"],
+    ["gift_meteor","ギフト流星","プレゼントが落ちてきた"],
+    ["core_halo","コアの光輪","輪が回って出力アップ"],
+    ["quiet_boost","静かな加速","音もなく全体が伸びる"],
+    ["rainbow_tick","虹ティック","数値が虹色に跳ねる"],
+    ["plus_capsule","プラスカプセル","カプセルを開けたら中身が得"],
+    ["stellar_pat","恒星ポン","星に頭をなでられた"],
+    ["grid_smile","グリッド笑顔","回路がご機嫌"],
+    ["amber_save","琥珀セーブ","漏れそうな分が固まった"],
+    ["focus_beam","フォーカスビーム","一点に力が集まる"],
+    ["mini_jackpot","ミニジャックポット","小さい大当たり"],
+    ["clockwork_ok","歯車好調","カチカチが気持ちいい"],
+    ["photon_stack","光子スタック","光が積み上がる"],
+    ["tide_up","上げ潮","全体がゆっくり上昇"],
+    ["bonus_echo2","二重残響","ごほうびが二重"],
+    ["green_lane","グリーンレーン","安全に生産アップ"],
+    ["sparkle_cap","きらめき帽","タップがきらめく"],
+    ["orbit_gift","軌道ギフト","周回のついでに得した"],
+    ["clear_cheer","クリア応援","ゴールまでの応援ソング"]
+  ];
+
+  const UNLUCKY = [
+    ["dust_sneeze","宇宙塵くしゃみ","フィルターがむせた"],
+    ["soft_lag","ソフトラグ","入力が一拍遅れる"],
+    ["dim_volt","電圧うす暗","明かりが落ちて生産減"],
+    ["sticky_sec","秒のベタつき","秒がベタついて遅い"],
+    ["cool_drip","冷却ポタポタ","冷えて動きが鈍い"],
+    ["packet_gap","パケット隙間","データがすっぽ抜ける"],
+    ["idle_yawn","アイドルあくび","施設がぼんやり"],
+    ["fog_soft","やわらか霧","視界がにじむ"],
+    ["core_hiccup","コアしゃっくり","タップが途切れる"],
+    ["static_hiss","静電気ノイズ","計算がざわつく"],
+    ["vacuum_sip","真空すすり","エネルギーが少し吸われる"],
+    ["overheat_soft","やさしい過熱","出力を落とさないと危ない"],
+    ["miscount","数え違い","端数が消えた"],
+    ["echo_cancel","残響キャンセル","反響が打ち消された"],
+    ["orbit_wobble","軌道ぐらつき","整列が崩れる"],
+    ["line_jam","ライン詰まり","ベルトがもたつく"],
+    ["tap_soap","タップ石鹸","手が滑って弱い"],
+    ["chrono_mud","時間の泥","進行がぬかるむ"],
+    ["glitch_dust","グリッチ塵","表示がちらつく"],
+    ["brown_tick","ブラウンティック","一瞬電圧が落ちる"],
+    ["cache_miss","キャッシュミス","計算が遠回り"],
+    ["combo_slip","コンボすべり","連鎖が滑る"],
+    ["star_frown","星のしかめ面","遠くが不機嫌"],
+    ["gift_empty","空の小包","開けたら空っぽ"],
+    ["halo_crack","光輪ひび","輪が少し欠ける"],
+    ["neon_flick","ネオン点滅","道がちらちら"],
+    ["watt_leak","ワット漏れ","隙間から漏れる"],
+    ["clock_skip","歯車とばし","カチッが一個抜ける"],
+    ["photon_scatter","光子さんざん","光が散って弱い"],
+    ["tide_down","引き潮","全体がすとんと"],
+    ["route_detour","遠回りルート","遠回りさせられた"],
+    ["meteor_miss","流星おあずけ","手が届かなかった"],
+    ["grid_grump","グリッド不機嫌","回路がむすっ"],
+    ["focus_blur","フォーカスぼやけ","一点に集まらない"],
+    ["capsule_rust","カプセルさび","開かない"],
+    ["spark_out","火花消え","弾ける前に消えた"],
+    ["lane_ice","レーン凍結","生産路が滑る"],
+    ["quiet_drop","静かな落下","音もなく少し減る"],
+    ["rainbow_fade","虹あせ","色が落ちて勢い減"],
+    ["shield_gap","シールド隙間","守りに穴"],
+    ["fever_chill","フィーバー冷え","熱気が冷める"],
+    ["orb_pop","オーブ破裂","球が先に割れた"],
+    ["mail_late","郵便遅れ","小包が遅配"],
+    ["dice_one","ダイス1","出目が最小"],
+    ["petal_wilt","花弁しおれ","オーロラがしぼむ"],
+    ["song_offkey","工場音痴","鼻歌が外れる"],
+    ["polish_smudge","磨き汚れ","指紋が残る"],
+    ["beam_scatter","ビーム拡散","力が散る"],
+    ["cheer_mute","応援ミュート","歌が小さくなる"],
+    ["mud_splash","泥はね","進行に泥がつく"]
+  ];
+
+  function Dsafe(v){
+    try {
+      if (typeof D === "function") return D(v);
+      if (typeof Decimal !== "undefined") return new Decimal(v);
+    } catch(e){}
+    return v;
+  }
+  function fmt(v){
+    try { if (typeof formatValue === "function") return formatValue(v); } catch(e){}
+    try { return String(v); } catch(e){ return "?"; }
+  }
+  function energyAdd(v){
+    try {
+      if (typeof addEnergySafe === "function") { addEnergySafe(v); return; }
+      if (window.game) window.game.energy = Dsafe(window.game.energy).add(Dsafe(v));
+    } catch(e){}
+  }
+  function energySub(v){
+    try {
+      if (typeof subEnergySafe === "function") { subEnergySafe(v); return; }
+      if (window.game && typeof decMax0 === "function") window.game.energy = decMax0(Dsafe(window.game.energy).sub(Dsafe(v)));
+    } catch(e){}
+  }
+  function cpsW(sec){
+    try {
+      if (typeof cpsWorth === "function") return cpsWorth(sec);
+      const cps = (typeof getTotalCps === "function") ? getTotalCps() : 1;
+      return Dsafe(cps).mul(sec);
+    } catch(e){ return Dsafe(1); }
+  }
+  function pct(p){
+    try {
+      if (typeof pctEnergy === "function") return pctEnergy(p);
+      return Dsafe(window.game && window.game.energy || 0).mul(p);
+    } catch(e){ return Dsafe(0); }
+  }
+  function buff(type, mul, dur, label){
+    try { if (typeof addBuff === "function") addBuff(type, mul, dur, label); } catch(e){}
+  }
+
+  function applyKind(kind, i){
+    // Deterministic-ish variety from index
+    const n = i % 10;
+    if (kind === "lucky") {
+      if (n === 0) { const g=cpsW(10+ (i%8)); energyAdd(g); return "+"+fmt(g)+" E"; }
+      if (n === 1) { buff("click", 1.6 + (i%5)*0.2, 12 + (i%8), "タップUP"); return "タップ一時アップ"; }
+      if (n === 2) { buff("cps", 1.5 + (i%4)*0.2, 14 + (i%10), "CPS UP"); return "生産一時アップ"; }
+      if (n === 3) { buff("speed", 1.4 + (i%3)*0.2, 12 + (i%6), "速度UP"); return "速度一時アップ"; }
+      if (n === 4) { const g=pct(0.04 + (i%5)*0.01).add(cpsW(6)); energyAdd(g); return "+"+fmt(g)+" E"; }
+      if (n === 5) { buff("click", 2.2, 10, "タップ x2.2"); buff("cps", 1.4, 10, "CPS x1.4"); return "調和アップ"; }
+      if (n === 6) { const g=cpsW(16); energyAdd(g); buff("cps", 1.3, 16, "余韻生産"); return "+"+fmt(g)+" E"; }
+      if (n === 7) { buff("click", 3.0, 8, "短時間会心"); return "短時間タップ x3"; }
+      if (n === 8) { buff("speed", 1.8, 14, "早送り"); buff("click", 1.5, 14, "タップ x1.5"); return "早送りセット"; }
+      const g=cpsW(8); energyAdd(g); buff("cps", 1.6, 18, "ライン好調"); return "+"+fmt(g)+" E / 生産UP";
+    }
+    if (n === 0) { const l=cpsW(5+(i%5)); energySub(l); return "-"+fmt(l)+" E"; }
+    if (n === 1) { buff("click", 0.55, 10, "タップDOWN"); return "タップ一時ダウン"; }
+    if (n === 2) { buff("cps", 0.6, 14, "CPS DOWN"); return "生産一時ダウン"; }
+    if (n === 3) { buff("speed", 0.65, 12, "速度DOWN"); return "速度一時ダウン"; }
+    if (n === 4) { const l=pct(0.03+(i%4)*0.01); energySub(l); return "-"+fmt(l)+" E"; }
+    if (n === 5) { buff("click", 0.7, 12, "滑りタップ"); buff("speed", 0.8, 12, "粘り"); return "鈍化セット"; }
+    if (n === 6) { const l=cpsW(8); energySub(l); return "-"+fmt(l)+" E"; }
+    if (n === 7) { buff("cps", 0.45, 8, "詰まり"); return "短時間生産ダウン"; }
+    if (n === 8) { buff("click", 0.4, 8, "しゃっくり"); return "短時間タップ減"; }
+    const l=pct(0.02); energySub(l); buff("speed", 0.75, 10, "泥"); return "-"+fmt(l)+" E / 速度減";
+  }
+
+  function toEvent(row, kind, i){
+    const id = "xpack_"+kind+"_"+row[0];
+    return {
+      id: id,
+      kind: kind,
+      title: row[1],
+      desc: row[2],
+      apply: function(){ return applyKind(kind, i); }
+    };
+  }
+
+  const EXTRA_EVENTS = [];
+  for (let i=0;i<LUCKY.length;i++) EXTRA_EVENTS.push(toEvent(LUCKY[i], "lucky", i));
+  for (let i=0;i<UNLUCKY.length;i++) EXTRA_EVENTS.push(toEvent(UNLUCKY[i], "unlucky", i));
+
+  const S = {
+    dopamine: 0,
+    pulses: 0,
+    luckyP: 0,
+    unluckyP: 0,
+    orbs: 0,
+    orbsCaught: 0,
+    last: [],
+    clearPct: 0,
+    nextPulse: 7,
+    acc: 0,
+    running: true
+  };
+  window.OmegaPack = S;
+
+  function pvLog(kind, title, result){
+    S.pulses++;
+    if (kind === "lucky") S.luckyP++; else S.unluckyP++;
+    S.last.unshift((kind==="lucky"?"★ ":"▼ ")+title+(result?("  "+result):""));
+    if (S.last.length > 6) S.last.length = 6;
+    const el = document.getElementById("pv-log");
+    if (el) el.textContent = S.last.join("  /  ");
+    const n = document.getElementById("pv-pulses");
+    if (n) n.textContent = String(S.pulses);
+    miniToast(kind, title, result);
+  }
+
+  function miniToast(kind, title, result){
+    const hub = document.getElementById("pvToast");
+    if (!hub) return;
+    while (hub.children.length > 2) hub.removeChild(hub.firstChild);
+    const d = document.createElement("div");
+    d.className = "pvt"+(kind==="unlucky"?" bad":"");
+    d.textContent = title + (result ? " — "+result : "");
+    hub.appendChild(d);
+    setTimeout(function(){ if (d.parentNode) d.parentNode.removeChild(d); }, 2200);
+  }
+
+  function bumpDop(amt){
+    S.dopamine = Math.max(0, Math.min(100, S.dopamine + amt));
+    const i = document.getElementById("pv-dop-i");
+    if (i) i.style.width = S.dopamine.toFixed(1)+"%";
+    const v = document.getElementById("pv-dop-v");
+    if (v) v.textContent = Math.round(S.dopamine)+"%";
+  }
+
+  function updateClear(){
+    let pct = 0;
+    try {
+      const e = Dsafe(window.game && window.game.energy || 0);
+      let log10 = 0;
+      if (e && typeof e.log10 === "function") log10 = Number(e.log10());
+      else if (e && e.e != null) log10 = e.e;
+      pct = Math.max(0, Math.min(100, (log10 / 1000) * 100));
+    } catch(e){}
+    S.clearPct = pct;
+    const i = document.getElementById("pv-clear-i");
+    if (i) i.style.width = pct.toFixed(2)+"%";
+    const v = document.getElementById("pv-clear-v");
+    if (v) v.textContent = pct.toFixed(2)+"%";
+  }
+
+  function firePulse(forceKind){
+    const luckyChance = 0.62;
+    const kind = forceKind || (Math.random() < luckyChance ? "lucky" : "unlucky");
+    const pool = kind === "lucky" ? LUCKY : UNLUCKY;
+    const i = (Math.random()*pool.length)|0;
+    const row = pool[i];
+    let result = "";
+    try { result = applyKind(kind, i) || ""; } catch(e){}
+    if (kind === "lucky") bumpDop(8 + Math.random()*6);
+    else bumpDop(-(10 + Math.random()*8));
+    pvLog(kind, row[1], result);
+    try { if (typeof renderBuffs === "function") renderBuffs(); } catch(e){}
+    try { if (typeof refreshUI === "function") refreshUI(); } catch(e){}
+  }
+
+  function spawnOrb(kind){
+    const layer = document.getElementById("pvOrbs");
+    if (!layer) return;
+    if (layer.childElementCount >= 6) return;
+    const core = document.getElementById("coreTrigger");
+    let x = window.innerWidth * (0.18 + Math.random()*0.28);
+    let y = window.innerHeight * (0.28 + Math.random()*0.36);
+    if (core) {
+      const r = core.getBoundingClientRect();
+      const ang = Math.random()*Math.PI*2;
+      const rad = Math.max(r.width, 90) * (0.7 + Math.random()*0.55);
+      x = r.left + r.width/2 + Math.cos(ang)*rad;
+      y = r.top + r.height/2 + Math.sin(ang)*rad;
+    }
+    x = Math.max(24, Math.min(window.innerWidth-24, x));
+    y = Math.max(24, Math.min(window.innerHeight-24, y));
+    const el = document.createElement("button");
+    el.type = "button";
+    el.className = "pv-orb "+kind;
+    el.style.left = x+"px";
+    el.style.top = y+"px";
+    el.setAttribute("aria-label", kind==="lucky"?"ラッキーオーブ":"アンラッキーオーブ");
+    const life = setTimeout(function(){
+      if (el.parentNode) el.parentNode.removeChild(el);
+    }, 4200);
+    el.addEventListener("click", function(ev){
+      ev.preventDefault(); ev.stopPropagation();
+      clearTimeout(life);
+      if (el.parentNode) el.parentNode.removeChild(el);
+      S.orbsCaught++;
+      const c = document.getElementById("pv-orbs");
+      if (c) c.textContent = String(S.orbsCaught);
+      if (kind === "lucky") {
+        const g = cpsW(4); energyAdd(g); bumpDop(6);
+        pvLog("lucky", "オーブキャッチ", "+"+fmt(g)+" E");
+      } else {
+        const l = cpsW(3); energySub(l); bumpDop(-5);
+        pvLog("unlucky", "ノイズオーブ", "-"+fmt(l)+" E");
+      }
+    }, {passive:false});
+    layer.appendChild(el);
+  }
+
+  function mountUI(){
+    if (document.getElementById("playView")) return;
+    const hud = document.getElementById("effectHUD");
+    const box = document.createElement("div");
+    box.id = "playView";
+    box.setAttribute("aria-label", "play view");
+    box.innerHTML = ""
+      + "<div class='pv-title'>PLAY VIEW <b>OMEGA PACK</b></div>"
+      + "<div class='pv-row'><span>CLEARまで</span><span class='pv-val' id='pv-clear-v'>0%</span></div>"
+      + "<div class='pv-bar' title='1e1000までの対数進捗'><i id='pv-clear-i'></i></div>"
+      + "<div class='pv-row'><span>ドーパミン</span><span class='pv-val' id='pv-dop-v'>0%</span></div>"
+      + "<div class='pv-dop'><i id='pv-dop-i'></i></div>"
+      + "<div class='pv-row'><span>フィーチャー</span><span class='pv-val' id='pv-pulses'>0</span></div>"
+      + "<div class='pv-row'><span>オーブ</span><span class='pv-val' id='pv-orbs'>0</span></div>"
+      + "<div class='pv-chipwrap'>"
+      +   "<span class='pv-chip'>楽しい +50</span>"
+      +   "<span class='pv-chip bad'>アンラッキー +50</span>"
+      +   "<span class='pv-chip'>イベント追加 +100</span>"
+      + "</div>"
+      + "<div class='pv-log' id='pv-log'>フィーチャー待機中</div>";
+    if (hud && hud.parentNode) hud.parentNode.insertBefore(box, hud.nextSibling);
+    else {
+      const left = document.querySelector(".column-left");
+      if (left) left.appendChild(box);
+      else document.body.appendChild(box);
+    }
+    if (!document.getElementById("pvOrbs")) {
+      const o = document.createElement("div"); o.id="pvOrbs"; document.body.appendChild(o);
+    }
+    if (!document.getElementById("pvToast")) {
+      const t = document.createElement("div"); t.id="pvToast"; document.body.appendChild(t);
+    }
+  }
+
+  function appendEvents(){
+    const arr = window.__GAME_EVENTS;
+    if (!arr || !arr.push) return false;
+    if (arr.__omegaPatched) return true;
+    for (let i=0;i<EXTRA_EVENTS.length;i++) arr.push(EXTRA_EVENTS[i]);
+    arr.__omegaPatched = true;
+    return true;
+  }
+
+  function hookClicks(){
+    document.addEventListener("pointerdown", function(e){
+      const t = e.target;
+      if (!t) return;
+      if (t.id === "coreTrigger" || (t.closest && t.closest("#coreTrigger"))) {
+        bumpDop(1.2);
+        if (S.dopamine >= 88) bumpDop(-0.4);
+        if (Math.random() < 0.045) firePulse("lucky");
+        else if (Math.random() < 0.018) firePulse("unlucky");
+        if (Math.random() < 0.07) spawnOrb(Math.random()<0.72 ? "lucky" : "unlucky");
+      }
+    }, {capture:true, passive:true});
+  }
+
+  let last = performance.now();
+  function loop(ts){
+    const dt = Math.min(0.05, (ts-last)/1000);
+    last = ts;
+    S.acc += dt;
+    S.nextPulse -= dt;
+    if (S.dopamine > 0) S.dopamine = Math.max(0, S.dopamine - dt*1.15);
+    if (S.acc >= 0.4) {
+      S.acc = 0;
+      updateClear();
+      const i = document.getElementById("pv-dop-i");
+      if (i) i.style.width = S.dopamine.toFixed(1)+"%";
+      const v = document.getElementById("pv-dop-v");
+      if (v) v.textContent = Math.round(S.dopamine)+"%";
+    }
+    if (S.nextPulse <= 0) {
+      S.nextPulse = 9 + Math.random()*16;
+      firePulse(Math.random() < 0.58 ? "lucky" : "unlucky");
+      if (Math.random() < 0.45) spawnOrb(Math.random()<0.7?"lucky":"unlucky");
+    }
+    requestAnimationFrame(loop);
+  }
+
+  ready(function(){
+    mountUI();
+    hookClicks();
+    let tries = 0;
+    (function waitEv(){
+      tries++;
+      if (!appendEvents() && tries < 80) return setTimeout(waitEv, 50);
+    })();
+    requestAnimationFrame(loop);
+    updateClear();
   });
 })();
 </script>
