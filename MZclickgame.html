@@ -2012,6 +2012,8 @@ function decMax0(v) {
 function serializeGameState(state) {
   const raw = Object.assign({}, state);
   raw.energy = D(state.energy).toString();
+  try { raw.antimatter = D(state.antimatter).toString(); } catch (e) { raw.antimatter = "0"; }
+  try { raw.timeShards = D(state.timeShards).toString(); } catch (e) { raw.timeShards = "0"; }
   raw.totalCpsCache = undefined;
   return JSON.stringify(raw);
 }
@@ -2019,6 +2021,8 @@ function serializeGameState(state) {
 function hydrateGameEnergy(state) {
   if (!state) return state;
   state.energy = D(state.energy);
+  try { state.antimatter = D(state.antimatter || 0); } catch (e) { state.antimatter = D(0); }
+  try { state.timeShards = D(state.timeShards || 0); } catch (e) { state.timeShards = D(0); }
   if (!Array.isArray(state.facCounts)) state.facCounts = [];
   if (!Array.isArray(state.upgLevels)) state.upgLevels = [];
   if (!Array.isArray(state.amUpgLevels)) state.amUpgLevels = [];
@@ -3693,15 +3697,15 @@ function runInternalAutomation() {
         for (let i = 0; i < DB_AM_UPGRADES.length; i++) {
           if ((game.amUpgLevels[i] || 0) >= DB_AM_UPGRADES[i].max) continue;
           const cost = getAmUpgradeCost(i);
-          if (game.antimatter >= cost) {
-            game.antimatter -= cost;
+          if (D(game.antimatter).gte(cost)) {
+            game.antimatter = decMax0(D(game.antimatter).sub(cost));
             game.amUpgLevels[i] = (game.amUpgLevels[i] || 0) + 1;
           }
         }
       }
       if (game.autoPrestigeAmEnabled && game.tlUpgLevels && game.tlUpgLevels[3] >= 1) {
         const g = getGainAntimatter();
-        if (g >= 1) executePrestigeAm(g);
+        if (D(g).gte(1)) executePrestigeAm(g);
       }
     }
   } catch (e) {}
@@ -3943,14 +3947,14 @@ window.ModAPI = {
   // === [6-10] Antimatter Accessors ===
   getAntimatter: () => game.antimatter,
   setAntimatter: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.antimatter = v; refreshUI(); } },
-  addAntimatter: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.antimatter += v; refreshUI(); } },
+  addAntimatter: (v) => { try { game.antimatter = D(game.antimatter).add(D(v)); refreshUI(); } catch(e){} },
   subAntimatter: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.antimatter = Math.max(0, game.antimatter - v); refreshUI(); } },
   clearAntimatter: () => { game.antimatter = 0; refreshUI(); },
 
   // === [11-15] Time Shards Accessors ===
   getTimeShards: () => game.timeShards,
   setTimeShards: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.timeShards = v; refreshUI(); } },
-  addTimeShards: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.timeShards += v; refreshUI(); } },
+  addTimeShards: (v) => { try { game.timeShards = D(game.timeShards).add(D(v)); refreshUI(); } catch(e){} },
   subTimeShards: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.timeShards = Math.max(0, game.timeShards - v); refreshUI(); } },
   clearTimeShards: () => { game.timeShards = 0; refreshUI(); },
 
@@ -4021,7 +4025,7 @@ setUpgradeLevel: (id, v) => {
   // === [47-51] System IO Architecture Commands ===
   triggerCoreClickEvent: (e) => handleCoreClick(e),
   executePrestigeAmShift: (forcedGain) => executePrestigeAm(forcedGain),
-  executePrestigeTlShift: () => { game.timeShards += getGainTimeShards(); refreshUI(); },
+  executePrestigeTlShift: () => { game.timeShards = D(game.timeShards).add(D(getGainTimeShards())); refreshUI(); },
   executePrestigeGxShift: () => { game.galaxyNodes += getGainGalaxyNodes(); refreshUI(); },
   executeSaveSerialization: () => saveGameManual(),
 
@@ -4149,8 +4153,8 @@ function sanitizeGameData() {
 
   // 主要リソース・数値ステータスの厳格なサニタイジング
   game.energy = decMax0(game.energy);
-  game.antimatter = __sanitizeNumber(game.antimatter, 0);
-  game.timeShards = __sanitizeNumber(game.timeShards, 0);
+  try { game.antimatter = decMax0(D(game.antimatter)); } catch (e) { game.antimatter = D(0); }
+  try { game.timeShards = decMax0(D(game.timeShards)); } catch (e) { game.timeShards = D(0); }
   game.galaxyNodes = __sanitizeNumber(game.galaxyNodes, 0);
   game.totalTime = __sanitizeNumber(game.totalTime, 0);
 }
@@ -4215,33 +4219,31 @@ function getUpgradeCost(id) {
 
 function getAmUpgradeCost(id) {  
   try {
-    if (!DB_AM_UPGRADES || !DB_AM_UPGRADES[id]) return Number.MAX_VALUE;
+    if (!DB_AM_UPGRADES || !DB_AM_UPGRADES[id]) return D("1e9000");
     const auData = DB_AM_UPGRADES[id];
     const lvl = __sanitizeNumber(game?.amUpgLevels?.[id], 0);
     const maxLvl = __sanitizeNumber(auData.max, 1);
     const safeLvl = Math.min(Math.max(0, lvl), maxLvl);
-    const baseCost = Number(auData.baseCost || 1);
-    const costMult = Number(auData.costMultiplier != null ? auData.costMultiplier : (auData.costMult != null ? auData.costMult : 2.0));
-    const cost = baseCost * Math.pow(costMult, safeLvl);
-    return __sanitizeNumber(cost, Number.MAX_VALUE);
+    const baseCost = D(auData.baseCost || 1);
+    const costMult = D(auData.costMultiplier != null ? auData.costMultiplier : (auData.costMult != null ? auData.costMult : 2.0));
+    return decMax0(baseCost.mul(costMult.pow(safeLvl)));
   } catch (e) {
-    return Number.MAX_VALUE;
+    return D("1e9000");
   }
 }
 
 function getTlUpgradeCost(id) {  
   try {
-    if (!DB_TL_UPGRADES || !DB_TL_UPGRADES[id]) return Number.MAX_VALUE;
+    if (!DB_TL_UPGRADES || !DB_TL_UPGRADES[id]) return D("1e9000");
     const tuData = DB_TL_UPGRADES[id];
     const lvl = __sanitizeNumber(game?.tlUpgLevels?.[id], 0);
     const maxLvl = __sanitizeNumber(tuData.max, 1);
     const safeLvl = Math.min(Math.max(0, lvl), maxLvl);
-    const baseCost = Number(tuData.baseCost || 1);
-    const costMult = Number(tuData.costMultiplier != null ? tuData.costMultiplier : (tuData.costMult != null ? tuData.costMult : 2.0));
-    const cost = baseCost * Math.pow(costMult, safeLvl);
-    return __sanitizeNumber(cost, Number.MAX_VALUE);
+    const baseCost = D(tuData.baseCost || 1);
+    const costMult = D(tuData.costMultiplier != null ? tuData.costMultiplier : (tuData.costMult != null ? tuData.costMult : 2.0));
+    return decMax0(baseCost.mul(costMult.pow(safeLvl)));
   } catch (e) {
-    return Number.MAX_VALUE;
+    return D("1e9000");
   }
 }
 
@@ -4253,9 +4255,10 @@ function getGameSpeedMultiplier() {
 
     const baseShardsEffect = 1 + Math.max(0, timeShards) * (0.02 + (tlUpg0 * 0.02));
     const amUpg3Effect = 1 + (Math.max(0, amUpg3) * 0.5);
-    const result = baseShardsEffect * amUpg3Effect;
-    
-    return __sanitizeNumber(result, 1.0);
+    let result = baseShardsEffect * amUpg3Effect;
+    if (!isFinite(result) || result > 1e6) result = 1e6;
+    if (result < 1) result = 1;
+    return result;
   } catch (e) {
     return 1.0;
   }
@@ -4278,8 +4281,9 @@ function getGlobalProductionMultiplier() {
     let timelineTimeMultiplier = 1.0 + (Math.max(0, tlUpg1) * (Math.max(0, totalTime) * 0.005));
     let galaxyMultiplier = 1.0 + (Math.max(0, galaxyNodes) * 5.0);
     
-    const result = amMultiplier * baseUpgradeMultiplier * exponentialMultiplier * timelineTimeMultiplier * galaxyMultiplier;
-    return __sanitizeNumber(result, 1.0);
+    let result = amMultiplier * baseUpgradeMultiplier * exponentialMultiplier * timelineTimeMultiplier * galaxyMultiplier;
+    if (!isFinite(result) || result <= 0) result = 1.0;
+    return result;
   } catch (e) {
     return 1.0;
   }
@@ -4297,14 +4301,23 @@ function getFactoryCps(id) {
   }
 }
 
+let __cpsCacheVal = null, __cpsCacheAt = 0, __cpsCacheKey = "";
 function getTotalCps() {
   try {
+    const now = (typeof performance !== "undefined") ? performance.now() : Date.now();
+    const key = String((game && game.facCounts) ? game.facCounts.length : 0) + ":" + String((game && game.upgLevels) ? (game.upgLevels[1]||0) : 0);
+    if (__cpsCacheVal && (now - __cpsCacheAt) < 90 && key === __cpsCacheKey) return __cpsCacheVal;
     let total = new Decimal(0);
     if (!DB_FACTORIES) return total;
-    for (let i = 0; i < DB_FACTORIES.length; i++) {
+    const n = DB_FACTORIES.length;
+    for (let i = 0; i < n; i++) {
+      if (!game.facCounts || !game.facCounts[i]) continue;
       total = total.add(getFactoryCps(i));
     }
-    return decMax0(total);
+    __cpsCacheVal = decMax0(total);
+    __cpsCacheAt = now;
+    __cpsCacheKey = key;
+    return __cpsCacheVal;
   } catch (e) {
     return new Decimal(0);
   }
@@ -4334,10 +4347,9 @@ function getGainAntimatter() {
     let baseGain = energy.div(1e6).sqrt().floor();
     baseGain = baseGain.mul(1.0 + Math.max(0, upg6) * 0.5).floor();
     if (tlUpg2 >= 1) baseGain = baseGain.mul(2);
-    const n = baseGain.toNumber();
-    return (!isFinite(n) || isNaN(n)) ? 1e15 : Math.floor(n);
+    return decMax0(baseGain);
   } catch (e) {
-    return 0;
+    return D(0);
   }
 }
 
@@ -4349,10 +4361,9 @@ function getGainTimeShards() {
     const val = energy.div(1e11);
     if (val.lte(0)) return 0;
     const gain = val.log(10).mul(1 + Math.floor(antimatter / 400)).floor();
-    const n = gain.toNumber();
-    return (!isFinite(n) || isNaN(n)) ? 1e12 : Math.max(0, Math.floor(n));
+    return decMax0(gain);
   } catch (e) {
-    return 0;
+    return D(0);
   }
 }
 
@@ -4590,6 +4601,7 @@ function executeBuyFactory(id) {
       // undefinedやNaNだった場合は0にしてから加算
       let currentQty = __sanitizeNumber(game.facCounts[id], 0);
       game.facCounts[id] = currentQty + 1;
+      __cpsCacheAt = 0;
       if (typeof SoundManager !== 'undefined' && SoundManager.playBuy) {
         SoundManager.playBuy();
       }
@@ -4624,6 +4636,7 @@ function executeBuyUpgrade(id) {
     if (D(game.energy).gte(cost)) {
       game.energy = D(game.energy).sub(cost);
       game.upgLevels[id] = currentLvl + 1;
+      __cpsCacheAt = 0;
       if (typeof SoundManager !== 'undefined' && SoundManager.playBuy) {
         SoundManager.playBuy();
       }
@@ -4654,9 +4667,10 @@ function executeBuyAmUpgrade(id) {
     if (currentLvl >= auData.max) return;
     
     const cost = getAmUpgradeCost(id);
-    if (game.antimatter >= cost) {
-      game.antimatter -= cost;
+    if (D(game.antimatter).gte(cost)) {
+      game.antimatter = decMax0(D(game.antimatter).sub(cost));
       game.amUpgLevels[id] = currentLvl + 1;
+      __cpsCacheAt = 0;
       if (typeof SoundManager !== 'undefined' && SoundManager.playBuy) {
         SoundManager.playBuy();
       }
@@ -4683,9 +4697,10 @@ function executeBuyTlUpgrade(id) {
     if (currentLvl >= tuData.max) return;
     
     const cost = getTlUpgradeCost(id);
-    if (game.timeShards >= cost) {
-      game.timeShards -= cost;
+    if (D(game.timeShards).gte(cost)) {
+      game.timeShards = decMax0(D(game.timeShards).sub(cost));
       game.tlUpgLevels[id] = currentLvl + 1;
+      __cpsCacheAt = 0;
       if (typeof SoundManager !== 'undefined' && SoundManager.playBuy) {
         SoundManager.playBuy();
       }
@@ -4705,16 +4720,16 @@ function executeBuyTlUpgrade(id) {
  */
 document.getElementById("btnResetAm").addEventListener("click", () => {
   const gain = getGainAntimatter();
-  if (gain <= 0) return;
+  if (!D(gain).gt(0)) return;
   if (confirm(`現在の世界線のエネルギーと全施設を破棄し、新たに ${gain} AM を引き継いで反物質空間へ転生しますか？`)) {
     executePrestigeAm(gain);
   }
 });
 
 function executePrestigeAm(forcedGain) {
-  // ゲイン値の安全化
-  const safeGain = Number(forcedGain);
-  game.antimatter = (isNaN(game.antimatter) ? 0 : game.antimatter) + (isNaN(safeGain) ? 0 : safeGain);
+  // ゲイン値の安全化（Decimal対応。Number化すると巨大値が消える）
+  const safeGain = D(forcedGain || 0);
+  game.antimatter = decMax0(D(game.antimatter).add(safeGain));
   game.prestigeAmCount = (isNaN(game.prestigeAmCount) ? 0 : game.prestigeAmCount) + 1;
 
   let carryOverEnergy = 0;
@@ -4726,19 +4741,21 @@ function executePrestigeAm(forcedGain) {
     game.energy = new Decimal(0);
   }
   
-  // 各種リソースの初期化（NaNガード付き）
-  game.facCounts = new Array(DB_FACTORIES.length).fill(0);
-  
-  // インデックス 7 のみが引き継がれる実装の確認
+  // 各種リソースの初期化（配列長はDBに合わせる）
   const keepUpg7 = (game.upgLevels && !isNaN(game.upgLevels[7])) ? game.upgLevels[7] : 0;
-  game.upgLevels = [0, 0, 0, 0, 0, 0, 0, keepUpg7];
+  if (typeof resetLayerArrays === "function") resetLayerArrays(keepUpg7);
+  else {
+    game.facCounts = new Array(DB_FACTORIES.length).fill(0);
+    game.upgLevels = new Array(DB_UPGRADES.length).fill(0);
+    game.upgLevels[7] = keepUpg7;
+  }
   
   game.sessionTime = 0;
   // ★ 反物質転生時の効果音
   if (typeof SoundManager !== 'undefined' && SoundManager.playAchievement) {
     SoundManager.playAchievement();
   }
-  pushLog(`★ 反物質転生が実行されました（+${safeGain} AM）`, "var(--color-antimatter)");
+  pushLog(`★ 反物質転生が実行されました（+${formatValue(safeGain)} AM）`, "var(--color-antimatter)");
   createToast("世界線反物質化", `粒子が対消滅し、${formatValue(safeGain)} AM を回収しました。`);
   
   if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onPrestigeAm) {
@@ -4749,22 +4766,33 @@ function executePrestigeAm(forcedGain) {
 }
 document.getElementById("btnResetTl").addEventListener("click", () => {
   const gain = getGainTimeShards();
-  if (gain <= 0) return;
+  if (!D(gain).gt(0)) return;
   if (confirm(`下位の全構造をリセットし、時間律の破片 ${gain} TS を獲得しますか？`)) {
-    game.timeShards += gain;
-    game.prestigeTlCount++;
-    game.energy = new Decimal(0); game.antimatter = 0;
-    game.facCounts = new Array(DB_FACTORIES.length).fill(0);
-    game.upgLevels = [0, 0, 0, 0, 0, 0, 0, 0];
-    game.amUpgLevels = [0, 0, 0, 0];
-    game.sessionTime = 0;
-    // ★ 反物質転生時の効果音
-  if (typeof SoundManager !== 'undefined' && SoundManager.playAchievement) {
-    SoundManager.playAchievement();
-  }
-    pushLog(`⏳ 時空の切断に成功（+${gain} TS 獲得）`, "var(--color-timeline)");
-    window.ModAPI.hooks.onPrestigeTl.forEach(cb => { try { cb({gain: gain}); } catch(e){} });
-    refreshUI();
+    try {
+      game.timeShards = decMax0(D(game.timeShards).add(D(gain)));
+      game.prestigeTlCount = (game.prestigeTlCount || 0) + 1;
+      game.energy = new Decimal(0);
+      game.antimatter = D(0);
+      if (typeof resetLayerArrays === "function") resetLayerArrays(0);
+      else {
+        game.facCounts = new Array(DB_FACTORIES.length).fill(0);
+        game.upgLevels = new Array(DB_UPGRADES.length).fill(0);
+      }
+      game.amUpgLevels = new Array(DB_AM_UPGRADES.length).fill(0);
+      game.sessionTime = 0;
+      if (typeof SoundManager !== 'undefined' && SoundManager.playAchievement) {
+        SoundManager.playAchievement();
+      }
+      pushLog(`⏳ 時空の切断に成功（+${gain} TS 獲得）`, "var(--color-timeline)");
+      if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onPrestigeTl) {
+        window.ModAPI.hooks.onPrestigeTl.forEach(cb => { try { cb({gain: gain}); } catch(e){} });
+      }
+      if (typeof sanitizeGameData === "function") sanitizeGameData();
+      refreshUI();
+    } catch (err) {
+      console.error("TL prestige error:", err);
+      try { refreshUI(); } catch (e2) {}
+    }
   }
 });
 
@@ -4773,18 +4801,24 @@ document.getElementById("btnResetGx").addEventListener("click", () => {
   if (gain <= 0) return;
   if (confirm(`究極の統合：時間と物質のすべてを捧げ、銀河系統合ノードを1つ固定化します。全リソースがリセットされますが、全生産効率が永久に5倍になります。`)) {
     game.galaxyNodes += gain;
-    game.prestigeGxCount++;
-    game.energy = new Decimal(0); game.antimatter = 0; game.timeShards = 0;
-    game.facCounts = new Array(DB_FACTORIES.length).fill(0);
-    game.upgLevels = [0, 0, 0, 0, 0, 0, 0, 0];
-    game.amUpgLevels = [0, 0, 0, 0]; game.tlUpgLevels = [0, 0, 0, 0];
+    game.prestigeGxCount = (game.prestigeGxCount || 0) + 1;
+    game.energy = new Decimal(0); game.antimatter = D(0); game.timeShards = D(0);
+    if (typeof resetLayerArrays === "function") resetLayerArrays(0);
+    else {
+      game.facCounts = new Array(DB_FACTORIES.length).fill(0);
+      game.upgLevels = new Array(DB_UPGRADES.length).fill(0);
+    }
+    game.amUpgLevels = new Array(DB_AM_UPGRADES.length).fill(0);
+    game.tlUpgLevels = new Array(DB_TL_UPGRADES.length).fill(0);
     game.sessionTime = 0;
-    // ★ 反物質転生時の効果音
   if (typeof SoundManager !== 'undefined' && SoundManager.playAchievement) {
     SoundManager.playAchievement();
   }
     pushLog(`🌌 銀河収束完了。大宇宙の定数が書き換わりました。`, "var(--color-galaxy)");
-    window.ModAPI.hooks.onPrestigeGx.forEach(cb => { try { cb({gain: gain}); } catch(e){} });
+    if (window.ModAPI && window.ModAPI.hooks && window.ModAPI.hooks.onPrestigeGx) {
+      window.ModAPI.hooks.onPrestigeGx.forEach(cb => { try { cb({gain: gain}); } catch(e){} });
+    }
+    if (typeof sanitizeGameData === "function") sanitizeGameData();
     refreshUI();
   }
 });
@@ -5256,30 +5290,30 @@ function refreshUI() {
   const elClickPow = document.getElementById("v-click-power");
   if (elClickPow) elClickPow.textContent = "+" + formatValue(getClickPower());
   
-  if (game.antimatter > 0 || game.prestigeAmCount > 0) {
+  if (D(game.antimatter).gt(0) || game.prestigeAmCount > 0) {
     const groupAm = document.getElementById("group-am");
     if (groupAm) groupAm.style.display = "block";
     const vAntimatter = document.getElementById("v-antimatter");
-    if (vAntimatter) vAntimatter.textContent = game.antimatter.toLocaleString();
+    if (vAntimatter) vAntimatter.textContent = formatValue(game.antimatter);
   }
-  if (game.timeShards > 0 || game.prestigeTlCount > 0) {
+  if (D(game.timeShards).gt(0) || game.prestigeTlCount > 0) {
     const groupTl = document.getElementById("group-tl");
     if (groupTl) groupTl.style.display = "block";
     const vTimeShards = document.getElementById("v-timeshards");
-    if (vTimeShards) vTimeShards.textContent = game.timeShards.toLocaleString();
+    if (vTimeShards) vTimeShards.textContent = formatValue(game.timeShards);
   }
 
   const gainAm = getGainAntimatter();
   const vGainAm = document.getElementById("v-gain-am");
-  if (vGainAm) vGainAm.textContent = `+${gainAm.toLocaleString()} AM`;
+  if (vGainAm) vGainAm.textContent = `+${formatValue(gainAm)} AM`;
   const btnResetAm = document.getElementById("btnResetAm");
-  if (btnResetAm) btnResetAm.disabled = gainAm <= 0;
+  if (btnResetAm) btnResetAm.disabled = !D(gainAm).gt(0);
 
   const gainTl = getGainTimeShards();
   const vGainTl = document.getElementById("v-gain-tl");
-  if (vGainTl) vGainTl.textContent = `+${gainTl.toLocaleString()} TS`;
+  if (vGainTl) vGainTl.textContent = `+${formatValue(gainTl)} TS`;
   const btnResetTl = document.getElementById("btnResetTl");
-  if (btnResetTl) btnResetTl.disabled = gainTl <= 0;
+  if (btnResetTl) btnResetTl.disabled = !D(gainTl).gt(0);
 
   const gainGx = getGainGalaxyNodes();
   const vGainGx = document.getElementById("v-gain-gx");
@@ -5287,90 +5321,101 @@ function refreshUI() {
   const btnResetGx = document.getElementById("btnResetGx");
   if (btnResetGx) btnResetGx.disabled = gainGx <= 0;
 
-  // 施設（現在画面にある要素だけ更新）
-  DB_FACTORIES.forEach(f => {
-    const cost = getFactoryCost(f.id);
-    const domCost = document.getElementById(`dom-fac-cost-${f.id}`);
-    if (domCost) domCost.textContent = formatValue(cost);
-    
-    const domCount = document.getElementById(`dom-fac-count-${f.id}`);
-    if (domCount) domCount.textContent = game.facCounts[f.id];
-    
-    const domCps = document.getElementById(`dom-fac-cps-${f.id}`);
-    if (domCps) domCps.textContent = formatValue(getFactoryCps(f.id));
-      
-    const card = document.getElementById(`dom-fac-${f.id}`);
-    if (card) {
+  // 施設・改良は「今見えているカードだけ」更新（全件ループでフリーズしない）
+  const facPaneOn = !!(document.getElementById("tab-fac") && document.getElementById("tab-fac").classList.contains("active"));
+  const upgPaneOn = !!(document.getElementById("tab-upg") && document.getElementById("tab-upg").classList.contains("active"));
+  const amPaneOn = !!(document.getElementById("tab-am-layer") && document.getElementById("tab-am-layer").classList.contains("active"));
+  const tlPaneOn = !!(document.getElementById("tab-tl-layer") && document.getElementById("tab-tl-layer").classList.contains("active"));
+
+  if (facPaneOn) {
+    const facCards = document.querySelectorAll('[id^="dom-fac-"]');
+    facCards.forEach(card => {
+      const m = /^dom-fac-(\d+)$/.exec(card.id);
+      if (!m) return;
+      const id = +m[1];
+      const cost = getFactoryCost(id);
+      const domCost = document.getElementById(`dom-fac-cost-${id}`);
+      if (domCost) domCost.textContent = formatValue(cost);
+      const domCount = document.getElementById(`dom-fac-count-${id}`);
+      if (domCount) domCount.textContent = game.facCounts[id];
+      const domCps = document.getElementById(`dom-fac-cps-${id}`);
+      if (domCps) domCps.textContent = formatValue(getFactoryCps(id));
       if (D(game.energy).gte(cost)) card.classList.remove("state-disabled");
       else card.classList.add("state-disabled");
-    }
-  });
+    });
+  }
 
-  // 改良 (CONCEPT)
-  DB_UPGRADES.forEach(u => {
-    const lv = game.upgLevels[u.id];
-    const cost = getUpgradeCost(u.id);
-    const card = document.getElementById(`dom-upg-${u.id}`);
-    const labelCost = document.getElementById(`dom-upg-cost-${u.id}`);
-    const labelLv = document.getElementById(`dom-upg-lv-${u.id}`);
-
-    if (labelLv) labelLv.textContent = `${lv} / ${u.max}`;
-    if (card && labelCost) {
-      if (lv >= u.max) {
-        card.className = "card-upgrade-node state-maxed";
-        labelCost.textContent = "MAX定着";
-      } else {
-        card.className = "card-upgrade-node";
-        labelCost.textContent = `${formatValue(cost)} E`;
-        if (D(game.energy).gte(cost)) card.classList.remove("state-disabled");
-        else card.classList.add("state-disabled");
+  if (upgPaneOn) {
+    const upgCards = document.querySelectorAll('[id^="dom-upg-"]');
+    upgCards.forEach(card => {
+      const m = /^dom-upg-(\d+)$/.exec(card.id);
+      if (!m) return;
+      const id = +m[1];
+      const u = DB_UPGRADES[id]; if (!u) return;
+      const lv = game.upgLevels[id] || 0;
+      const cost = getUpgradeCost(id);
+      const labelCost = document.getElementById(`dom-upg-cost-${id}`);
+      const labelLv = document.getElementById(`dom-upg-lv-${id}`);
+      if (labelLv) labelLv.textContent = `${lv} / ${u.max}`;
+      if (labelCost) {
+        if (lv >= u.max) { card.className = "card-upgrade-node state-maxed"; labelCost.textContent = "MAX定着"; }
+        else {
+          card.className = "card-upgrade-node";
+          labelCost.textContent = `${formatValue(cost)} E`;
+          if (D(game.energy).gte(cost)) card.classList.remove("state-disabled");
+          else card.classList.add("state-disabled");
+        }
       }
-    }
-  });
+    });
+  }
 
-  // 反物質改良
-  DB_AM_UPGRADES.forEach(au => {
-    const lv = game.amUpgLevels[au.id];
-    const cost = getAmUpgradeCost(au.id);
-    const card = document.getElementById(`dom-amupg-${au.id}`);
-    const labelCost = document.getElementById(`dom-amupg-cost-${au.id}`);
-    const labelLv = document.getElementById(`dom-amupg-lv-${au.id}`);
-
-    if (labelLv) labelLv.textContent = `${lv} / ${au.max}`;
-    if (card && labelCost) {
-      if (lv >= au.max) {
-        card.className = "card-upgrade-node state-maxed";
-        labelCost.textContent = "結合最大";
-      } else {
-        card.className = "card-upgrade-node";
-        labelCost.textContent = `${cost} AM`;
-        if (game.antimatter >= cost) card.classList.remove("state-disabled");
-        else card.classList.add("state-disabled");
+  if (amPaneOn) {
+    const amCards = document.querySelectorAll('[id^="dom-amupg-"]');
+    amCards.forEach(card => {
+      const m = /^dom-amupg-(\d+)$/.exec(card.id);
+      if (!m) return;
+      const id = +m[1];
+      const au = DB_AM_UPGRADES[id]; if (!au) return;
+      const lv = game.amUpgLevels[id] || 0;
+      const cost = getAmUpgradeCost(id);
+      const labelCost = document.getElementById(`dom-amupg-cost-${id}`);
+      const labelLv = document.getElementById(`dom-amupg-lv-${id}`);
+      if (labelLv) labelLv.textContent = `${lv} / ${au.max}`;
+      if (labelCost) {
+        if (lv >= au.max) { card.className = "card-upgrade-node state-maxed"; labelCost.textContent = "結合最大"; }
+        else {
+          card.className = "card-upgrade-node";
+          labelCost.textContent = `${formatValue(cost)} AM`;
+          if (D(game.antimatter).gte(cost)) card.classList.remove("state-disabled");
+          else card.classList.add("state-disabled");
+        }
       }
-    }
-  });
+    });
+  }
 
-  // 時間律改良
-  DB_TL_UPGRADES.forEach(tu => {
-    const lv = game.tlUpgLevels[tu.id];
-    const cost = getTlUpgradeCost(tu.id);
-    const card = document.getElementById(`dom-tlupg-${tu.id}`);
-    const labelCost = document.getElementById(`dom-tlupg-cost-${tu.id}`);
-    const labelLv = document.getElementById(`dom-tlupg-lv-${tu.id}`);
-
-    if (labelLv) labelLv.textContent = `${lv} / ${tu.max}`;
-    if (card && labelCost) {
-      if (lv >= tu.max) {
-        card.className = "card-upgrade-node state-maxed";
-        labelCost.textContent = "超越完了";
-      } else {
-        card.className = "card-upgrade-node";
-        labelCost.textContent = `${cost} TS`;
-        if (game.timeShards >= cost) card.classList.remove("state-disabled");
-        else card.classList.add("state-disabled");
+  if (tlPaneOn) {
+    const tlCards = document.querySelectorAll('[id^="dom-tlupg-"]');
+    tlCards.forEach(card => {
+      const m = /^dom-tlupg-(\d+)$/.exec(card.id);
+      if (!m) return;
+      const id = +m[1];
+      const tu = DB_TL_UPGRADES[id]; if (!tu) return;
+      const lv = game.tlUpgLevels[id] || 0;
+      const cost = getTlUpgradeCost(id);
+      const labelCost = document.getElementById(`dom-tlupg-cost-${id}`);
+      const labelLv = document.getElementById(`dom-tlupg-lv-${id}`);
+      if (labelLv) labelLv.textContent = `${lv} / ${tu.max}`;
+      if (labelCost) {
+        if (lv >= tu.max) { card.className = "card-upgrade-node state-maxed"; labelCost.textContent = "超越完了"; }
+        else {
+          card.className = "card-upgrade-node";
+          labelCost.textContent = `${formatValue(cost)} TS`;
+          if (D(game.timeShards).gte(cost)) card.classList.remove("state-disabled");
+          else card.classList.add("state-disabled");
+        }
       }
-    }
-  });
+    });
+  }
 
   if (game.upgLevels[7] >= 1) {
     const lockedMsg = document.getElementById("auto-locked-msg");
@@ -5535,7 +5580,7 @@ function executeCoreGameTick(currentTimestamp) {
 
   // UIの更新頻度を制限（約0.1秒おき = 秒間10回にスロットリングして重さを解消）
   uiUpdateTimer += baseDeltaTime;
-  if (uiUpdateTimer >= 0.1) {
+  if (uiUpdateTimer >= 0.18) {
     refreshUI();
     uiUpdateTimer = 0;
   }
@@ -7087,9 +7132,9 @@ document.addEventListener("DOMContentLoaded", () => {
     { id:"lucky_star", kind:"lucky", title:"ラッキースター", desc:"現在エネルギーの一部が結晶化して還元された。",
       apply(){ const g=pctEnergy(0.18).add(cpsWorth(8)); addEnergySafe(g); return "+"+formatValue(g)+" E"; } },
     { id:"am_gift", kind:"lucky", title:"反物質の恵み", desc:"次元の隙間から反物質のかけらが落ちてきた。",
-      apply(){ if ((game.prestigeAmCount||0)>0 || (game.antimatter||0)>0) { game.antimatter += 1; return "+1 AM"; } const g=cpsWorth(20); addEnergySafe(g); return "+"+formatValue(g)+" E"; } },
+      apply(){ if ((game.prestigeAmCount||0)>0 || D(game.antimatter).gt(0)) { game.antimatter = D(game.antimatter).add(1); return "+1 AM"; } const g=cpsWorth(20); addEnergySafe(g); return "+"+formatValue(g)+" E"; } },
     { id:"shard_echo", kind:"lucky", title:"時間律の残響", desc:"過去の自分が未来へ破片を投げた。",
-      apply(){ if ((game.prestigeTlCount||0)>0 || (game.timeShards||0)>0) { game.timeShards += 1; return "+1 TS"; } const g=cpsWorth(22); addEnergySafe(g); return "+"+formatValue(g)+" E"; } },
+      apply(){ if ((game.prestigeTlCount||0)>0 || D(game.timeShards).gt(0)) { game.timeShards = D(game.timeShards).add(1); return "+1 TS"; } const g=cpsWorth(22); addEnergySafe(g); return "+"+formatValue(g)+" E"; } },
     { id:"crit_core", kind:"lucky", title:"クリティカルコア", desc:"12秒間、タップ威力が 5倍！",
       apply(){ addBuff("click", 5, 12, "タップ x5"); return "タップ x5 / 12秒"; } },
     { id:"harmony", kind:"lucky", title:"調和共振", desc:"タップと生産が同時に盛り上がる。",
@@ -8518,19 +8563,20 @@ document.addEventListener("DOMContentLoaded", () => {
     box.id = "playView";
     box.setAttribute("aria-label", "play view");
     box.innerHTML = ""
-      + "<div class='pv-title'>PLAY VIEW <b>OMEGA PACK</b></div>"
+      + "<div class='pv-title'>PLAY VIEW <b>LIVE</b></div>"
       + "<div class='pv-row'><span>CLEARまで</span><span class='pv-val' id='pv-clear-v'>0%</span></div>"
       + "<div class='pv-bar' title='1e1000までの対数進捗'><i id='pv-clear-i'></i></div>"
       + "<div class='pv-row'><span>ドーパミン</span><span class='pv-val' id='pv-dop-v'>0%</span></div>"
       + "<div class='pv-dop'><i id='pv-dop-i'></i></div>"
+      + "<div class='pv-row'><span>ミッション</span><span class='pv-val' id='pv-mission'>コアを20回タップ</span></div>"
       + "<div class='pv-row'><span>フィーチャー</span><span class='pv-val' id='pv-pulses'>0</span></div>"
       + "<div class='pv-row'><span>オーブ</span><span class='pv-val' id='pv-orbs'>0</span></div>"
-      + "<div class='pv-chipwrap'>"
+      + "<div class='pv-row'><span>AM / TS</span><span class='pv-val' id='pv-amts'>0 / 0</span></div>"
+      + "<div class='pv-chipwrap' id='pv-bonus-chips'>"
       +   "<span class='pv-chip'>楽しい +50</span>"
       +   "<span class='pv-chip bad'>アンラッキー +50</span>"
-      +   "<span class='pv-chip'>イベント追加 +100</span>"
       + "</div>"
-      + "<div class='pv-log' id='pv-log'>フィーチャー待機中</div>";
+      + "<div class='pv-log' id='pv-log'>PLAY VIEW 待機中</div>";
     if (hud && hud.parentNode) hud.parentNode.insertBefore(box, hud.nextSibling);
     else {
       const left = document.querySelector(".column-left");
@@ -8599,6 +8645,42 @@ document.addEventListener("DOMContentLoaded", () => {
       tries++;
       if (!appendEvents() && tries < 80) return setTimeout(waitEv, 50);
     })();
+    // extra dopamine systems (cheap, no extra intervals)
+    const missions = [
+      ["コアを 20 回タップ", function(){ return (S.taps||0) >= 20; }, 20],
+      ["オーブを 3 個キャッチ", function(){ return S.orbsCaught >= 3; }, 3],
+      ["フィーチャー 5 回", function(){ return S.pulses >= 5; }, 5],
+      ["コンボ 8 到達", function(){ return (window.EffectSystem && ES.combo >= 8); }, 8],
+      ["CLEAR 0.1% 超え", function(){ return S.clearPct >= 0.1; }, 1]
+    ];
+    S.taps = 0; S.missionI = 0; S.missionDone = 0;
+    document.addEventListener("pointerdown", function(e){
+      const t2 = e.target;
+      if (t2 && (t2.id === "coreTrigger" || (t2.closest && t2.closest("#coreTrigger")))) {
+        S.taps++;
+        if (S.taps % 25 === 0) { const g = cpsW(3); energyAdd(g); bumpDop(4); pvLog("lucky","タップボーナス","+"+fmt(g)+" E"); }
+        const m = missions[S.missionI % missions.length];
+        const lab = document.getElementById("pv-mission");
+        if (lab) lab.textContent = m[0];
+        if (m[1]()) {
+          const g = cpsW(8); energyAdd(g);
+          S.missionDone++; S.missionI++; S.taps = 0;
+          bumpDop(12);
+          pvLog("lucky","ミッションクリア","+"+fmt(g)+" E");
+          if (lab) lab.textContent = missions[S.missionI % missions.length][0];
+        }
+      }
+    }, {capture:true, passive:true});
+
+    const _upd = updateClear;
+    updateClear = function(){
+      _upd();
+      const amts = document.getElementById("pv-amts");
+      if (amts && window.game) {
+        try { amts.textContent = fmt(game.antimatter)+" / "+fmt(game.timeShards); } catch(e){}
+      }
+    };
+
     requestAnimationFrame(loop);
     updateClear();
   });
