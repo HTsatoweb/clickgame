@@ -6824,7 +6824,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const IS_MOBILE = (navigator.maxTouchPoints > 0 && Math.min(screen.width, screen.height) <= 920)
     || /Android|iPhone|iPad|iPod/i.test(UA);
   const LOW = IS_MOBILE || IS_GECKO || window.isLightweightMode || (typeof navigator.hardwareConcurrency === "number" && navigator.hardwareConcurrency <= 4);
-  const EVT = { cooldown: 0, nextIn: 18 + Math.random() * 22, active: [], lastId: null, lastBuffHTML: "" };
+  const EVT = { cooldown: 0, nextIn: 18 + Math.random() * 22, active: [], lastId: null, lastBuffHTML: "", busy: false, lastAt: 0, minGapMs: 9000 };
   window.__randomEventState = EVT;
   window.__perfFlags = { mobile: IS_MOBILE, low: LOW, fps: 60, worker: false };
 
@@ -7348,14 +7348,24 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function triggerRandomEvent(forceId) {
-    if (EVT.cooldown > 0 && !forceId) return;
+    const wall = performance.now();
+    if (EVT.busy) return;
+    if (!forceId) {
+      if (EVT.cooldown > 0) return;
+      if (EVT.lastAt && (wall - EVT.lastAt) < (EVT.minGapMs || 9000)) return;
+      if (overlay && overlay.classList.contains("show")) return;
+    }
+    EVT.busy = true;
     let pool = EVENTS;
     if (EVT.lastId) {
       pool = [];
       for (let i=0;i<EVENTS.length;i++) if (EVENTS[i].id !== EVT.lastId) pool.push(EVENTS[i]);
     }
+    if (!pool || !pool.length) pool = EVENTS;
     const ev = forceId ? (EVENTS.find(function(e){ return e.id===forceId; }) || pool[0]) : pool[(Math.random()*pool.length)|0];
+    if (!ev) { EVT.busy = false; EVT.cooldown = 8; EVT.nextIn = 20; return; }
     EVT.lastId = ev.id;
+    EVT.lastAt = wall;
     let result = "";
     try {
       if (window.EffectSystem && ES.shield && ev.kind === "unlucky") {
@@ -7367,17 +7377,21 @@ document.addEventListener("DOMContentLoaded", () => {
         result = ev.apply() || "";
       }
     } catch(e) {}
-    showEventAnim(ev, result);
-    playEventSound(ev.kind);
-    if (typeof pushHist === 'function') pushHist(ev, result);
-    if (typeof checkMission === 'function') checkMission();
-    const color = ev.kind === "unlucky" ? "var(--color-antimatter)" : ev.kind === "mixed" ? "var(--color-timeline)" : "var(--color-upgrade)";
-    if (typeof createToast === "function") createToast(ev.title, result || ev.desc);
-    if (typeof pushLog === "function") pushLog("イベント："+ev.title+" — "+(result || ev.desc), color);
-    EVT.cooldown = 12;
-    EVT.nextIn = 38 + Math.random() * 52;
-    try { if (typeof refreshUI === "function") refreshUI(); } catch(e){}
-    renderBuffs();
+    try {
+      showEventAnim(ev, result);
+      playEventSound(ev.kind);
+      if (typeof pushHist === 'function') pushHist(ev, result);
+      if (typeof checkMission === 'function') checkMission();
+      const color = ev.kind === "unlucky" ? "var(--color-antimatter)" : ev.kind === "mixed" ? "var(--color-timeline)" : "var(--color-upgrade)";
+      if (typeof createToast === "function") createToast(ev.title, result || ev.desc);
+      if (typeof pushLog === "function") pushLog("イベント："+ev.title+" — "+(result || ev.desc), color);
+      try { if (typeof refreshUI === "function") refreshUI(); } catch(e){}
+      renderBuffs();
+    } finally {
+      EVT.cooldown = forceId ? 6 : 14;
+      EVT.nextIn = 28 + Math.random() * 40;
+      EVT.busy = false;
+    }
   }
   window.triggerRandomEvent = triggerRandomEvent;
 
@@ -7403,9 +7417,13 @@ document.addEventListener("DOMContentLoaded", () => {
   tryWrap();
   setTimeout(tryWrap, 400);
 
-  /* reuse existing game tick instead of extra rAF loop */
+  /* イベント時計は実時間。ゲーム速度(時間律)に乗せると毎フレーム発火する */
   let buffAcc = 0;
-  function onTick(dt) {
+  let evtWallPrev = performance.now();
+  function onTick(_gameDt) {
+    const wall = performance.now();
+    const dt = Math.min(0.05, Math.max(0, (wall - evtWallPrev) / 1000));
+    evtWallPrev = wall;
     noteFrame();
     if (typeof tickSkills === "function") tickSkills(dt);
     if (ES.burstCd > 0) ES.burstCd = Math.max(0, ES.burstCd - dt);
@@ -7416,7 +7434,7 @@ document.addEventListener("DOMContentLoaded", () => {
     EVT.nextIn -= dt;
     buffAcc += dt;
     if (buffAcc >= 0.4) { buffAcc = 0; if (EVT.active.length) renderBuffs(); }
-    if (EVT.nextIn <= 0 && EVT.cooldown <= 0) triggerRandomEvent();
+    if (EVT.nextIn <= 0 && EVT.cooldown <= 0 && !EVT.busy) triggerRandomEvent();
   }
   if (window.ModAPI && window.ModAPI.hooks && Array.isArray(window.ModAPI.hooks.onTick)) {
     window.ModAPI.hooks.onTick.push(onTick);
@@ -7437,7 +7455,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ES.combo = (now - ES.comboAt < 420) ? (ES.combo + 1) : 1;
       ES.comboAt = now;
       showCombo(ES.combo);
-      if (EVT.cooldown <= 0 && Math.random() < 0.016) triggerRandomEvent();
+      if (EVT.cooldown <= 0 && !EVT.busy && Math.random() < 0.008) triggerRandomEvent();
     }
   }, { capture: true, passive: true });
 
@@ -8239,6 +8257,51 @@ document.addEventListener("DOMContentLoaded", () => {
     #pvToast{left:8px;right:8px;width:auto;bottom:8px}
     #playView{width:min(100%,360px)}
   }
+  #playView .pv-bar > i, #playView .pv-dop > i{
+    transition:width .35s ease;
+  }
+  #playView.pv-flash{
+    animation:pvFlash .45s ease;
+  }
+  @keyframes pvFlash{
+    0%{box-shadow:0 0 0 0 rgba(0,255,204,.0)}
+    35%{box-shadow:0 0 18px 2px rgba(0,255,204,.35)}
+    100%{box-shadow:0 0 0 0 rgba(0,255,204,.0)}
+  }
+  #playView.pv-flash-bad{
+    animation:pvFlashBad .45s ease;
+  }
+  @keyframes pvFlashBad{
+    0%{box-shadow:0 0 0 0 rgba(255,0,85,.0)}
+    35%{box-shadow:0 0 18px 2px rgba(255,0,85,.35)}
+    100%{box-shadow:0 0 0 0 rgba(255,0,85,.0)}
+  }
+  .pv-ripple{
+    position:fixed;border-radius:50%;pointer-events:none;z-index:45;
+    border:2px solid rgba(0,255,204,.65);
+    animation:pvRipple .55s ease-out forwards;
+  }
+  .pv-ripple.bad{border-color:rgba(255,0,85,.7)}
+  @keyframes pvRipple{
+    0%{transform:translate(-50%,-50%) scale(.2);opacity:.9}
+    100%{transform:translate(-50%,-50%) scale(2.4);opacity:0}
+  }
+  .pv-float{
+    position:fixed;pointer-events:none;z-index:46;font-weight:900;
+    font-size:.72rem;color:#00ffcc;text-shadow:0 0 8px #00ffcc;
+    animation:pvFloat .7s ease-out forwards;
+  }
+  .pv-float.bad{color:#ff0055;text-shadow:0 0 8px #ff0055}
+  @keyframes pvFloat{
+    0%{transform:translate(-50%,0);opacity:1}
+    100%{transform:translate(-50%,-28px);opacity:0}
+  }
+  #coreTrigger.pv-tap-pulse{animation:pvTapPulse .18s ease-out}
+  @keyframes pvTapPulse{
+    0%{filter:brightness(1)}
+    40%{filter:brightness(1.35)}
+    100%{filter:brightness(1)}
+  }
 </style>
 <script>
 (function OmegaFeaturePack(){
@@ -8463,6 +8526,62 @@ document.addEventListener("DOMContentLoaded", () => {
     miniToast(kind, title, result);
   }
 
+  let lastBeep = 0, beepBusy = 0;
+  function beep(kind){
+    const now = performance.now();
+    if (now - lastBeep < 80 || beepBusy >= 3) return;
+    lastBeep = now;
+    try {
+      const bank = window.__AudioBank;
+      if (bank && bank.play) {
+        bank.play(kind === "unlucky" ? "unlucky" : kind === "lucky" ? "lucky" : "click", 1);
+        return;
+      }
+    } catch(e){}
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      const ctx = window.__evtAudioCtx || (window.__evtAudioCtx = new AC());
+      if (ctx.state === "suspended") ctx.resume();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = kind === "unlucky" ? "sawtooth" : "square";
+      o.frequency.value = kind === "unlucky" ? 220 : kind === "lucky" ? 784 : 523;
+      g.gain.value = 0.04;
+      o.connect(g); g.connect(ctx.destination);
+      beepBusy++;
+      o.start();
+      o.stop(ctx.currentTime + 0.09);
+      o.onended = function(){ beepBusy = Math.max(0, beepBusy-1); };
+    } catch(e){}
+  }
+  function fxRipple(kind, x, y){
+    const layer = document.getElementById("pvOrbs");
+    if (!layer || layer.childElementCount > 10) return;
+    const r = document.createElement("div");
+    r.className = "pv-ripple" + (kind==="unlucky"?" bad":"");
+    r.style.left = x + "px"; r.style.top = y + "px";
+    r.style.width = r.style.height = "26px";
+    document.body.appendChild(r);
+    setTimeout(function(){ if (r.parentNode) r.parentNode.removeChild(r); }, 560);
+  }
+  function fxFloat(text, kind, x, y){
+    const n = document.querySelectorAll(".pv-float").length;
+    if (n >= 6) return;
+    const el = document.createElement("div");
+    el.className = "pv-float" + (kind==="unlucky"?" bad":"");
+    el.textContent = text;
+    el.style.left = x + "px"; el.style.top = y + "px";
+    document.body.appendChild(el);
+    setTimeout(function(){ if (el.parentNode) el.parentNode.removeChild(el); }, 720);
+  }
+  function flashPlay(kind){
+    const pv = document.getElementById("playView");
+    if (!pv) return;
+    pv.classList.remove("pv-flash","pv-flash-bad");
+    void pv.offsetWidth;
+    pv.classList.add(kind==="unlucky" ? "pv-flash-bad" : "pv-flash");
+  }
   function miniToast(kind, title, result){
     const hub = document.getElementById("pvToast");
     if (!hub) return;
@@ -8498,7 +8617,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (v) v.textContent = pct.toFixed(2)+"%";
   }
 
+  S.lastPulseAt = 0;
   function firePulse(forceKind){
+    const now = performance.now();
+    if (!forceKind && S.lastPulseAt && now - S.lastPulseAt < 6500) return;
+    S.lastPulseAt = now;
     const luckyChance = 0.62;
     const kind = forceKind || (Math.random() < luckyChance ? "lucky" : "unlucky");
     const pool = kind === "lucky" ? LUCKY : UNLUCKY;
@@ -8509,6 +8632,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (kind === "lucky") bumpDop(8 + Math.random()*6);
     else bumpDop(-(10 + Math.random()*8));
     pvLog(kind, row[1], result);
+    beep(kind); flashPlay(kind);
+    const core = document.getElementById("coreTrigger");
+    if (core) {
+      const r = core.getBoundingClientRect();
+      fxRipple(kind, r.left+r.width/2, r.top+r.height/2);
+      fxFloat(kind==="lucky"?"★":"▼", kind, r.left+r.width/2, r.top);
+    }
     try { if (typeof renderBuffs === "function") renderBuffs(); } catch(e){}
     try { if (typeof refreshUI === "function") refreshUI(); } catch(e){}
   }
@@ -8545,11 +8675,16 @@ document.addEventListener("DOMContentLoaded", () => {
       S.orbsCaught++;
       const c = document.getElementById("pv-orbs");
       if (c) c.textContent = String(S.orbsCaught);
+      const rr = el.getBoundingClientRect();
+      fxRipple(kind, rr.left+rr.width/2, rr.top+rr.height/2);
+      beep(kind); flashPlay(kind);
       if (kind === "lucky") {
         const g = cpsW(4); energyAdd(g); bumpDop(6);
+        fxFloat("+"+fmt(g), "lucky", rr.left+rr.width/2, rr.top);
         pvLog("lucky", "オーブキャッチ", "+"+fmt(g)+" E");
       } else {
         const l = cpsW(3); energySub(l); bumpDop(-5);
+        fxFloat("-"+fmt(l), "unlucky", rr.left+rr.width/2, rr.top);
         pvLog("unlucky", "ノイズオーブ", "-"+fmt(l)+" E");
       }
     }, {passive:false});
@@ -8607,9 +8742,15 @@ document.addEventListener("DOMContentLoaded", () => {
       if (t.id === "coreTrigger" || (t.closest && t.closest("#coreTrigger"))) {
         bumpDop(1.2);
         if (S.dopamine >= 88) bumpDop(-0.4);
-        if (Math.random() < 0.045) firePulse("lucky");
-        else if (Math.random() < 0.018) firePulse("unlucky");
-        if (Math.random() < 0.07) spawnOrb(Math.random()<0.72 ? "lucky" : "unlucky");
+        const coreEl = document.getElementById("coreTrigger");
+        if (coreEl) {
+          coreEl.classList.remove("pv-tap-pulse");
+          void coreEl.offsetWidth;
+          coreEl.classList.add("pv-tap-pulse");
+        }
+        if (Math.random() < 0.03) firePulse("lucky");
+        else if (Math.random() < 0.012) firePulse("unlucky");
+        if (Math.random() < 0.05) spawnOrb(Math.random()<0.72 ? "lucky" : "unlucky");
       }
     }, {capture:true, passive:true});
   }
@@ -8630,9 +8771,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (v) v.textContent = Math.round(S.dopamine)+"%";
     }
     if (S.nextPulse <= 0) {
-      S.nextPulse = 9 + Math.random()*16;
+      S.nextPulse = 14 + Math.random()*18;
       firePulse(Math.random() < 0.58 ? "lucky" : "unlucky");
-      if (Math.random() < 0.45) spawnOrb(Math.random()<0.7?"lucky":"unlucky");
+      if (Math.random() < 0.28) spawnOrb(Math.random()<0.7?"lucky":"unlucky");
     }
     requestAnimationFrame(loop);
   }
