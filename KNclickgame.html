@@ -7,82 +7,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="google" content="notranslate">
 <title>インクリメンタル絶対神 — INFINITY MATRIX OMEGA ULTRA MULTI-LAYER MAX 65+ API OVERDRIVE —</title>
-  <script>
-  // 他のサイトにiframeで埋め込まれているかを判定
-  if (window.self !== window.top) {
-    // ページ読み込み完了時に警告画面に書き換える
-    document.addEventListener("DOMContentLoaded", () => {
-      document.body.innerHTML = `
-        <div style="
-          position: fixed;
-          inset: 0;
-          background: #020106;
-          color: #f4f4f5;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          font-family: 'Consolas', 'Fira Code', 'Courier New', monospace, system-ui;
-          z-index: 999999;
-          padding: 20px;
-          text-align: center;
-        ">
-          <div style="
-            background: rgba(20, 14, 38, 0.8);
-            border: 1px solid rgba(255, 0, 85, 0.35);
-            border-radius: 12px;
-            padding: 30px;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 0 30px rgba(255, 0, 85, 0.15);
-          ">
-            <h2 style="
-              font-size: 1rem;
-              font-weight: 900;
-              margin: 0 0 16px 0;
-              background: linear-gradient(90deg, #fff, #ff0055);
-              -webkit-background-clip: text;
-              -webkit-text-fill-color: transparent;
-              letter-spacing: 1px;
-            ">ACCESS BLOCKED</h2>
-            
-            <p style="
-              font-size: 0.8rem;
-              color: #bbb;
-              margin: 0 0 20px 0;
-              line-height: 1.5;
-            ">あなたはこのゲームを読み込むことができません</p>
-            
-            <a href="${window.self.location.href}" target="_top" style="
-              display: inline-block;
-              width: 100%;
-              padding: 12px;
-              background: linear-gradient(90deg, #1b0a33, #2f1057);
-              border: 1px solid rgba(157, 78, 221, 0.5);
-              border-radius: 6px;
-              color: #fff;
-              font-size: 0.8rem;
-              font-weight: 900;
-              text-decoration: none;
-              letter-spacing: 1px;
-              box-shadow: 0 0 12px rgba(157, 78, 221, 0.25);
-              transition: all 0.15s;
-              box-sizing: border-box;
-            ">ゲームに飛ぶ</a>
-          </div>
-        </div>
-      `;
-    });
-  }
-</script>
-  <script>
-  // ホーム画面を経由しているか（登録フラグがあるか）チェック
-  if (!localStorage.getItem('infinity_game_registered')) {
-    // 登録されていなければホーム画面へ強制送還
-    // ※ホーム画面のファイル名が「index.html」以外の場合は、下のファイル名を書き換えてください
-    window.location.replace('index.html');
-  }
-</script>
 <style>
 :root {
   --bg-main: #020106;
@@ -938,47 +862,61 @@ body, button, input, select, textarea, [class*="game-"] {
   letter-spacing: 1px;
   color: #6b7280;
 }
-  .btn-fullscreen {
-  background: rgba(0, 255, 204, 0.1);
-  border: 1px solid rgba(0, 255, 204, 0.5);
-  color: #00ffcc;
-  padding: 8px 14px;
-  border-radius: 6px;
-  font-family: inherit;
-  font-size: 0.75rem;
-  font-weight: 900;
-  cursor: pointer;
-  letter-spacing: 1px;
-  transition: all 0.2s ease;
-  box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);
+  .migration-btn-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.btn-fullscreen:hover {
-  background: #00ffcc;
-  color: #000;
+/* 新バージョンへの誘導ボタン（メイン） */
+.migration-btn-link {
+  display: inline-block;
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(90deg, #00ffcc, #3a86ff);
+  color: #020106;
+  font-size: 0.8rem;
+  font-weight: 900;
+  text-decoration: none;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
+  transition: all 0.2s;
+  letter-spacing: 1px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.migration-btn-link:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
   box-shadow: 0 0 20px rgba(0, 255, 204, 0.6);
 }
-  .copyright {
-  position: fixed;   /* 画面に対して固定する */
-  left: 10px;        /* 左からの距離 */
-  bottom: 10px;      /* 下からの距離 */
-  font-size: 11px;   /* 小さめの文字サイズ */
-  color: #666;       /* 文字色（グレーなど） */
-  z-index: 9999;     /* 他の要素の下に隠れないように手前に表示 */
+
+/* このまま遊ぶボタン（サブ） */
+.migration-btn-sub {
+  width: 100%;
+  padding: 8px;
+  background: transparent;
+  border: 1px solid var(--border-strong, #444);
+  color: var(--text-muted, #6b7280);
+  font-size: 0.68rem;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.migration-btn-sub:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main, #f4f4f5);
+  border-color: var(--text-main, #f4f4f5);
 }
 </style>
 </head>
 <body>
-  <div class="copyright">&copy; 2026 HTsatoweb</div>
 <!-- ★ ここから読み込み画面 -->
 <div id="bootLoader" aria-live="polite">
   <div class="boot-title">INFINITY MATRIX BOOT</div>
-  <div style="text-align: center; margin: 15px 0; font-family: monospace; color: #aaa;">
-<div style="text-align: center; margin: 15px 0;">
-  <a href="https://visitor-badge.laobi.icu" target="_blank" rel="noopener noreferrer">
-    <img src="https://visitor-badge.laobi.icu/badge?page_id=htsatoweb.clickgame&left_text=%E9%96%B2%E8%A6%A7%E8%80%85%E6%95%B0" alt="visitor badge">
-  </a>
-</div>
   <div class="boot-bar-wrap"><div class="boot-bar" id="bootBar"></div></div>
   <div class="boot-pct" id="bootPct">0%</div>
   <div class="boot-sub" id="bootSub">HTML を読み込み中...</div>
@@ -1058,12 +996,98 @@ body, button, input, select, textarea, [class*="game-"] {
   }, 20000);
 })();
 </script>
- 
+  <script>
+  // 他のサイトにiframeで埋め込まれているかを判定
+  if (window.self !== window.top) {
+    // ページ読み込み完了時に警告画面に書き換える
+    document.addEventListener("DOMContentLoaded", () => {
+      document.body.innerHTML = `
+        <div style="
+          position: fixed;
+          inset: 0;
+          background: #020106;
+          color: #f4f4f5;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          font-family: 'Consolas', 'Fira Code', 'Courier New', monospace, system-ui;
+          z-index: 999999;
+          padding: 20px;
+          text-align: center;
+        ">
+          <div style="
+            background: rgba(20, 14, 38, 0.8);
+            border: 1px solid rgba(255, 0, 85, 0.35);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 0 30px rgba(255, 0, 85, 0.15);
+          ">
+            <h2 style="
+              font-size: 1rem;
+              font-weight: 900;
+              margin: 0 0 16px 0;
+              background: linear-gradient(90deg, #fff, #ff0055);
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+              letter-spacing: 1px;
+            ">ACCESS BLOCKED</h2>
+            
+            <p style="
+              font-size: 0.8rem;
+              color: #bbb;
+              margin: 0 0 20px 0;
+              line-height: 1.5;
+            ">あなたはこのゲームを読み込むことができません</p>
+            
+            <a href="${window.self.location.href}" target="_top" style="
+              display: inline-block;
+              width: 100%;
+              padding: 12px;
+              background: linear-gradient(90deg, #1b0a33, #2f1057);
+              border: 1px solid rgba(157, 78, 221, 0.5);
+              border-radius: 6px;
+              color: #fff;
+              font-size: 0.8rem;
+              font-weight: 900;
+              text-decoration: none;
+              letter-spacing: 1px;
+              box-shadow: 0 0 12px rgba(157, 78, 221, 0.25);
+              transition: all 0.15s;
+              box-sizing: border-box;
+            ">ゲームに飛ぶ</a>
+          </div>
+        </div>
+      `;
+    });
+  }
+</script>
 <div class="notification-center-container" id="toastHub"></div>
-
+<!-- サポート終了・移行案内モーダル -->
+<div id="migrationModal" class="migration-overlay">
+  <div class="migration-box">
+    <div class="migration-title">⚠️ 重要なお知らせ（サポート終了）</div>
+    <div class="migration-desc">
+      いつも当ゲームをお楽しみいただきありがとうございます。<br>
+      本バージョンのサポートは終了いたしました。<br><br>
+      今後はより快適にプレイいただける新バージョン（MZclickgame）への移行をおすすめします！
+    </div>
+    <div class="migration-btn-wrap">
+      <a href="https://htsatoweb.github.io/clickgame/MZclickgame.html" class="migration-btn-link" target="_blank" rel="noopener noreferrer">
+        🚀 新バージョンへ移動する
+      </a>
+      <button id="closeMigrationModal" class="migration-btn-sub">
+        このまま旧バージョンで遊ぶ
+      </button>
+    </div>
+  </div>
+</div>
+  
 <div class="column-left">
-<div class="game-title">INFINITY MATRIX — OMEGA MULTI-LAYER OVERDRIVE API 65 —</div>
-<div class="god-display" id="displayGodName" style="font-size: 0.8rem; color: #00ffcc; letter-spacing: 2px; margin-top: 8px; margin-bottom: 15px; text-shadow: 0 0 8px rgba(0, 255, 204, 0.3); text-align: center;">GOD: <span id="playerNameSpan">名無しの神</span></div>
+  <div class="game-title">INFINITY MATRIX — OMEGA MULTI-LAYER OVERDRIVE API 65 簡単vr</div>
+
  <div class="display-group">
   <div class="resource-label">ENERGY [物質エネルギー]</div>
   <div class="resource-value value-energy"><span id="v-energy">0.0</span><span class="unit">/ワット</span></div>
@@ -1170,7 +1194,6 @@ body, button, input, select, textarea, [class*="game-"] {
     <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
       <button class="btn-utility" onclick="saveGameManual()" style="white-space: nowrap;">手動セーブ</button>
       <button class="btn-utility" id="settingsMenuBtn" onclick="toggleSettingsMenu()" style="color: var(--color-upgrade); border-color: var(--color-upgrade); white-space: nowrap; font-weight: bold;">⚙️ 設定</button>
-      <button class="btn-fullscreen" id="fullscreenToggleBtn">⛶ 全画面切替</button>
     </div>
   </div>
 
@@ -1281,20 +1304,6 @@ body, button, input, select, textarea, [class*="game-"] {
 <div id="google_translate_element" style="display:none;"></div>
 <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <script>
-  // 画面がまだ全画面でない場合に、最初のタップ/クリックで全画面にする
-document.addEventListener('click', () => {
-  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-    const elem = document.documentElement;
-    if (elem.requestFullscreen) {
-      elem.requestFullscreen().catch(err => {
-        // ブラウザの仕様やセキュリティ制限で失敗した場合は無視
-        console.log("Fullscreen request denied or not allowed.");
-      });
-    } else if (elem.webkitRequestFullscreen) {
-      elem.webkitRequestFullscreen(); // Safariなどの旧プレフィックス対応
-    }
-  }
-}, { once: true }); // { once: true } にしているので、最初の一回クリックされたらこのイベントは終了します
   document.addEventListener('contextmenu', function(e) {
   // ブラウザ本来の右クリックメニューを完全に阻止
   e.preventDefault();
@@ -1311,30 +1320,22 @@ document.addEventListener('click', () => {
   
   e.target.dispatchEvent(clickEvent);
 });
-  const fullscreenBtn = document.getElementById('fullscreenToggleBtn');
+  window.addEventListener('DOMContentLoaded', () => {
+  const modal = document.getElementById('migrationModal');
+  const closeBtn = document.getElementById('closeMigrationModal');
 
-if (fullscreenBtn) {
-  fullscreenBtn.addEventListener('click', () => {
-    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-      // 全画面にする
-      const elem = document.documentElement;
-      if (elem.requestFullscreen) {
-        elem.requestFullscreen().catch(err => {});
-      } else if (elem.webkitRequestFullscreen) {
-        elem.webkitRequestFullscreen();
-      }
-      fullscreenBtn.textContent = '⛶ 元に戻す';
-    } else {
-      // 全画面を解除する
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-      }
-      fullscreenBtn.textContent = '⛶ 全画面切替';
+  if (modal) {
+    // ページを開いたときにモーダルを表示
+    modal.style.display = 'flex';
+
+    // 「このまま旧バージョンで遊ぶ」が押されたらモーダルを非表示にする
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+      });
     }
-  });
-}
+  }
+});
   /**
  * =========================================================================
  * Extended Configuration Database Ecosystem (DEEP MASSIVE ARRAY ENHANCEMENT)
@@ -1940,12 +1941,7 @@ function sanitizeGameData() {
   game.galaxyNodes = __sanitizeNumber(game.galaxyNodes, 0);
   game.totalTime = __sanitizeNumber(game.totalTime, 0);
 }
-// 保存されている神の名前を読み込んで表示に反映させる
-const savedName = localStorage.getItem('infinity_game_player_name');
-if (savedName) {
-  const nameSpan = document.getElementById('playerNameSpan');
-  if (nameSpan) nameSpan.textContent = savedName;
-}
+
 // 2. 状態更新フレーム毎のデータ整合性チェックラッパー
 function updateGameLoopSafetyWrapper() {
   try {
