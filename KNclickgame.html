@@ -867,49 +867,103 @@ body, button, input, select, textarea, [class*="game-"] {
   flex-direction: column;
   gap: 8px;
 }
+/* 移行モーダルの背景オーバーレイ：画面全体に覆い被せる */
+.migration-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483647 !important; /* 最前面に強制表示 */
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  background: rgba(2, 1, 6, 0.92) !important;
+  backdrop-filter: blur(8px) !important;
+  padding: 20px !important;
+  box-sizing: border-box !important;
+}
+
+/* モーダル本体ボックス：画面の中央にでかでかと表示 */
+.migration-box {
+  background: rgba(20, 14, 38, 0.98) !important;
+  border: 2px solid var(--color-antimatter, #ff0055) !important;
+  box-shadow: 0 0 50px rgba(255, 0, 85, 0.4), 0 15px 40px rgba(0, 0, 0, 0.9) !important;
+  border-radius: 16px !important;
+  width: 100% !important;
+  max-width: 560px !important; /* 少し大きめのサイズに拡大 */
+  padding: 36px 28px !important;
+  text-align: center !important;
+  box-sizing: border-box !important;
+  animation: migration-pop-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+}
+
+@keyframes migration-pop-in {
+  0% { transform: scale(0.7); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.migration-title {
+  font-size: 1.2rem !important;
+  font-weight: 900 !important;
+  color: var(--color-antimatter, #ff0055) !important;
+  margin-bottom: 16px !important;
+  letter-spacing: 1px !important;
+}
+
+.migration-desc {
+  font-size: 0.85rem !important;
+  color: var(--text-main, #f4f4f5) !important;
+  line-height: 1.7 !important;
+  margin-bottom: 24px !important;
+  text-align: left !important; /* 読みやすいように左寄せ、中央にしたい場合は center に変更可能 */
+}
+
+.migration-btn-wrap {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+}
 
 /* 新バージョンへの誘導ボタン（メイン） */
 .migration-btn-link {
-  display: inline-block;
-  width: 100%;
-  padding: 12px;
-  background: linear-gradient(90deg, #00ffcc, #3a86ff);
-  color: #020106;
-  font-size: 0.8rem;
-  font-weight: 900;
-  text-decoration: none;
-  border-radius: 8px;
-  box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
-  transition: all 0.2s;
-  letter-spacing: 1px;
-  box-sizing: border-box;
-  text-align: center;
+  display: block !important;
+  width: 100% !important;
+  padding: 16px !important;
+  background: linear-gradient(90deg, #00ffcc, #3a86ff) !important;
+  color: #020106 !important;
+  font-size: 0.95rem !important;
+  font-weight: 900 !important;
+  text-decoration: none !important;
+  border-radius: 10px !important;
+  box-shadow: 0 0 20px rgba(0, 255, 204, 0.5) !important;
+  transition: all 0.2s !important;
+  letter-spacing: 1px !important;
+  box-sizing: border-box !important;
+  text-align: center !important;
 }
 
 .migration-btn-link:hover {
-  opacity: 0.9;
-  transform: translateY(-2px);
-  box-shadow: 0 0 20px rgba(0, 255, 204, 0.6);
+  opacity: 0.95 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 0 25px rgba(0, 255, 204, 0.7) !important;
 }
 
 /* このまま遊ぶボタン（サブ） */
 .migration-btn-sub {
-  width: 100%;
-  padding: 8px;
-  background: transparent;
-  border: 1px solid var(--border-strong, #444);
-  color: var(--text-muted, #6b7280);
-  font-size: 0.68rem;
-  font-weight: 700;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
+  width: 100% !important;
+  padding: 12px !important;
+  background: transparent !important;
+  border: 1px solid var(--border-strong, #555) !important;
+  color: var(--text-muted, #9ca3af) !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  border-radius: 10px !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
 }
 
 .migration-btn-sub:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-main, #f4f4f5);
-  border-color: var(--text-main, #f4f4f5);
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: var(--text-main, #f4f4f5) !important;
+  border-color: var(--text-main, #f4f4f5) !important;
 }
 </style>
 </head>
@@ -1066,43 +1120,104 @@ body, button, input, select, textarea, [class*="game-"] {
 </script>
 <div class="notification-center-container" id="toastHub"></div>
 
-<!-- サポート終了・移行案内モーダル -->
+  <!-- サポート終了・移行案内モーダル -->
 <div id="migrationModal" class="migration-overlay">
   <div class="migration-box">
-    <div class="migration-title">⚠️ 重要なお知らせ（サポート終了）</div>
-    <div class="migration-desc">
-      いつも当ゲームをお楽しみいただきありがとうございます。<br>
-      本バージョンのサポートは終了いたしました。<br><br>
-      今後はより快適にプレイいただける新バージョン（MZclickgame）への移行をおすすめします！
+    
+    <!-- 言語切り替えタブ（モーダル内用） -->
+    <div style="display: flex; justify-content: center; gap: 6px; margin-bottom: 16px;">
+      <button onclick="switchMigrationLang('jp')" id="m-btn-jp" style="padding: 4px 10px; font-size: 0.7rem; font-weight: bold; background: var(--color-antimatter, #ff0055); color: #fff; border: 1px solid #ff0055; border-radius: 4px; cursor: pointer;">JP</button>
+      <button onclick="switchMigrationLang('en')" id="m-btn-en" style="padding: 4px 10px; font-size: 0.7rem; font-weight: bold; background: transparent; color: #aaa; border: 1px solid #555; border-radius: 4px; cursor: pointer;">EN</button>
+      <button onclick="switchMigrationLang('cn')" id="m-btn-cn" style="padding: 4px 10px; font-size: 0.7rem; font-weight: bold; background: transparent; color: #aaa; border: 1px solid #555; border-radius: 4px; cursor: pointer;">CN</button>
     </div>
-    <div class="migration-btn-wrap">
-      <a href="MZclickgame.html" class="migration-btn-link">
-        🚀 新バージョンへ移動する
-      </a>
-      <button id="closeMigrationModal" class="migration-btn-sub">
-        このまま旧バージョンで遊ぶ
-      </button>
+
+    <!-- JP テキスト -->
+    <div id="m-text-jp" class="migration-lang-content" style="display: block;">
+      <div class="migration-title">⚠️ 重要なお知らせ（サポート終了）</div>
+      <div class="migration-desc">
+        いつも当ゲームをお楽しみいただきありがとうございます。<br>
+        本バージョンのアップデートは終了いたしました。<br><br>
+        ゲームの動作には問題ありませんが、バグなどの問題解決等のアップデートは終了しております。<br><br>
+        今後はより快適にプレイいただける新バージョン（MZclickgame）への移行をおすすめします！
+      </div>
+      <div class="migration-btn-wrap">
+        <a href="MZclickgame.html" class="migration-btn-link">🚀 新バージョンへ移動する</a>
+        <button id="closeMigrationModal" class="migration-btn-sub">このまま旧バージョンで遊ぶ</button>
+      </div>
     </div>
+
+    <!-- EN テキスト -->
+    <div id="m-text-en" class="migration-lang-content" style="display: none;">
+      <div class="migration-title">⚠️ Important Notice (Support Ended)</div>
+      <div class="migration-desc">
+        Thank you for playing our game.<br>
+        Updates for this version have ended.<br><br>
+        The game will still work properly, but bug fixes and further updates are no longer provided.<br><br>
+        We recommend moving to the new version (MZclickgame) for a better experience!
+      </div>
+      <div class="migration-btn-wrap">
+        <a href="MZclickgame.html" class="migration-btn-link">🚀 Move to New Version</a>
+        <button onclick="closeMigration()" class="migration-btn-sub">Play this old version</button>
+      </div>
+    </div>
+
+    <!-- CN テキスト -->
+    <div id="m-text-cn" class="migration-lang-content" style="display: none;">
+      <div class="migration-title">⚠️ 重要通知（停止更新）</div>
+      <div class="migration-desc">
+        感谢您一直以来对本游戏的支持。<br>
+        当前版本的更新已结束。<br><br>
+        游戏本身可以正常运行，但未来将不再提供Bug修复等后续更新。<br><br>
+        为了获得更好的体验，建议您前往新版本（MZclickgame）！
+      </div>
+      <div class="migration-btn-wrap">
+        <a href="MZclickgame.html" class="migration-btn-link">🚀 前往新版本</a>
+        <button onclick="closeMigration()" class="migration-btn-sub">继续游玩旧版本</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
 <div id="google_translate_element" style="display:none;"></div>
 <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <script>
-  document.addEventListener('contextmenu', function(e) {
-    // ブラウザ本来の右クリックメニューを完全に阻止
-    e.preventDefault();
-    
-    // 右クリックを通常の左クリック（click）イベントとして強制発火させる
-    const clickEvent = new MouseEvent('click', {
-      bubbles: true,
-      cancelable: true,
-      view: window,
-      button: 0,
-      clientX: e.clientX,
-      clientY: e.clientY
+  // 言語を切り替える関数
+  window.switchMigrationLang = function(lang) {
+    // すべてのテキストとボタンを一旦非アクティブにする
+    document.querySelectorAll('.migration-lang-content').forEach(el => el.style.display = 'none');
+    ['jp', 'en', 'cn'].forEach(l => {
+      const btn = document.getElementById(`m-btn-${l}`);
+      if (btn) {
+        btn.style.background = 'transparent';
+        btn.style.color = '#aaa';
+        btn.style.borderColor = '#555';
+      }
     });
-    
+
+    // 選択された言語を表示
+    const targetText = document.getElementById(`m-text-${lang}`);
+    const targetBtn = document.getElementById(`m-btn-${lang}`);
+    if (targetText) targetText.style.display = 'block';
+    if (targetBtn) {
+      targetBtn.style.background = 'var(--color-antimatter, #ff0055)';
+      targetBtn.style.color = '#fff';
+      targetBtn.style.borderColor = '#ff0055';
+    }
+  };
+
+  // モーダルを閉じる共通関数（EN・CN用）
+  window.closeMigration = function() {
+    const modal = document.getElementById('migrationModal');
+    if (modal) modal.style.display = 'none';
+  };
+
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    const clickEvent = new MouseEvent('click', {
+      bubbles: true, cancelable: true, view: window, button: 0,
+      clientX: e.clientX, clientY: e.clientY
+    });
     e.target.dispatchEvent(clickEvent);
   });
 
@@ -1123,7 +1238,6 @@ body, button, input, select, textarea, [class*="game-"] {
     }
   });
 </script>
-  
 <div class="column-left">
   <div class="game-title">INFINITY MATRIX — OMEGA MULTI-LAYER OVERDRIVE API 65 簡単vr</div>
 
