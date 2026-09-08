@@ -1120,7 +1120,7 @@ body, button, input, select, textarea, [class*="game-"] {
 </script>
 <div class="notification-center-container" id="toastHub"></div>
 
-  <!-- サポート終了・移行案内モーダル -->
+<!-- サポート終了・移行案内モーダル -->
 <div id="migrationModal" class="migration-overlay">
   <div class="migration-box">
     
@@ -1179,12 +1179,26 @@ body, button, input, select, textarea, [class*="game-"] {
   </div>
 </div>
 
+<!-- 独自のデータ引き継ぎ確認用ポップアップ -->
+<div id="migrationConfirmPopup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; justify-content: center; align-items: center;">
+  <div style="background: #1a1a1a; border: 2px solid var(--color-antimatter, #ff0055); padding: 24px; border-radius: 8px; max-width: 400px; width: 90%; color: #fff; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+    <h3 style="margin-top: 0; color: #ff0055;">🔄 セーブデータの引き継ぎ</h3>
+    <p style="font-size: 0.9rem; line-height: 1.5; margin-bottom: 20px;">
+      新バージョンへセーブデータを引き継ぎますか？<br>
+      <span style="font-size: 0.8rem; color: #aaa;">「データを引き継ぐ」を選ぶと変換して移行します。</span>
+    </p>
+    <div style="display: flex; gap: 10px; justify-content: center;">
+      <button id="migConfirmYes" style="padding: 8px 16px; background: #ff0055; color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">データを引き継ぐ</button>
+      <button id="migConfirmNo" style="padding: 8px 16px; background: #444; color: #fff; border: none; border-radius: 4px; cursor: pointer;">引き継がず移動</button>
+    </div>
+  </div>
+</div>
+
 <div id="google_translate_element" style="display:none;"></div>
 <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <script>
   // 言語を切り替える関数
   window.switchMigrationLang = function(lang) {
-    // すべてのテキストとボタンを一旦非アクティブにする
     document.querySelectorAll('.migration-lang-content').forEach(el => el.style.display = 'none');
     ['jp', 'en', 'cn'].forEach(l => {
       const btn = document.getElementById(`m-btn-${l}`);
@@ -1195,7 +1209,6 @@ body, button, input, select, textarea, [class*="game-"] {
       }
     });
 
-    // 選択された言語を表示
     const targetText = document.getElementById(`m-text-${lang}`);
     const targetBtn = document.getElementById(`m-btn-${lang}`);
     if (targetText) targetText.style.display = 'block';
@@ -1206,7 +1219,7 @@ body, button, input, select, textarea, [class*="game-"] {
     }
   };
 
-  // モーダルを確実に閉じる関数
+  // モーダルを閉じる関数
   window.closeMigration = function() {
     const modal = document.getElementById('migrationModal');
     if (modal) {
@@ -1216,28 +1229,16 @@ body, button, input, select, textarea, [class*="game-"] {
     }
   };
 
-  document.addEventListener('contextmenu', function(e) {
-    e.preventDefault();
-    const clickEvent = new MouseEvent('click', {
-      bubbles: true, cancelable: true, view: window, button: 0,
-      clientX: e.clientX, clientY: e.clientY
-    });
-    e.target.dispatchEvent(clickEvent);
-  });
-
-  // ページ読み込み時の処理 ＆ すべての閉じるボタンへのイベント一括登録
+  // ページ読み込み時の処理
   window.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('migrationModal');
     if (modal) {
-      // ページを開いたときにモーダルを表示
       modal.style.display = 'flex';
       modal.style.opacity = '1';
       modal.style.pointerEvents = 'auto';
 
-      // 画面内にある「閉じる・このまま遊ぶ」系のボタンすべてにクリックイベントを強制付与
       const closeButtons = modal.querySelectorAll('#closeMigrationModal, [onclick*="closeMigration"]');
       closeButtons.forEach(btn => {
-        // 既存のonclick属性の競合を防ぐため初期化
         btn.removeAttribute('onclick');
         btn.addEventListener('click', (e) => {
           e.preventDefault();
@@ -1245,98 +1246,117 @@ body, button, input, select, textarea, [class*="game-"] {
         });
       });
     }
+
+    // 「新バージョンへ移動する」ボタンの挙動を独自ポップアップに差し替え
+    const migrationLinks = document.querySelectorAll('.migration-btn-link');
+    const confirmPopup = document.getElementById('migrationConfirmPopup');
+    const btnYes = document.getElementById('migConfirmYes');
+    const btnNo = document.getElementById('migConfirmNo');
+
+    let destinationUrl = 'MZclickgame.html';
+
+    migrationLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        destinationUrl = this.getAttribute('href');
+        
+        // 独自ポップアップを表示
+        if (confirmPopup) {
+          confirmPopup.style.display = 'flex';
+        }
+      });
+    });
+
+    // 「引き継ぐ」を選んだ場合
+    if (btnYes) {
+      btnYes.addEventListener('click', () => {
+        executeMigration(true);
+        window.location.href = destinationUrl;
+      });
+    }
+
+    // 「引き継がず移動」を選んだ場合
+    if (btnNo) {
+      btnNo.addEventListener('click', () => {
+        window.location.href = destinationUrl;
+      });
+    }
   });
-  // ページ読み込み時に「新バージョンへ移動する」ボタンの挙動を書き換える
-window.addEventListener('DOMContentLoaded', () => {
-  // ... (既存のモーダル表示や閉じるボタンの処理はそのまま) ...
 
-  // すべての新バージョンへのリンクを取得
-  const migrationLinks = document.querySelectorAll('.migration-btn-link');
-  
-  migrationLinks.forEach(link => {
-    link.addEventListener('click', function(e) {
-      e.preventDefault(); // 一旦デフォルトのリンク遷移を止める
-      const targetUrl = this.getAttribute('href');
+  // セーブデータ変換・保存の実行関数（修正版）
+  function executeMigration(shouldMigrate) {
+    if (!shouldMigrate) return;
 
-      // 確認ダイアログを表示
-      // ※多言語対応が必要であればテキストを変えられます
-      const isMigrate = window.confirm(
-        '新バージョンへセーブデータを引き継ぎますか？\n' +
-        '「OK（はい）」を選ぶとデータを変換して引き継ぎます。\n' +
-        '「キャンセル（いいえ）」を選ぶと引き継がずにそのまま移動します。'
-      );
+    try {
+      const oldDataRaw = localStorage.getItem('your_game_save_KN_key');
+      if (!oldDataRaw) {
+        console.warn('旧セーブデータが見つかりませんでした (キー: your_game_save_KN_key)');
+        return;
+      }
 
-      if (isMigrate) {
-        // 「はい」の場合：旧データを読み込んで変換し、新キーで保存する
+      let oldData = null;
+      try {
+        // Base64デコードを先に試す（ご提示いただいたデータはBase64エンコードされています）
+        oldData = JSON.parse(atob(oldDataRaw));
+      } catch (e1) {
         try {
-          const oldDataRaw = localStorage.getItem('your_game_save_KN_key');
-          if (oldDataRaw) {
-            // Base64またはJSONのパース（旧データの形式に合わせて調整してください）
-            // 例としてBase64デコードを想定
-            let oldData;
-            try {
-              oldData = JSON.parse(atob(oldDataRaw));
-            } catch (err) {
-              oldData = JSON.parse(oldDataRaw); // JSONそのままの場合のフォールバック
-            }
-
-            // 新バージョンのデータ構造へ変換
-            // 計算エンジンの違い（energyの型、配列の長さなど）に応じた変換処理を行います
-            const newData = {
-              energy: String(oldData.energy || "0"), // 新仕様の文字列型へ変換
-              totalClicks: oldData.totalClicks || 0,
-              antimatter: String(oldData.antimatter || "0"),
-              prestigeAmCount: oldData.prestigeAmCount || 0,
-              timeShards: String(oldData.timeShards || "0"),
-              prestigeTlCount: oldData.prestigeTlCount || 0,
-              galaxyNodes: oldData.galaxyNodes || 0,
-              prestigeGxCount: oldData.prestigeGxCount || 0,
-              sessionTime: oldData.sessionTime || 0,
-              totalTime: oldData.totalTime || 0,
-              
-              // 配列などは新バージョンの長さに拡張・パディングするなどの処理
-              facCounts: expandArray(oldData.facCounts, 200), // 例: 新仕様の長さに合わせる関数
-              upgLevels: expandArray(oldData.upgLevels, 200),
-              amUpgLevels: expandArray(oldData.amUpgLevels, 200),
-              tlUpgLevels: expandArray(oldData.tlUpgLevels, 200),
-              
-              autoFacEnabled: oldData.autoFacEnabled || false,
-              autoUpgEnabled: oldData.autoUpgEnabled || false,
-              autoAmEnabled: oldData.autoAmEnabled || false,
-              autoPrestigeAmEnabled: oldData.autoPrestigeAmEnabled || false,
-              
-              achievements: oldData.achievements || [],
-              unlockedAchievements: oldData.unlockedAchievements || {}
-            };
-
-            // 新バージョンの形式にエンコードして保存（Base64にする場合）
-            const newDataString = btoa(JSON.stringify(newData));
-            localStorage.setItem('your_game_save_MZ_key', newDataString);
-            
-            console.log('セーブデータの変換と引き継ぎが完了しました。');
-          }
-        } catch (e) {
-          console.error('データ引き継ぎ中にエラーが発生しました:', e);
-          alert('データの変換に失敗しましたが、新バージョンへ移動します。');
+          oldData = JSON.parse(oldDataRaw); // フォールバックとしてそのままJSONパース
+        } catch (e2) {
+          console.error('セーブデータのデコードに失敗しました:', e2);
+          return;
         }
       }
 
-      // 「はい」「いいえ」どちらを選んでも新バージョンへ移動
-      window.location.href = targetUrl;
-    });
-  });
-});
+      if (!oldData) return;
 
-// 配列を指定の長さに拡張するヘルパー関数（足りない部分は0で埋める）
-function expandArray(arr, targetLength) {
-  if (!Array.isArray(arr)) return new Array(targetLength).fill(0);
-  if (arr.length >= targetLength) return arr;
-  const extended = [...arr];
-  while (extended.length < targetLength) {
-    extended.push(0);
+      // デコードされた旧データを元に新データの構造を組み立て
+      const newData = {
+        energy: String(oldData.energy ?? "0"),
+        totalClicks: oldData.totalClicks ?? 0,
+        antimatter: String(oldData.antimatter ?? "0"),
+        prestigeAmCount: oldData.prestigeAmCount ?? 0,
+        timeShards: String(oldData.timeShards ?? "0"),
+        prestigeTlCount: oldData.prestigeTlCount ?? 0,
+        galaxyNodes: oldData.galaxyNodes ?? 0,
+        prestigeGxCount: oldData.prestigeGxCount ?? 0,
+        sessionTime: oldData.sessionTime ?? 0,
+        totalTime: oldData.totalTime ?? 0,
+        
+        // 配列データを安全に引き継ぎつつ、新バージョンの長さに合わせる
+        facCounts: mapAndExpandArray(oldData.facCounts, 200),
+        upgLevels: mapAndExpandArray(oldData.upgLevels, 200),
+        amUpgLevels: mapAndExpandArray(oldData.amUpgLevels, 200),
+        tlUpgLevels: mapAndExpandArray(oldData.tlUpgLevels, 200),
+        
+        autoFacEnabled: oldData.autoFacEnabled ?? false,
+        autoUpgEnabled: oldData.autoUpgEnabled ?? false,
+        autoAmEnabled: oldData.autoAmEnabled ?? false,
+        autoPrestigeAmEnabled: oldData.autoPrestigeAmEnabled ?? false,
+        
+        achievements: oldData.achievements ?? [],
+        unlockedAchievements: oldData.unlockedAchievements ?? {}
+      };
+
+      // 新バージョンのキーでBase64エンコードして保存
+      const newDataString = btoa(JSON.stringify(newData));
+      localStorage.setItem('your_game_save_MZ_key', newDataString);
+
+      console.log('セーブデータの変換と引き継ぎが完了しました:', newData);
+    } catch (e) {
+      console.error('データ引き継ぎ中にエラーが発生しました:', e);
+      alert('データの変換中にエラーが発生しました。');
+    }
   }
-  return extended;
-}
+
+  // 配列を安全にマッピングし、指定の長さに拡張する関数
+  function mapAndExpandArray(arr, targetLength) {
+    if (!Array.isArray(arr)) return new Array(targetLength).fill(0);
+    const extended = [...arr];
+    while (extended.length < targetLength) {
+      extended.push(0);
+    }
+    return extended;
+  }
 </script>
 <div class="column-left">
   <div class="game-title">INFINITY MATRIX — OMEGA MULTI-LAYER OVERDRIVE API 65 簡単vr</div>
