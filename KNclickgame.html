@@ -1065,6 +1065,7 @@ body, button, input, select, textarea, [class*="game-"] {
   }
 </script>
 <div class="notification-center-container" id="toastHub"></div>
+
 <!-- サポート終了・移行案内モーダル -->
 <div id="migrationModal" class="migration-overlay">
   <div class="migration-box">
@@ -1075,7 +1076,7 @@ body, button, input, select, textarea, [class*="game-"] {
       今後はより快適にプレイいただける新バージョン（MZclickgame）への移行をおすすめします！
     </div>
     <div class="migration-btn-wrap">
-      <a href="https://htsatoweb.github.io/clickgame/MZclickgame.html" class="migration-btn-link" target="_blank" rel="noopener noreferrer">
+      <a href="MZclickgame.html" class="migration-btn-link">
         🚀 新バージョンへ移動する
       </a>
       <button id="closeMigrationModal" class="migration-btn-sub">
@@ -1084,6 +1085,44 @@ body, button, input, select, textarea, [class*="game-"] {
     </div>
   </div>
 </div>
+
+<div id="google_translate_element" style="display:none;"></div>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script>
+  document.addEventListener('contextmenu', function(e) {
+    // ブラウザ本来の右クリックメニューを完全に阻止
+    e.preventDefault();
+    
+    // 右クリックを通常の左クリック（click）イベントとして強制発火させる
+    const clickEvent = new MouseEvent('click', {
+      bubbles: true,
+      cancelable: true,
+      view: window,
+      button: 0,
+      clientX: e.clientX,
+      clientY: e.clientY
+    });
+    
+    e.target.dispatchEvent(clickEvent);
+  });
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('migrationModal');
+    const closeBtn = document.getElementById('closeMigrationModal');
+
+    if (modal) {
+      // ページを開いたときにモーダルを表示
+      modal.style.display = 'flex';
+
+      // 「このまま旧バージョンで遊ぶ」が押されたらモーダルを非表示にする
+      if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+          modal.style.display = 'none';
+        });
+      }
+    }
+  });
+</script>
   
 <div class="column-left">
   <div class="game-title">INFINITY MATRIX — OMEGA MULTI-LAYER OVERDRIVE API 65 簡単vr</div>
@@ -1320,22 +1359,7 @@ body, button, input, select, textarea, [class*="game-"] {
   
   e.target.dispatchEvent(clickEvent);
 });
-  window.addEventListener('DOMContentLoaded', () => {
-  const modal = document.getElementById('migrationModal');
-  const closeBtn = document.getElementById('closeMigrationModal');
 
-  if (modal) {
-    // ページを開いたときにモーダルを表示
-    modal.style.display = 'flex';
-
-    // 「このまま旧バージョンで遊ぶ」が押されたらモーダルを非表示にする
-    if (closeBtn) {
-      closeBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
-      });
-    }
-  }
-});
   /**
  * =========================================================================
  * Extended Configuration Database Ecosystem (DEEP MASSIVE ARRAY ENHANCEMENT)
