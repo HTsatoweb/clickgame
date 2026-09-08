@@ -1246,6 +1246,97 @@ body, button, input, select, textarea, [class*="game-"] {
       });
     }
   });
+  // ページ読み込み時に「新バージョンへ移動する」ボタンの挙動を書き換える
+window.addEventListener('DOMContentLoaded', () => {
+  // ... (既存のモーダル表示や閉じるボタンの処理はそのまま) ...
+
+  // すべての新バージョンへのリンクを取得
+  const migrationLinks = document.querySelectorAll('.migration-btn-link');
+  
+  migrationLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault(); // 一旦デフォルトのリンク遷移を止める
+      const targetUrl = this.getAttribute('href');
+
+      // 確認ダイアログを表示
+      // ※多言語対応が必要であればテキストを変えられます
+      const isMigrate = window.confirm(
+        '新バージョンへセーブデータを引き継ぎますか？\n' +
+        '「OK（はい）」を選ぶとデータを変換して引き継ぎます。\n' +
+        '「キャンセル（いいえ）」を選ぶと引き継がずにそのまま移動します。'
+      );
+
+      if (isMigrate) {
+        // 「はい」の場合：旧データを読み込んで変換し、新キーで保存する
+        try {
+          const oldDataRaw = localStorage.getItem('your_game_save_KN_key');
+          if (oldDataRaw) {
+            // Base64またはJSONのパース（旧データの形式に合わせて調整してください）
+            // 例としてBase64デコードを想定
+            let oldData;
+            try {
+              oldData = JSON.parse(atob(oldDataRaw));
+            } catch (err) {
+              oldData = JSON.parse(oldDataRaw); // JSONそのままの場合のフォールバック
+            }
+
+            // 新バージョンのデータ構造へ変換
+            // 計算エンジンの違い（energyの型、配列の長さなど）に応じた変換処理を行います
+            const newData = {
+              energy: String(oldData.energy || "0"), // 新仕様の文字列型へ変換
+              totalClicks: oldData.totalClicks || 0,
+              antimatter: String(oldData.antimatter || "0"),
+              prestigeAmCount: oldData.prestigeAmCount || 0,
+              timeShards: String(oldData.timeShards || "0"),
+              prestigeTlCount: oldData.prestigeTlCount || 0,
+              galaxyNodes: oldData.galaxyNodes || 0,
+              prestigeGxCount: oldData.prestigeGxCount || 0,
+              sessionTime: oldData.sessionTime || 0,
+              totalTime: oldData.totalTime || 0,
+              
+              // 配列などは新バージョンの長さに拡張・パディングするなどの処理
+              facCounts: expandArray(oldData.facCounts, 200), // 例: 新仕様の長さに合わせる関数
+              upgLevels: expandArray(oldData.upgLevels, 200),
+              amUpgLevels: expandArray(oldData.amUpgLevels, 200),
+              tlUpgLevels: expandArray(oldData.tlUpgLevels, 200),
+              
+              autoFacEnabled: oldData.autoFacEnabled || false,
+              autoUpgEnabled: oldData.autoUpgEnabled || false,
+              autoAmEnabled: oldData.autoAmEnabled || false,
+              autoPrestigeAmEnabled: oldData.autoPrestigeAmEnabled || false,
+              
+              achievements: oldData.achievements || [],
+              unlockedAchievements: oldData.unlockedAchievements || {}
+            };
+
+            // 新バージョンの形式にエンコードして保存（Base64にする場合）
+            const newDataString = btoa(JSON.stringify(newData));
+            localStorage.setItem('your_game_save_MZ_key', newDataString);
+            
+            console.log('セーブデータの変換と引き継ぎが完了しました。');
+          }
+        } catch (e) {
+          console.error('データ引き継ぎ中にエラーが発生しました:', e);
+          alert('データの変換に失敗しましたが、新バージョンへ移動します。');
+        }
+      }
+
+      // 「はい」「いいえ」どちらを選んでも新バージョンへ移動
+      window.location.href = targetUrl;
+    });
+  });
+});
+
+// 配列を指定の長さに拡張するヘルパー関数（足りない部分は0で埋める）
+function expandArray(arr, targetLength) {
+  if (!Array.isArray(arr)) return new Array(targetLength).fill(0);
+  if (arr.length >= targetLength) return arr;
+  const extended = [...arr];
+  while (extended.length < targetLength) {
+    extended.push(0);
+  }
+  return extended;
+}
 </script>
 <div class="column-left">
   <div class="game-title">INFINITY MATRIX — OMEGA MULTI-LAYER OVERDRIVE API 65 簡単vr</div>
