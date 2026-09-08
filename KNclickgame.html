@@ -1206,10 +1206,14 @@ body, button, input, select, textarea, [class*="game-"] {
     }
   };
 
-  // モーダルを閉じる共通関数（EN・CN用）
+  // モーダルを確実に閉じる関数
   window.closeMigration = function() {
     const modal = document.getElementById('migrationModal');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+      modal.style.display = 'none';
+      modal.style.opacity = '0';
+      modal.style.pointerEvents = 'none';
+    }
   };
 
   document.addEventListener('contextmenu', function(e) {
@@ -1221,20 +1225,25 @@ body, button, input, select, textarea, [class*="game-"] {
     e.target.dispatchEvent(clickEvent);
   });
 
+  // ページ読み込み時の処理 ＆ すべての閉じるボタンへのイベント一括登録
   window.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('migrationModal');
-    const closeBtn = document.getElementById('closeMigrationModal');
-
     if (modal) {
       // ページを開いたときにモーダルを表示
       modal.style.display = 'flex';
+      modal.style.opacity = '1';
+      modal.style.pointerEvents = 'auto';
 
-      // 「このまま旧バージョンで遊ぶ」が押されたらモーダルを非表示にする
-      if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-          modal.style.display = 'none';
+      // 画面内にある「閉じる・このまま遊ぶ」系のボタンすべてにクリックイベントを強制付与
+      const closeButtons = modal.querySelectorAll('#closeMigrationModal, [onclick*="closeMigration"]');
+      closeButtons.forEach(btn => {
+        // 既存のonclick属性の競合を防ぐため初期化
+        btn.removeAttribute('onclick');
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          window.closeMigration();
         });
-      }
+      });
     }
   });
 </script>
