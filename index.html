@@ -114,11 +114,11 @@ body {
   overflow: hidden;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 1.5s ease;
+  transition: opacity 2.5s ease;
   background: 
-    radial-gradient(circle at 20% 30%, rgba(157, 78, 221, 0.2) 0%, transparent 50%),
-    radial-gradient(circle at 80% 70%, rgba(255, 0, 85, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 50% 50%, rgba(57, 255, 20, 0.1) 0%, transparent 70%);
+    radial-gradient(circle at 20% 30%, rgba(157, 78, 221, 0.25) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(255, 0, 85, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(57, 255, 20, 0.15) 0%, transparent 70%);
 }
 
 body.activated .cyber-bg {
@@ -132,16 +132,16 @@ body.activated .cyber-bg {
   top: -50%;
   left: -50%;
   background-image: 
-    linear-gradient(rgba(57, 255, 20, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 0, 85, 0.05) 1px, transparent 1px);
+    linear-gradient(rgba(57, 255, 20, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 0, 85, 0.07) 1px, transparent 1px);
   background-size: 40px 40px;
   transform: perspective(400px) rotateX(65deg);
-  animation: grid-move 15s linear infinite;
+  animation: grid-move 20s linear infinite;
 }
 
 @keyframes grid-move {
   0% { transform: perspective(400px) rotateX(65deg) translateY(0) rotateZ(0deg); }
-  50% { transform: perspective(400px) rotateX(60deg) translateY(40px) rotateZ(1deg); }
+  50% { transform: perspective(400px) rotateX(60deg) translateY(50px) rotateZ(1.5deg); }
   100% { transform: perspective(400px) rotateX(65deg) translateY(0) rotateZ(0deg); }
 }
 
@@ -149,20 +149,21 @@ body.activated .cyber-bg {
   position: absolute;
   background: var(--color-kimo);
   border-radius: 30%;
-  box-shadow: 0 0 15px var(--color-kimo);
-  animation: float-particle 6s ease-in-out infinite;
+  box-shadow: 0 0 20px var(--color-kimo);
+  animation: float-particle 8s ease-in-out infinite;
 }
-.particle:nth-child(1) { width: 4px; height: 8px; top: 20%; left: 15%; animation-duration: 5s; }
-.particle:nth-child(2) { width: 6px; height: 3px; top: 70%; left: 80%; animation-duration: 8s; background: var(--color-antimatter); box-shadow: 0 0 15px var(--color-antimatter); }
-.particle:nth-child(3) { width: 5px; height: 5px; top: 40%; left: 85%; animation-duration: 6s; background: var(--color-timeline); box-shadow: 0 0 15px var(--color-timeline); }
-.particle:nth-child(4) { width: 7px; height: 4px; top: 80%; left: 25%; animation-duration: 10s; }
+.particle:nth-child(1) { width: 5px; height: 10px; top: 20%; left: 15%; animation-duration: 7s; }
+.particle:nth-child(2) { width: 7px; height: 4px; top: 70%; left: 80%; animation-duration: 10s; background: var(--color-antimatter); box-shadow: 0 0 20px var(--color-antimatter); }
+.particle:nth-child(3) { width: 6px; height: 6px; top: 40%; left: 85%; animation-duration: 8s; background: var(--color-timeline); box-shadow: 0 0 20px var(--color-timeline); }
+.particle:nth-child(4) { width: 8px; height: 5px; top: 80%; left: 25%; animation-duration: 12s; }
 
 @keyframes float-particle {
   0%, 100% { transform: translateY(0) translateX(0) scale(1); opacity: 0.3; }
-  30% { transform: translateY(-50px) translateX(30px) scale(1.5) rotate(45deg); opacity: 0.9; }
-  70% { transform: translateY(30px) translateX(-20px) scale(0.8) rotate(-45deg); opacity: 0.5; }
+  30% { transform: translateY(-70px) translateX(40px) scale(1.6) rotate(45deg); opacity: 0.9; }
+  70% { transform: translateY(40px) translateX(-30px) scale(0.7) rotate(-45deg); opacity: 0.5; }
 }
 
+/* 起動シネマティック演出（長尺化） */
 .author-screen {
   position: fixed;
   inset: 0;
@@ -172,14 +173,14 @@ body.activated .cyber-bg {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 1.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .author-logo-box {
   text-align: center;
   opacity: 0;
-  transform: scale(0.8);
-  transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: scale(0.75);
+  transition: all 2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .author-screen.show .author-logo-box {
@@ -188,27 +189,95 @@ body.activated .cyber-bg {
 }
 
 .author-label {
-  font-size: 0.75rem;
-  letter-spacing: 6px;
+  font-size: 0.8rem;
+  letter-spacing: 8px;
   color: var(--text-muted);
   text-transform: uppercase;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .author-name {
-  font-size: 2rem;
+  font-size: 2.3rem;
   font-weight: 900;
-  letter-spacing: 4px;
+  letter-spacing: 6px;
   background: linear-gradient(90deg, var(--color-kimo), var(--color-antimatter), var(--color-timeline));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 20px rgba(57, 255, 20, 0.6));
-  animation: author-glitch 3s infinite ease-in-out;
+  filter: drop-shadow(0 0 25px rgba(57, 255, 20, 0.6));
+  animation: author-glitch 4s infinite ease-in-out;
 }
 
 @keyframes author-glitch {
-  0%, 100% { filter: drop-shadow(0 0 20px rgba(57, 255, 20, 0.6)); }
-  50% { filter: drop-shadow(0 0 30px rgba(255, 0, 85, 0.8)) hue-rotate(45deg); }
+  0%, 100% { filter: drop-shadow(0 0 25px rgba(57, 255, 20, 0.6)); }
+  50% { filter: drop-shadow(0 0 40px rgba(255, 0, 85, 0.9)) hue-rotate(45deg); }
+}
+
+/* ヘルス＆セーフティ警告画面 */
+.warning-screen {
+  position: fixed;
+  inset: 0;
+  background: #020106;
+  z-index: 9995;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.2s ease;
+}
+
+.warning-box {
+  width: 85%;
+  max-width: 440px;
+  border: 1px solid var(--color-antimatter);
+  background: rgba(15, 5, 15, 0.95);
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 40px rgba(255, 0, 85, 0.25);
+  text-align: center;
+  transform: translateY(15px);
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.warning-screen.active .warning-box {
+  transform: translateY(0);
+}
+
+.warning-title {
+  font-size: 0.9rem;
+  color: var(--color-antimatter);
+  letter-spacing: 3px;
+  margin-bottom: 15px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.warning-desc {
+  font-size: 0.72rem;
+  color: #d1d5db;
+  margin-bottom: 25px;
+  line-height: 1.6;
+  text-align: left;
+}
+
+.btn-warning-ack {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(90deg, rgba(255,0,85,0.2), rgba(157,78,221,0.2));
+  border: 1px solid var(--color-antimatter);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 900;
+  cursor: pointer;
+  letter-spacing: 2px;
+  transition: all 0.3s;
+}
+
+.btn-warning-ack:hover {
+  background: var(--color-antimatter);
+  box-shadow: 0 0 25px rgba(255, 0, 85, 0.9);
 }
 
 .library-screen {
@@ -222,7 +291,7 @@ body.activated .cyber-bg {
   justify-content: center;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.5s ease;
+  transition: opacity 0.8s ease;
 }
 
 .library-box {
@@ -232,7 +301,7 @@ body.activated .cyber-bg {
   background: rgba(5, 2, 12, 0.9);
   padding: 25px;
   border-radius: 8px;
-  box-shadow: 0 0 35px rgba(157, 78, 221, 0.3);
+  box-shadow: 0 0 40px rgba(157, 78, 221, 0.3);
   text-align: left;
 }
 
@@ -249,10 +318,10 @@ body.activated .cyber-bg {
 .lib-line {
   font-size: 0.7rem;
   color: #a1a1aa;
-  margin: 6px 0;
+  margin: 8px 0;
   opacity: 0;
-  transform: translateY(5px);
-  transition: all 0.2s ease;
+  transform: translateY(8px);
+  transition: all 0.4s ease;
 }
 
 .lib-line.active {
@@ -262,7 +331,7 @@ body.activated .cyber-bg {
 
 .lib-line.highlight {
   color: var(--color-energy);
-  text-shadow: 0 0 8px rgba(0, 255, 204, 0.5);
+  text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
 }
 
 .name-screen {
@@ -276,8 +345,8 @@ body.activated .cyber-bg {
   justify-content: center;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.6s ease;
-  backdrop-filter: blur(12px);
+  transition: opacity 1s ease;
+  backdrop-filter: blur(15px);
 }
 
 .name-screen.active {
@@ -292,8 +361,14 @@ body.activated .cyber-bg {
   border: 1px solid var(--color-energy);
   border-radius: 12px;
   padding: 30px;
-  box-shadow: 0 0 40px rgba(0, 255, 204, 0.2);
+  box-shadow: 0 0 50px rgba(0, 255, 204, 0.25);
   text-align: center;
+  transform: scale(0.9);
+  transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.name-screen.active .name-box {
+  transform: scale(1);
 }
 
 .name-title {
@@ -302,7 +377,7 @@ body.activated .cyber-bg {
   letter-spacing: 2px;
   color: var(--color-energy);
   margin-bottom: 10px;
-  text-shadow: 0 0 10px rgba(0, 255, 204, 0.4);
+  text-shadow: 0 0 12px rgba(0, 255, 204, 0.4);
 }
 
 .name-desc {
@@ -324,13 +399,13 @@ body.activated .cyber-bg {
   letter-spacing: 2px;
   outline: none;
   margin-bottom: 20px;
-  transition: all 0.2s;
+  transition: all 0.3s;
   user-select: text;
 }
 
 .name-input:focus {
   border-color: var(--color-energy);
-  box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
+  box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
 }
 
 .btn-name-submit {
@@ -344,13 +419,13 @@ body.activated .cyber-bg {
   font-weight: 900;
   cursor: pointer;
   letter-spacing: 2px;
-  transition: all 0.2s;
+  transition: all 0.3s;
 }
 
 .btn-name-submit:hover {
   background: var(--color-energy);
   color: #000;
-  box-shadow: 0 0 25px rgba(0, 255, 204, 0.8);
+  box-shadow: 0 0 30px rgba(0, 255, 204, 0.9);
 }
 
 .home-container {
@@ -360,13 +435,13 @@ body.activated .cyber-bg {
   border: 1px solid var(--border-strong);
   border-radius: 16px;
   padding: 40px 30px;
-  box-shadow: 0 0 50px rgba(57, 255, 20, 0.1), inset 0 0 30px rgba(255, 0, 85, 0.1);
+  box-shadow: 0 0 60px rgba(57, 255, 20, 0.12), inset 0 0 35px rgba(255, 0, 85, 0.12);
   text-align: center;
   position: relative;
   backdrop-filter: blur(16px);
   opacity: 0;
   transform: scale(0.85);
-  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 1.5s cubic-bezier(0.16, 1, 0.3, 1), transform 1.5s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
 }
 
@@ -378,8 +453,8 @@ body.activated .home-container {
 }
 
 @keyframes panel-glitch-idle {
-  0%, 95%, 100% { transform: translate(0, 0); box-shadow: 0 0 50px rgba(57, 255, 20, 0.1), inset 0 0 30px rgba(255, 0, 85, 0.1); }
-  96% { transform: translate(-3px, 2px); box-shadow: 0 0 40px rgba(255, 0, 85, 0.4), inset 0 0 20px rgba(57, 255, 20, 0.3); }
+  0%, 95%, 100% { transform: translate(0, 0); box-shadow: 0 0 60px rgba(57, 255, 20, 0.12), inset 0 0 35px rgba(255, 0, 85, 0.12); }
+  96% { transform: translate(-3px, 2px); box-shadow: 0 0 50px rgba(255, 0, 85, 0.4), inset 0 0 25px rgba(57, 255, 20, 0.3); }
   98% { transform: translate(3px, -2px); border-color: var(--color-antimatter); }
 }
 
@@ -638,7 +713,7 @@ body.activated .home-container {
   opacity: 0;
   pointer-events: none;
   transform: scale(0.05) rotate(-45deg);
-  transition: opacity 0.7s cubic-bezier(0.9, 0, 0.8, 1), transform 0.7s cubic-bezier(0.7, 0, 0.9, 1);
+  transition: opacity 0.8s cubic-bezier(0.9, 0, 0.8, 1), transform 0.8s cubic-bezier(0.7, 0, 0.9, 1);
   mix-blend-mode: hard-light;
 }
 
@@ -665,15 +740,16 @@ body.warping .home-container {
 }
 
 body.warping {
-  animation: kimo-shake 0.7s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  animation: kimo-shake 0.8s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
-  .copyright {
-  position: fixed;   /* 画面に対して固定する */
-  left: 10px;        /* 左からの距離 */
-  bottom: 10px;      /* 下からの距離 */
-  font-size: 11px;   /* 小さめの文字サイズ */
-  color: #666;       /* 文字色（グレーなど） */
-  z-index: 9999;     /* 他の要素の下に隠れないように手前に表示 */
+
+.copyright {
+  position: fixed;
+  left: 10px;
+  bottom: 10px;
+  font-size: 11px;
+  color: #666;
+  z-index: 9999;
 }
 </style>
 </head>
@@ -683,6 +759,18 @@ body.warping {
   <div class="author-logo-box">
     <div class="author-label">PRESENTS BY</div>
     <div class="author-name">HTsatoweb</div>
+  </div>
+</div>
+
+<div class="warning-screen" id="warningScreen">
+  <div class="warning-box">
+    <div class="warning-title">⚠ HEALTH & SAFETY WARNING</div>
+    <div class="warning-desc">
+      本ゲームには、激しい光の点滅、画面のフラッシュ演出、および高刺激なサイバーエフェクトが含まれております。<br><br>
+      光過敏性発作やてんかんの症状持ちの方、体調がすぐれない方はプレイをお控えください。また、プレイ時は部屋を明るくし、画面から十分な距離をとってください。<br><br>
+      またclickタップするゲームなので腱鞘炎にご注意ください
+    </div>
+    <button class="btn-warning-ack" id="ackWarningBtn">▶ 理解して進む</button>
   </div>
 </div>
 
@@ -727,7 +815,7 @@ body.warping {
     <button class="btn-menu btn-reset" id="openResetModalBtn">⚠ セーブデータ初期化 / 設定</button>
   </div>
 
-  <div class="version-tag">home v6.1</div>
+  <div class="version-tag">home v6.2</div>
 </div>
 
 <div class="reset-modal" id="resetModal">
@@ -761,20 +849,17 @@ body.warping {
 </div>
 
 <script>
-  // 画面がまだ全画面でない場合に、最初のタップ/クリックで全画面にする
 document.addEventListener('click', () => {
   if (!document.fullscreenElement && !document.webkitFullscreenElement) {
     const elem = document.documentElement;
     if (elem.requestFullscreen) {
-      elem.requestFullscreen().catch(err => {
-        // ブラウザの仕様やセキュリティ制限で失敗した場合は無視
-        console.log("Fullscreen request denied or not allowed.");
-      });
+      elem.requestFullscreen().catch(() => {});
     } else if (elem.webkitRequestFullscreen) {
-      elem.webkitRequestFullscreen(); // Safariなどの旧プレフィックス対応
+      elem.webkitRequestFullscreen();
     }
   }
-}, { once: true }); // { once: true } にしているので、最初の一回クリックされたらこのイベントは終了します
+}, { once: true });
+
 class KimoSoundManager {
   static initContext() {
     if (!this.audioCtx) {
@@ -795,17 +880,36 @@ class KimoSoundManager {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(110, now);
-      osc.frequency.exponentialRampToValueAtTime(440, now + 1.2);
+      osc.frequency.setValueAtTime(90, now);
+      osc.frequency.exponentialRampToValueAtTime(520, now + 1.8);
 
       gain.gain.setValueAtTime(0.001, now);
-      gain.gain.linearRampToValueAtTime(0.12, now + 0.3);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+      gain.gain.linearRampToValueAtTime(0.15, now + 0.5);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 2.2);
 
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start(now);
-      osc.stop(now + 1.5);
+      osc.stop(now + 2.2);
+    } catch(e) {}
+  }
+
+  static playWarningBeep() {
+    try {
+      this.initContext();
+      const ctx = this.audioCtx;
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(660, now);
+      osc.frequency.exponentialRampToValueAtTime(330, now + 0.3);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.linearRampToValueAtTime(0.001, now + 0.3);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.3);
     } catch(e) {}
   }
 
@@ -822,29 +926,29 @@ class KimoSoundManager {
 
         osc.type = index % 2 === 0 ? 'sawtooth' : 'square';
         osc.frequency.setValueAtTime(freq, now);
-        osc.frequency.exponentialRampToValueAtTime(freq * 1.5, now + 1.5);
-        osc.frequency.exponentialRampToValueAtTime(freq * 0.8, now + 3.0);
+        osc.frequency.exponentialRampToValueAtTime(freq * 1.5, now + 2.0);
+        osc.frequency.exponentialRampToValueAtTime(freq * 0.8, now + 4.0);
 
         filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(200, now);
-        filter.frequency.linearRampToValueAtTime(1200, now + 1.5);
-        filter.frequency.linearRampToValueAtTime(300, now + 3.0);
+        filter.frequency.setValueAtTime(150, now);
+        filter.frequency.linearRampToValueAtTime(1500, now + 2.0);
+        filter.frequency.linearRampToValueAtTime(250, now + 4.0);
 
         gain.gain.setValueAtTime(0.001, now);
-        gain.gain.linearRampToValueAtTime(0.1, now + 0.8);
-        gain.gain.setValueAtTime(0.1, now + 2.2);
-        gain.gain.linearRampToValueAtTime(0.001, now + 3.0);
+        gain.gain.linearRampToValueAtTime(0.12, now + 1.2);
+        gain.gain.setValueAtTime(0.12, now + 3.0);
+        gain.gain.linearRampToValueAtTime(0.001, now + 4.0);
 
         osc.connect(filter);
         filter.connect(gain);
         gain.connect(ctx.destination);
         
         osc.start(now);
-        osc.stop(now + 3.0);
+        osc.stop(now + 4.0);
       });
 
       if (typeof onFinished === 'function') {
-        setTimeout(onFinished, 2500);
+        setTimeout(onFinished, 3200);
       }
     } catch (e) {
       if (typeof onFinished === 'function') onFinished();
@@ -880,13 +984,13 @@ class KimoSoundManager {
         osc.frequency.setValueAtTime(freq * 1.5, now);
 
         gain.gain.setValueAtTime(0.001, now);
-        gain.gain.linearRampToValueAtTime(0.03, now + 0.03);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        gain.gain.linearRampToValueAtTime(0.03, now + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
 
         osc.connect(gain);
         gain.connect(ctx.destination);
         osc.start(now);
-        osc.stop(now + 0.35);
+        osc.stop(now + 0.4);
 
         noteIndex++;
         if (noteIndex >= currentChord.length) {
@@ -894,7 +998,7 @@ class KimoSoundManager {
           chordIndex = (chordIndex + 1) % creepyChords.length;
         }
 
-        setTimeout(playStep, 200);
+        setTimeout(playStep, 220);
       };
 
       playStep();
@@ -913,23 +1017,25 @@ class KimoSoundManager {
       
       osc.type = 'sawtooth';
       osc.frequency.setValueAtTime(80, now);
-      osc.frequency.exponentialRampToValueAtTime(2400, now + 0.5);
-      osc.frequency.exponentialRampToValueAtTime(400, now + 0.65);
+      osc.frequency.exponentialRampToValueAtTime(2400, now + 0.6);
+      osc.frequency.exponentialRampToValueAtTime(400, now + 0.8);
 
-      gain.gain.setValueAtTime(0.35, now);
-      gain.gain.linearRampToValueAtTime(0.01, now + 0.7);
+      gain.gain.setValueAtTime(0.4, now);
+      gain.gain.linearRampToValueAtTime(0.01, now + 0.85);
 
       osc.connect(gain);
       gain.connect(ctx.destination);
       
       osc.start(now);
-      osc.stop(now + 0.7);
+      osc.stop(now + 0.85);
     } catch (e) {}
   }
 }
 
 window.addEventListener('DOMContentLoaded', () => {
   const authorScreen = document.getElementById('authorScreen');
+  const warningScreen = document.getElementById('warningScreen');
+  const ackWarningBtn = document.getElementById('ackWarningBtn');
   const libraryScreen = document.getElementById('libraryScreen');
   const nameScreen = document.getElementById('nameScreen');
   const godNameInput = document.getElementById('godNameInput');
@@ -945,46 +1051,57 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   if (hasRegistered) {
-    // 2回目以降：名前入力をスキップして直接メイン画面へ
     authorScreen.style.display = 'none';
+    warningScreen.style.display = 'none';
     libraryScreen.style.display = 'none';
     nameScreen.style.display = 'none';
     document.body.classList.add('activated');
     KimoSoundManager.startBGM();
   } else {
-    // 初回起動時のみの演出
+    // 初回起動シネマティックシーケンス（演出を長尺化・優雅に調整）
     setTimeout(() => {
       authorScreen.classList.add('show');
       KimoSoundManager.playAuthorSound();
-    }, 300);
+    }, 400);
 
+    // 作者ロゴ消灯 → ヘルス＆セーフティ警告表示（時間を長めにとる）
     setTimeout(() => {
       authorScreen.style.opacity = '0';
       authorScreen.style.pointerEvents = 'none';
       
+      warningScreen.style.opacity = '1';
+      warningScreen.style.pointerEvents = 'auto';
+      warningScreen.classList.add('active');
+      KimoSoundManager.playWarningBeep();
+    }, 3800);
+
+    ackWarningBtn.addEventListener('click', () => {
+      warningScreen.style.opacity = '0';
+      warningScreen.style.pointerEvents = 'none';
+
       libraryScreen.style.opacity = '1';
       libraryScreen.style.pointerEvents = 'auto';
 
       ['l1', 'l2', 'l3', 'l4', 'l5'].forEach((id, idx) => {
         setTimeout(() => {
           document.getElementById(id).classList.add('active');
-        }, idx * 180);
+        }, idx * 300); // スペック検証の文字を1つずつじっくり表示
       });
-    }, 2200);
-
-    setTimeout(() => {
-      libraryScreen.style.opacity = '0';
-      libraryScreen.style.pointerEvents = 'none';
-
-      nameScreen.classList.add('active');
-      godNameInput.focus();
 
       setTimeout(() => {
-        authorScreen.remove();
-        libraryScreen.remove();
-      }, 1000);
+        libraryScreen.style.opacity = '0';
+        libraryScreen.style.pointerEvents = 'none';
 
-    }, 5000);
+        nameScreen.classList.add('active');
+        godNameInput.focus();
+
+        setTimeout(() => {
+          authorScreen.remove();
+          warningScreen.remove();
+          libraryScreen.remove();
+        }, 1200);
+      }, 4200);
+    }, { once: true });
   }
 
   submitNameBtn.addEventListener('click', () => {
@@ -1008,7 +1125,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     setTimeout(() => {
       nameScreen.remove();
-    }, 600);
+    }, 800);
   });
 
   godNameInput.addEventListener('keydown', (e) => {
@@ -1084,7 +1201,7 @@ document.getElementById('startHardBtn').addEventListener('click', (e) => {
 
   setTimeout(() => {
     window.location.href = 'MZclickgame.html';
-  }, 700);
+  }, 800);
 });
 
 document.getElementById('startEasyBtn').addEventListener('click', (e) => {
@@ -1094,7 +1211,7 @@ document.getElementById('startEasyBtn').addEventListener('click', (e) => {
 
   setTimeout(() => {
     window.location.href = 'KNclickgame.html';
-  }, 700);
+  }, 800);
 });
 
 document.querySelectorAll('.checkbox-label').forEach(label => {
@@ -1106,8 +1223,6 @@ document.querySelectorAll('.checkbox-label').forEach(label => {
     checkbox.checked = !checkbox.checked;
   });
 });
-  
 </script>
-
 </body>
 </html>
