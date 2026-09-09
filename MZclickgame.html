@@ -1709,6 +1709,7 @@ body.force-lightweight-all #eventOverlay.show .event-card {
     <button class="tab-trigger-button tab-color-tl" onclick="switchMainTab('tab-tl-layer')">TIME (時間律)</button>
     <button class="tab-trigger-button" onclick="switchMainTab('tab-auto')">AUTOMATION (自動化)</button>
     <button class="tab-trigger-button" onclick="switchMainTab('tab-ach'); renderAchievementsList();" style="color: var(--color-upgrade); border-color: var(--color-upgrade);">ACHIEVEMENTS (実績)</button>
+    <button class="tab-trigger-button" id="tabBtnPlayview" onclick="switchMainTab('tab-playview'); if(window.renderPlayViewTab) renderPlayViewTab();" style="color: var(--color-energy);">PLAY VIEW (やりこみ)</button>
   </div>
 
   <div class="center-content-viewport">
@@ -1757,6 +1758,12 @@ body.force-lightweight-all #eventOverlay.show .event-card {
       <div class="pane-heading" style="color: var(--color-upgrade);">ACHIEVEMENTS MATRIX (実績データベース)</div>
       <div class="guide-text-block">宇宙の因果を紐解き、数々の条件を達成して称号を手に入れろ。<br>達成率: <span id="ach-progress-text">0 / 0</span> (<span id="ach-progress-percent">0%</span>)</div>
       <div class="upgrade-matrix-grid" id="containerAchievements" style="display: flex; flex-direction: column; gap: 6px;"></div>
+    </div>
+
+    <div class="tab-pane" id="tab-playview">
+      <div class="pane-heading" style="color: var(--color-energy);">PLAY VIEW / LONG PLAY</div>
+      <div class="guide-text-block">週課題・熟練・遺物・研究。左の PLAY VIEW と同じ進行です。タブ位置だけ追加しています。</div>
+      <div id="playviewTabBody"></div>
     </div>
 
   </div>
@@ -1905,6 +1912,9 @@ body.force-lightweight-all #eventOverlay.show .event-card {
     <div style="padding: 16px; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box;">
       <div style="display: flex; width: 100%;">
         <button class="btn-utility" onclick="location.href='index.html'" style="width: 100%; white-space: nowrap; color: var(--color-energy); border-color: var(--color-energy); cursor: pointer;">🏠 ホームに戻る</button>
+      </div>
+      <div style="display: flex; width: 100%;">
+        <button class="btn-utility" type="button" onclick="toggleAboutGame()" style="width: 100%; white-space: nowrap; color: var(--color-upgrade); border-color: var(--color-upgrade); cursor: pointer; font-weight: bold;">📘 ゲームについて</button>
       </div>
       <!-- ボタン行 1 -->
       <div style="display: flex; gap: 8px; flex-wrap: wrap; width: 100%;">
@@ -3778,8 +3788,10 @@ function renderFactories() {
             const name = (f && f.name) ? f.name : `施設 #${globalIndex + 1}`;
             const desc = (f && f.desc) ? f.desc : "";
             
-            // 正しい購入関数 executeBuyFactory を呼ぶ
-            el.onclick = () => executeBuyFactory(globalIndex);
+            el.onclick = (ev) => {
+              if (ev && ev.shiftKey) executeBuyFactory(globalIndex);
+              else openFactoryDetail(globalIndex);
+            };
             
             el.innerHTML = `
                 <div class="fac-profile-left">
@@ -4459,7 +4471,7 @@ function buildGameDOM() {
     fContainer.innerHTML = "";
     DB_FACTORIES.forEach(f => {
       fContainer.innerHTML += `
-        <div class="factory-linear-card state-disabled" id="dom-fac-${f.id}" onclick="executeBuyFactory(${f.id})">
+        <div class="factory-linear-card state-disabled" id="dom-fac-${f.id}" onclick="openFactoryDetail(${f.id})">
           <div class="fac-profile-left">
             <span class="fac-name-text">${f.name}</span>
             <span class="fac-desc-text">${f.desc}</span>
@@ -5628,6 +5640,8 @@ function switchMainTab(targetId, clickEvent) {
     renderTlUpgrades();
   } else if (targetId === "tab-auto" && typeof renderAutomation === "function") {
     renderAutomation();
+  } else if (targetId === "tab-playview" && typeof window.renderPlayViewTab === "function") {
+    window.renderPlayViewTab();
   }
 }
 
@@ -8720,10 +8734,23 @@ document.addEventListener("DOMContentLoaded", () => {
       + "<div class='pv-row'><span>フィーチャー</span><span class='pv-val' id='pv-pulses'>0</span></div>"
       + "<div class='pv-row'><span>オーブ</span><span class='pv-val' id='pv-orbs'>0</span></div>"
       + "<div class='pv-row'><span>AM / TS</span><span class='pv-val' id='pv-amts'>0 / 0</span></div>"
+      + "<div class='pv-row'><span>レガシー</span><span class='pv-val' id='pv-legacy'>Lv.1</span></div>"
+      + "<div class='pv-bar' title='長期ランク'><i id='pv-legacy-i'></i></div>"
+      + "<div class='pv-row'><span>称号</span><span class='pv-val' id='pv-title'>新星見習い</span></div>"
+      + "<div class='pv-row'><span>デイリー</span><span class='pv-val' id='pv-daily'>0 / 3</span></div>"
+      + "<div class='pv-row'><span>図鑑</span><span class='pv-val' id='pv-codex'>0</span></div>"
+      + "<div class='pv-row'><span>星座</span><span class='pv-val' id='pv-starsign'>0 / 12</span></div>"
+      + "<div class='pv-row'><span>章</span><span class='pv-val' id='pv-chapter'>I はじまり</span></div>"
+      + "<div class='pv-row'><span>週課題</span><span class='pv-val' id='pv-weekly'>—</span></div>"
+      + "<div class='pv-row'><span>熟練</span><span class='pv-val' id='pv-mastery'>0</span></div>"
+      + "<div class='pv-row'><span>遺物</span><span class='pv-val' id='pv-relics'>0 / 36</span></div>"
+      + "<div class='pv-row'><span>研究</span><span class='pv-val' id='pv-research'>0</span></div>"
       + "<div class='pv-chipwrap' id='pv-bonus-chips'>"
-      +   "<span class='pv-chip'>楽しい +50</span>"
-      +   "<span class='pv-chip bad'>アンラッキー +50</span>"
+      +   "<span class='pv-chip'>章</span>"
+      +   "<span class='pv-chip'>週課題</span>"
+      +   "<span class='pv-chip'>遺物</span>"
       + "</div>"
+      + "<div class='pv-row'><span>ポイント案内</span><span class='pv-val' id='pv-points'>E / AM / TS / 研究</span></div>"
       + "<div class='pv-log' id='pv-log'>PLAY VIEW 待機中</div>";
     if (hud && hud.parentNode) hud.parentNode.insertBefore(box, hud.nextSibling);
     else {
@@ -9033,6 +9060,732 @@ document.addEventListener("DOMContentLoaded", () => {
       if (Math.random() < 0.08) window.openOmegaQuiz();
     }, 45000);
   });
+})();
+</script>
+
+
+<script>
+(function OmegaGrind(){
+  "use strict";
+  const KEY = "omega_grind_v1";
+  const SIGNS = ["おひつじ","おうし","ふたご","かに","しし","おとめ","てんびん","さそり","いて","やぎ","みずがめ","うお"];
+  const TITLES = [
+    [1,"新星見習い"],[5,"観測助手"],[10,"恒星守り"],[20,"銀河書記"],
+    [35,"星図職人"],[50,"時の integr"],[70,"終焉観測士"],[90,"無限記録官"],[100,"絶対観測核"]
+  ];
+  function titleOf(lv){
+    let n = TITLES[0][1];
+    for (let i=0;i<TITLES.length;i++) if (lv >= TITLES[i][0]) n = TITLES[i][1];
+    return n.replace(" integr","番人");
+  }
+  function today(){
+    try { return new Date().toISOString().slice(0,10); } catch(e){ return "day"; }
+  }
+  function load(){
+    const base = {
+      lv:1, xp:0, taps:0, minutes:0, quiz:0, orbs:0,
+      codex:{}, signs:{}, dailyDay:"", daily:{taps:0,events:0,orbs:0}, dailyDone:[0,0,0],
+      lastMin:0
+    };
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return base;
+      const o = JSON.parse(raw);
+      return Object.assign(base, o, {codex:o.codex||{}, signs:o.signs||{}, daily:o.daily||base.daily, dailyDone:o.dailyDone||[0,0,0]});
+    } catch(e){ return base; }
+  }
+  function save(G){
+    try { localStorage.setItem(KEY, JSON.stringify(G)); } catch(e){}
+  }
+  function need(lv){ return 20 + lv * 8; }
+  const G = load();
+  window.OmegaGrind = G;
+
+  function rollDaily(){
+    if (G.dailyDay === today()) return;
+    G.dailyDay = today();
+    G.daily = {taps:0, events:0, orbs:0};
+    G.dailyDone = [0,0,0];
+    save(G);
+  }
+  function addXp(n){
+    G.xp += n;
+    let up = 0;
+    while (G.lv < 100 && G.xp >= need(G.lv)) {
+      G.xp -= need(G.lv);
+      G.lv++;
+      up++;
+      const idx = Math.min(11, Math.floor((G.lv-1)/8));
+      G.signs[SIGNS[idx]] = 1;
+      if (typeof createToast === "function") createToast("レガシー Lv."+G.lv, titleOf(G.lv));
+    }
+    save(G); paint();
+    return up;
+  }
+  function paint(){
+    rollDaily();
+    const lvEl = document.getElementById("pv-legacy");
+    if (lvEl) lvEl.textContent = "Lv."+G.lv+"  XP "+G.xp+"/"+need(G.lv);
+    const bar = document.getElementById("pv-legacy-i");
+    if (bar) bar.style.width = Math.min(100, (G.xp/need(G.lv))*100).toFixed(1)+"%";
+    const t = document.getElementById("pv-title");
+    if (t) t.textContent = titleOf(G.lv);
+    const dDone = (G.dailyDone[0]?1:0)+(G.dailyDone[1]?1:0)+(G.dailyDone[2]?1:0);
+    const d = document.getElementById("pv-daily");
+    if (d) d.textContent = dDone+" / 3";
+    const c = document.getElementById("pv-codex");
+    if (c) c.textContent = String(Object.keys(G.codex).length);
+    const s = document.getElementById("pv-starsign");
+    if (s) s.textContent = Object.keys(G.signs).length+" / 12";
+  }
+  function checkDaily(){
+    if (!G.dailyDone[0] && G.daily.taps >= 80) {
+      G.dailyDone[0] = 1; addXp(12);
+      try { if (typeof addEnergySafe==="function") addEnergySafe((typeof cpsWorth==="function"?cpsWorth(20):100)); } catch(e){}
+      if (typeof createToast==="function") createToast("デイリー","タップ課題クリア");
+    }
+    if (!G.dailyDone[1] && G.daily.events >= 3) {
+      G.dailyDone[1] = 1; addXp(12);
+      try { if (typeof addEnergySafe==="function") addEnergySafe((typeof cpsWorth==="function"?cpsWorth(20):100)); } catch(e){}
+      if (typeof createToast==="function") createToast("デイリー","イベント課題クリア");
+    }
+    if (!G.dailyDone[2] && G.daily.orbs >= 5) {
+      G.dailyDone[2] = 1; addXp(12);
+      try { if (typeof addEnergySafe==="function") addEnergySafe((typeof cpsWorth==="function"?cpsWorth(20):100)); } catch(e){}
+      if (typeof createToast==="function") createToast("デイリー","オーブ課題クリア");
+    }
+    save(G); paint();
+  }
+
+  // 永久のごく小さなやりこみボーナス（UIは動かさない）
+  function installBonus(){
+    if (window.__grindClickWrap) return;
+    const orig = window.getClickPower;
+    if (typeof orig !== "function") return;
+    window.getClickPower = function(){
+      const v = orig.apply(this, arguments);
+      const m = 1 + Math.min(0.5, (G.lv-1) * 0.004);
+      try {
+        if (v && typeof v.mul === "function") return v.mul(m);
+        if (typeof v === "number") return v * m;
+      } catch(e){}
+      return v;
+    };
+    window.__grindClickWrap = true;
+  }
+
+  function hook(){
+    document.addEventListener("pointerdown", function(e){
+      const t = e.target;
+      if (!t) return;
+      if (t.id === "coreTrigger" || (t.closest && t.closest("#coreTrigger"))) {
+        G.taps++; G.daily.taps++;
+        if (G.taps % 50 === 0) addXp(2);
+        else if (G.taps % 10 === 0) { G.xp += 1; save(G); }
+        checkDaily();
+      }
+    }, {capture:true, passive:true});
+
+    const origTrig = window.triggerRandomEvent;
+    if (typeof origTrig === "function" && !origTrig.__grind) {
+      window.triggerRandomEvent = function(forceId){
+        const r = origTrig.apply(this, arguments);
+        try {
+          const id = (window.EVT && EVT.lastId) || forceId || "ev";
+          G.codex[id] = 1;
+          G.daily.events++;
+          addXp(1);
+          checkDaily();
+        } catch(e){}
+        return r;
+      };
+      window.triggerRandomEvent.__grind = true;
+    }
+  }
+
+  function tickPlaytime(){
+    try {
+      const min = Math.floor(((window.game && game.totalTime) || 0) / 60);
+      if (min > (G.lastMin||0)) {
+        const dlt = min - (G.lastMin||0);
+        G.lastMin = min;
+        G.minutes = min;
+        addXp(dlt);
+      }
+    } catch(e){}
+  }
+
+  function ready(fn){
+    if (document.readyState === "complete" || document.readyState === "interactive") setTimeout(fn, 0);
+    else document.addEventListener("DOMContentLoaded", fn);
+  }
+  ready(function(){
+    rollDaily();
+    paint();
+    hook();
+    setTimeout(installBonus, 600);
+    setInterval(function(){ tickPlaytime(); paint(); }, 8000);
+    if (window.OmegaPack) {
+      const prevOrb = OmegaPack.orbsCaught;
+      setInterval(function(){
+        const now = (window.OmegaPack && OmegaPack.orbsCaught) || 0;
+        if (now > (G.orbs||0)) {
+          const d = now - (G.orbs||0);
+          G.orbs = now;
+          G.daily.orbs += d;
+          addXp(d);
+          checkDaily();
+        }
+      }, 4000);
+    }
+  });
+})();
+</script>
+
+
+<script>
+(function OmegaLongPlay(){
+  "use strict";
+  const KEY = "omega_longplay_v1";
+  const CHAPTERS = [
+    "I はじまり","II 点火","III 軌道","IV 恒星風","V 反物質海",
+    "VI 時間の岸","VII 銀河棚","VIII 観測塔","IX 終焉手前",
+    "X 無限廊下","XI 絶対記録","XII オメガ核"
+  ];
+  const WEEKLY = [
+    ["タップ職人","コアを 400 回タップ", function(S){ return S.taps >= 400; }],
+    ["イベント観測","イベントを 12 回見る", function(S){ return S.events >= 12; }],
+    ["オーブ狩り","オーブを 15 個取る", function(S){ return S.orbs >= 15; }],
+    ["クイズ週間","クイズに 6 回正解", function(S){ return S.quizOk >= 6; }],
+    ["フィーバー週","フィーバーを 8 回使う", function(S){ return S.fever >= 8; }],
+    ["長時間観測","60 分遊ぶ", function(S){ return S.mins >= 60; }],
+    ["コンボ週","コンボ 15 に到達", function(S){ return S.comboMax >= 15; }],
+    ["早起き観測","タップ200とイベント5", function(S){ return S.taps>=200 && S.events>=5; }],
+    ["双眼鏡","オーブ8とクイズ3", function(S){ return S.orbs>=8 && S.quizOk>=3; }],
+    ["熟練週間","熟練合計80", function(S){ const m=S.mastery||{}; return (m.tap||0)+(m.idle||0)+(m.ev||0)+(m.quiz||0)>=80; }],
+    ["長考","90分観測", function(S){ return S.mins>=90; }],
+    ["連打祭","タップ800", function(S){ return S.taps>=800; }],
+    ["図鑑週","イベント20", function(S){ return S.events>=20; }],
+    ["オーブ嵐","オーブ25", function(S){ return S.orbs>=25; }],
+    ["クイズ大会","クイズ10正解", function(S){ return S.quizOk>=10; }],
+    ["熱気週","フィーバー12", function(S){ return S.fever>=12; }],
+    ["コンボ職人","コンボ25", function(S){ return S.comboMax>=25; }],
+    ["静かな週","放置熟練40", function(S){ return ((S.mastery&&S.mastery.idle)||0)>=40; }],
+    ["研究週間","研究3以上", function(S){ return (S.research||0)>=3; }],
+    ["遺物集め","遺物3種", function(S){ return Object.keys(S.relics||{}).length>=3; }]
+  ];
+  const RELICS = [
+    "初火の芯","軌道の砂","恒星のしずく","真空の糸","反転の欠片",
+    "秒針の歯","銀河のひとかけ","観測レンズ","終焉のメモ","無限のしおり",
+    "絶対の印章","オメガの種","彗星のリボン","プリズム片","ネオン回路",
+    "時計のねじ","星図の端","無音の鈴","虹の薄片","琥珀コンデンサ",
+    "風の羽根","冷却結晶","パルス核","キャッシュ花","設計図切れ",
+    "シールド薄片","フィーバー種","クイズバッジ","デイリーメダル","レガシー印",
+    "図鑑しおり","星座ピン","章のしおり","週の旗","熟練バッジ","研究ノート"
+  ];
+  ["銅の星片","銀の星片","金の星片","観測手帳","古い星図","新しい星図","時間の砂時計","反物質小瓶","コアのさび","タップグローブ","静かな椅子","書庫の灯","週報クリップ","研究白衣","終焉鉛筆","無限消しゴム","絶対定規","オメガ印章","銀河スタンプ","軌道コンパス","恒星マッチ","真空瓶","冷却パック","パルス手帳","キャッシュ鍵","設計ナイフ","シールド布","フィーバーうちわ","クイズ笛","デイリー印鑑","レガシー冠","図鑑カバー","星座シール","遺物箱","研究机","第一観測窓","第二観測窓","第三観測窓","深夜のコップ","朝のメモ","昼の印","彗星ボタン","流星ボタン","銀河ボタン","時間ボタン","反転ボタン","コアボタン"].forEach(function(n){ RELICS.push(n); });
+  for (var ri=1; ri<=40; ri++) RELICS.push("記録石 "+ri);
+  window.__OMEGA_RELICS = RELICS;
+  const MORE_QUIZ = [
+    { q:"三角形の角の合計は？", a:["90度","180度","360度"], ok:1 },
+    { q:"地球は何惑星目？（内側から）", a:["2","3","4"], ok:1 },
+    { q:"100センチは何メートル？", a:["1","10","100"], ok:0 },
+    { q:"光より速い乗り物は？", a:["新幹線","ない","自転車"], ok:1 },
+    { q:"水の化学式は？", a:["CO2","H2O","O2"], ok:1 },
+    { q:"1週間は何日？", a:["5","6","7"], ok:2 },
+    { q:"月は自分で光る？", a:["光る","太陽の反射","電気"], ok:1 },
+    { q:"北極に近い動物は？", a:["ペンギン","シロクマ","カンガルー"], ok:1 },
+    { q:"2の10乗に近いのは？", a:["20","512","1024"], ok:2 },
+    { q:"音が伝わりやすいのは？", a:["真空","水や空気","宇宙の外"], ok:1 },
+    { q:"虹の外側に近い色は？", a:["赤","紫","緑"], ok:0 },
+    { q:"地球の表面の多くは？", a:["砂漠","海","氷だけ"], ok:1 },
+    { q:"1日は約何時間？", a:["12","24","48"], ok:1 },
+    { q:"磁石が引きやすいのは？", a:["木","鉄","ガラス"], ok:1 },
+    { q:"植物が光で作るのは？", a:["栄養と酸素","石","電気だけ"], ok:0 }
+  ];
+  const EXTRA_EV = [
+    ["lucky","chronicle_ink","年代記のインク","記録が少し濃くなった"],
+    ["lucky","archive_key","書庫の鍵","古い棚が開いた"],
+    ["lucky","observer_tea","観測のお茶","集中が戻った"],
+    ["lucky","star_ticket","星の切符","次の駅が近い"],
+    ["lucky","soft_engine","やさしい機関","ラインが歌う"],
+    ["lucky","map_corner","地図の角","道が見えた"],
+    ["lucky","quiet_lab","静かな実験室","計算が澄む"],
+    ["lucky","gift_orbit","周回ギフト","一周ぶん得した"],
+    ["unlucky","ink_smudge","インク汚れ","記録がにじむ"],
+    ["unlucky","shelf_jam","棚の詰まり","本が落ちそう"],
+    ["unlucky","sleepy_lens","レンズ眠気","ピントが甘い"],
+    ["unlucky","ticket_crease","切符の折り目","改札でもたつく"],
+    ["unlucky","map_tear","地図の裂け","遠回り"],
+    ["unlucky","lab_dust","実験室のほこり","精度が落ちる"],
+    ["mixed","coin_page","本の間のコイン","出目は不明"],
+    ["mixed","two_clocks","二つの時計","どちらが正しいか"],
+    ["lucky","chapter_seal","章の封印が緩む","物語が進む"],
+    ["lucky","relic_glint","遺物のきらめき","何かが光った"],
+    ["lucky","research_spark","研究の火花","ノートが増える"],
+    ["unlucky","page_loss","ページ紛失","話が飛ぶ"]
+  ];
+
+  function weekId(){
+    const d = new Date();
+    const t = Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+    return Math.floor(t / 86400000 / 7);
+  }
+  function load(){
+    const base = { taps:0, events:0, orbs:0, quizOk:0, fever:0, mins:0, comboMax:0, week: -1, weekDone:0, relics:{}, research:0, mastery:{tap:0,idle:0,ev:0,quiz:0,combo:0,fever:0,relic:0,research:0}, bought:{} };
+    try {
+      const o = JSON.parse(localStorage.getItem(KEY) || "null");
+      if (!o) return base;
+      return Object.assign(base, o, {relics:o.relics||{}, mastery:Object.assign(base.mastery, o.mastery||{})});
+    } catch(e){ return base; }
+  }
+  function save(S){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+  const S = load();
+  window.OmegaLong = S;
+
+  function chapter(){
+    let n = 0;
+    try {
+      const e = (typeof D === "function") ? D(game && game.energy || 0) : 0;
+      const log = (e && e.log10) ? Number(e.log10()) : 0;
+      n = Math.max(0, Math.min(11, Math.floor(log / 80)));
+    } catch(e){}
+    const g = window.OmegaGrind;
+    if (g && g.lv) n = Math.max(n, Math.min(11, Math.floor((g.lv-1)/8)));
+    return n;
+  }
+  function weeklyItem(){
+    const id = weekId();
+    if (S.week !== id) { S.week = id; S.weekDone = 0; S.taps=0; S.events=0; S.orbs=0; S.quizOk=0; S.fever=0; S.mins=0; S.comboMax=0; save(S); }
+    return WEEKLY[id % WEEKLY.length];
+  }
+  function grantRelic(){
+    const locked = [];
+    for (let i=0;i<RELICS.length;i++) if (!S.relics[RELICS[i]]) locked.push(RELICS[i]);
+    if (!locked.length) return null;
+    const name = locked[(Math.random()*locked.length)|0];
+    S.relics[name] = 1;
+    S.research++;
+    save(S);
+    if (typeof createToast === "function") createToast("遺物入手", name);
+    return name;
+  }
+  function paint(){
+    const ch = chapter();
+    const cel = document.getElementById("pv-chapter");
+    if (cel) cel.textContent = CHAPTERS[ch];
+    const w = weeklyItem();
+    const wel = document.getElementById("pv-weekly");
+    if (wel) wel.textContent = S.weekDone ? "完了" : w[0];
+    const m = S.mastery;
+    const mel = document.getElementById("pv-mastery");
+    if (mel) mel.textContent = "T"+m.tap+" I"+m.idle+" E"+m.ev+" Q"+m.quiz;
+    const rel = document.getElementById("pv-relics");
+    if (rel) rel.textContent = Object.keys(S.relics).length+" / "+RELICS.length;
+    const res = document.getElementById("pv-research");
+    if (res) res.textContent = String(S.research);
+  }
+  function reward(kind){
+    try {
+      const g = (typeof cpsWorth === "function") ? cpsWorth(kind === "week" ? 40 : 12) : 200;
+      if (typeof addEnergySafe === "function") addEnergySafe(g);
+      if (window.OmegaGrind && OmegaGrind.xp != null) { OmegaGrind.xp += (kind==="week"?25:4); }
+    } catch(e){}
+  }
+  function checkWeek(){
+    const w = weeklyItem();
+    if (!S.weekDone && w[2](S)) {
+      S.weekDone = 1;
+      reward("week");
+      grantRelic();
+      if (typeof createToast === "function") createToast("週課題クリア", w[0]);
+      save(S);
+    }
+  }
+  function addMastery(k, n){
+    S.mastery[k] = (S.mastery[k]||0) + n;
+    if (S.mastery[k] % 25 === 0) { S.research++; grantRelic(); }
+    save(S);
+  }
+
+  function extraEvents(){
+    const arr = window.__GAME_EVENTS;
+    if (!arr || arr.__longPatched) return !!arr;
+    EXTRA_EV.forEach(function(row, i){
+      arr.push({
+        id: "long_"+row[1],
+        kind: row[0],
+        title: row[2],
+        desc: row[3],
+        apply: function(){
+          if (row[0] === "lucky") {
+            try { if (typeof addEnergySafe==="function") addEnergySafe(typeof cpsWorth==="function"?cpsWorth(8):50); } catch(e){}
+            if (Math.random() < 0.2) grantRelic();
+            return "記録が伸びた";
+          }
+          if (row[0] === "unlucky") {
+            try { if (typeof subEnergySafe==="function") subEnergySafe(typeof cpsWorth==="function"?cpsWorth(4):20); } catch(e){}
+            return "記録がにじんだ";
+          }
+          return (Math.random()<0.5) ? (grantRelic()||"どちらでもあり") : "どちらでもあり";
+        }
+      });
+    });
+    arr.__longPatched = true;
+    return true;
+  }
+  function showMoreQuiz(){
+    const box = document.getElementById("omegaQuiz");
+    if (!box || box.classList.contains("show")) return;
+    const item = MORE_QUIZ[(Math.random()*MORE_QUIZ.length)|0];
+    const q = document.getElementById("qzQ");
+    const a = document.getElementById("qzA");
+    if (!q || !a) return;
+    q.textContent = item.q;
+    a.innerHTML = "";
+    item.a.forEach(function(txt, idx){
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "qz-a";
+      b.textContent = (idx+1)+". "+txt;
+      b.onclick = function(){
+        const ok = idx === item.ok;
+        try {
+          if (ok) {
+            if (typeof addEnergySafe==="function") addEnergySafe(100);
+            S.quizOk++; addMastery("quiz", 2);
+            if (typeof createToast==="function") createToast("クイズ正解","+100 E");
+          } else {
+            if (typeof subEnergySafe==="function") subEnergySafe(1000);
+            if (typeof createToast==="function") createToast("クイズミス","-1000 E");
+          }
+        } catch(e){}
+        box.classList.remove("show");
+        checkWeek(); paint(); save(S);
+        try { if (typeof refreshUI==="function") refreshUI(); } catch(e){}
+      };
+      a.appendChild(b);
+    });
+    box.classList.add("show");
+  }
+
+  function hook(){
+    document.addEventListener("pointerdown", function(e){
+      const t = e.target;
+      if (!t) return;
+      if (t.id === "coreTrigger" || (t.closest && t.closest("#coreTrigger"))) {
+        S.taps++;
+        addMastery("tap", 1);
+        const combo = (window.EffectSystem && ES.combo) || 0;
+        if (combo > S.comboMax) S.comboMax = combo;
+        if (S.taps % 120 === 0 && Math.random() < 0.35) grantRelic();
+        checkWeek(); paint();
+      }
+    }, {capture:true, passive:true});
+    const ot = window.triggerRandomEvent;
+    if (typeof ot === "function" && !ot.__long) {
+      window.triggerRandomEvent = function(){
+        const r = ot.apply(this, arguments);
+        S.events++; addMastery("ev", 1); checkWeek(); paint();
+        return r;
+      };
+      window.triggerRandomEvent.__long = true;
+    }
+    const of = window.OmegaPack && OmegaPack.onFeverUse;
+    if (window.OmegaPack) {
+      const prev = OmegaPack.onFeverUse;
+      OmegaPack.onFeverUse = function(lv){
+        if (prev) try { prev(lv); } catch(e){}
+        S.fever++; checkWeek();
+      };
+    }
+  }
+
+  function ready(fn){
+    if (document.readyState === "complete" || document.readyState === "interactive") setTimeout(fn,0);
+    else document.addEventListener("DOMContentLoaded", fn);
+  }
+  ready(function(){
+    let n=0; (function w(){ n++; if(!extraEvents() && n<80) setTimeout(w,80); })();
+    hook();
+    paint();
+    setInterval(function(){
+      if (!document.hidden && Math.random() < 0.12) showMoreQuiz();
+    }, 70000);
+    setInterval(function(){
+      try { S.mins = Math.max(S.mins, Math.floor(((game && game.totalTime)||0)/60)); } catch(e){}
+      try { S.orbs = Math.max(S.orbs, (window.OmegaPack && OmegaPack.orbsCaught) || 0); } catch(e){}
+      addMastery("idle", 1);
+      checkWeek(); paint(); save(S);
+    }, 10000);
+  });
+})();
+</script>
+
+
+<style>
+#playviewTabBody .pv-sec{margin:0 0 14px;padding:10px;border:1px solid rgba(0,255,204,.22);border-radius:10px;background:rgba(8,4,20,.45)}
+#playviewTabBody .pv-sec h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:#00ffcc}
+#playviewTabBody .pv-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#playviewTabBody .pv-item{border:1px solid rgba(255,234,0,.22);border-radius:8px;padding:8px;font-size:.68rem;color:#d4d4d8}
+#playviewTabBody .pv-item b{color:#ffea00;display:block;margin-bottom:4px}
+#playviewTabBody .pv-item.on{border-color:rgba(0,255,204,.45)}
+#playviewTabBody .pv-barx{height:7px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:6px}
+#playviewTabBody .pv-barx>i{display:block;height:100%;background:linear-gradient(90deg,#00ffcc,#ffea00)}
+@media (max-width:820px){#playviewTabBody .pv-grid{grid-template-columns:1fr}}
+</style>
+<script>
+
+window.buyOmegaResearch = function(id){
+  const L = window.OmegaLong; if (!L) return;
+  const shop = {t1:3,t2:8,t3:15,c1:3,c2:8,c3:15,s1:5,s2:12,q1:6,r1:6,w1:4,l1:10};
+  const cost = shop[id]; if (!cost) return;
+  L.bought = L.bought || {};
+  if (L.bought[id]) return;
+  if ((L.research||0) < cost) {
+    if (typeof createToast==="function") createToast("研究不足", "ポイントが足りません");
+    return;
+  }
+  L.research -= cost;
+  L.bought[id] = 1;
+  try { localStorage.setItem("omega_longplay_v1", JSON.stringify(L)); } catch(e){}
+  if (typeof createToast==="function") createToast("研究導入", id);
+  if (typeof renderPlayViewTab==="function") renderPlayViewTab();
+};
+
+function renderPlayViewTab(){
+  const box = document.getElementById("playviewTabBody");
+  if (!box) return;
+  const L = window.OmegaLong || {mastery:{}, relics:{}, research:0, weekDone:0, bought:{}};
+  const G = window.OmegaGrind || {lv:1, xp:0, dailyDone:[0,0,0], signs:{}, codex:{}};
+  const WEEKLY = [
+    "タップ職人（コア400）","イベント観測（12回）","オーブ狩り（15個）",
+    "クイズ週間（6正解）","フィーバー週（8回）","長時間観測（60分）","コンボ週（15）",
+    "早起き観測","双眼鏡","熟練週間","長考90分","連打祭800","図鑑週20",
+    "オーブ嵐25","クイズ大会10","熱気週12","コンボ職人25","静かな週","研究週間","遺物集め"
+  ];
+  let weekName = "—", weekIdx = 0;
+  try {
+    const d = new Date();
+    weekIdx = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000 / 7);
+    weekName = WEEKLY[weekIdx % WEEKLY.length];
+  } catch(e){}
+  const m = L.mastery || {};
+  const shop = [
+    {id:"t1", name:"タップ理論 I", cost:3},
+    {id:"t2", name:"タップ理論 II", cost:8},
+    {id:"t3", name:"タップ理論 III", cost:15},
+    {id:"c1", name:"生産理論 I", cost:3},
+    {id:"c2", name:"生産理論 II", cost:8},
+    {id:"c3", name:"生産理論 III", cost:15},
+    {id:"s1", name:"観測耐久 I", cost:5},
+    {id:"s2", name:"観測耐久 II", cost:12},
+    {id:"q1", name:"クイズ辞典", cost:6},
+    {id:"r1", name:"遺物図解", cost:6},
+    {id:"w1", name:"週報の型", cost:4},
+    {id:"l1", name:"レガシー注釈", cost:10}
+  ];
+  function bar(v){
+    const p = Math.max(0, Math.min(100, ((v%25)/25)*100));
+    return "<div class='pv-barx'><i style='width:"+p.toFixed(1)+"%'></i></div>";
+  }
+  const bought = L.bought || {};
+  const shopHtml = shop.map(function(s){
+    const on = !!bought[s.id];
+    const btn = on ? "<span style='color:#00ffcc'>導入済</span>" :
+      "<button type='button' class='btn-utility' onclick='window.buyOmegaResearch(\""+s.id+"\")'>消費 "+s.cost+"</button>";
+    return "<div class='pv-item"+(on?" on":"")+"'><b>"+s.name+"</b>コスト "+s.cost+"　"+btn+"</div>";
+  }).join("");
+  const tracks = [["タップ",m.tap||0],["放置",m.idle||0],["イベント",m.ev||0],["クイズ",m.quiz||0],["コンボ",m.combo||0],["フィーバー",m.fever||0],["遺物",m.relic||0],["研究",m.research||0]];
+  const masterHtml = tracks.map(function(x){ return "<div class='pv-item'><b>"+x[0]+" "+x[1]+"</b>"+bar(x[1])+"</div>"; }).join("");
+  const got = L.relics || {};
+  const list = (window.__OMEGA_RELICS && window.__OMEGA_RELICS.length) ? window.__OMEGA_RELICS : Object.keys(got);
+  const relHtml = list.map(function(n){
+    return "<div class='pv-item"+(got[n]?" on":"")+"'><b>"+n+"</b>"+(got[n]?"入手済":"未入手")+"</div>";
+  }).join("");
+  const upcoming = [];
+  for (let i=1;i<8;i++) upcoming.push(WEEKLY[(weekIdx+i)%WEEKLY.length]);
+  box.innerHTML = ""
+    + "<div class='pv-sec'><h3>WEEKLY</h3><div class='pv-item on'><b>今週："+weekName+"</b>"+(L.weekDone?"クリア済み":"進行中")+"</div>"
+    + "<div class='guide-text-block' style='margin-top:8px'>次週以降："+upcoming.join(" / ")+"</div></div>"
+    + "<div class='pv-sec'><h3>MASTERY 8本</h3><div class='pv-grid'>"+masterHtml+"</div></div>"
+    + "<div class='pv-sec'><h3>RESEARCH　所持 "+(L.research||0)+"</h3><div class='pv-grid'>"+shopHtml+"</div></div>"
+    + "<div class='pv-sec'><h3>RELICS "+Object.keys(got).length+" / "+Math.max(list.length,1)+"</h3><div class='pv-grid'>"+relHtml+"</div></div>"
+    + "<div class='pv-sec'><h3>LONG STAT</h3><div class='pv-grid'>"
+    + "<div class='pv-item'><b>レガシー</b>Lv."+(G.lv||1)+"</div>"
+    + "<div class='pv-item'><b>図鑑</b>"+Object.keys(G.codex||{}).length+"</div>"
+    + "<div class='pv-item'><b>星座</b>"+Object.keys(G.signs||{}).length+" / 12</div>"
+    + "<div class='pv-item'><b>デイリー</b>"+((G.dailyDone||[]).filter(Boolean).length)+" / 3</div>"
+    + "</div></div>"
+    + "<div class='pv-sec'><h3>ポイントの見方</h3>"
+    + "<div class='pv-item on'><b>E（エネルギー）</b>メイン通貨。タップと施設で増える。施設の購入に使う。</div>"
+    + "<div class='pv-item'><b>AM（反物質）</b>転生「反物質化」で得る。ANTIMATTERタブの改良に使う。</div>"
+    + "<div class='pv-item'><b>TS（時間律）</b>転生「時間軸の切断」で得る。TIMEタブの改良に使う。</div>"
+    + "<div class='pv-item'><b>★スター</b>50タップで+1。左の STAR に表示。</div>"
+    + "<div class='pv-item'><b>研究ポイント</b>熟練や遺物で増える。このタブの理論と交換。</div>"
+    + "<div class='pv-item'><b>レガシーXP</b>長期プレイの階級。転生しても残る。</div>"
+    + "</div>";
+}
+window.renderPlayViewTab = renderPlayViewTab;
+</script>
+
+
+<script>
+(function(){
+  function mult(){
+    const L = window.OmegaLong || {bought:{}};
+    const b = L.bought || {};
+    let click = 1, cps = 1;
+    if (b.t1) click += 0.03; if (b.t2) click += 0.05; if (b.t3) click += 0.08;
+    if (b.c1) cps += 0.03; if (b.c2) cps += 0.05; if (b.c3) cps += 0.08;
+    return {click, cps};
+  }
+  window.__omegaResMult = mult;
+  function wrap(){
+    if (window.__omegaResWrapped) return;
+    const gc = window.getClickPower, gs = window.getTotalCps;
+    if (typeof gc === "function") {
+      window.getClickPower = function(){
+        const v = gc.apply(this, arguments);
+        const m = mult().click;
+        try { if (v && v.mul) return v.mul(m); if (typeof v==="number") return v*m; } catch(e){}
+        return v;
+      };
+    }
+    if (typeof gs === "function") {
+      window.getTotalCps = function(){
+        const v = gs.apply(this, arguments);
+        const m = mult().cps;
+        try { if (v && v.mul) return v.mul(m); if (typeof v==="number") return v*m; } catch(e){}
+        return v;
+      };
+    }
+    window.__omegaResWrapped = true;
+  }
+  setTimeout(wrap, 800);
+  setTimeout(wrap, 2500);
+})();
+</script>
+
+
+<div id="aboutGameOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.78); z-index:100050; justify-content:center; align-items:center; padding:15px; box-sizing:border-box;">
+  <div style="background:rgba(15,10,25,0.98); border:1px solid var(--border-strong,#444); border-radius:8px; width:100%; max-width:520px; max-height:min(82vh,640px); display:flex; flex-direction:column; box-shadow:0 8px 25px rgba(0,0,0,0.6); overflow:hidden;">
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:rgba(10,6,20,0.9); border-bottom:1px solid var(--border-weak,#333);">
+      <span style="font-size:0.85rem; font-weight:bold; color:var(--color-upgrade,#ffea00);">📘 ゲームについて</span>
+      <button type="button" onclick="toggleAboutGame(false)" style="background:none; border:none; color:#aaa; font-size:1.1rem; cursor:pointer; padding:0 4px;">✕</button>
+    </div>
+    <div id="aboutGameBody" style="padding:14px 16px; overflow-y:auto; font-size:0.74rem; line-height:1.7; color:#d4d4d8;">
+      <p style="margin:0 0 10px; color:#00ffcc; font-weight:800;">インクリメンタル絶対神 — INFINITY MATRIX OMEGA</p>
+      <p>コアをタップしてエネルギーを集め、施設・改良・転生を重ねてどこまでも大きくしていくクリック／放置ゲームです。ゴールの目安はエネルギー <b>1e1000</b> です。</p>
+      <p style="color:#ffea00; font-weight:800; margin:12px 0 4px;">基本操作</p>
+      <p>左の大きな <b>TAP CORE</b> を押すとエネルギーが増えます。連続で押すとコンボが伸びます。右上の設定からセーブ、BGM、画質、操作方法を変えられます。</p>
+      <p style="color:#ffea00; font-weight:800; margin:12px 0 4px;">中央のタブ</p>
+      <p><b>MATERIAL</b> … 施設を買って自動生産（毎秒のエネルギー）。<br>
+      <b>CONCEPT</b> … タップや生産を強くする改良。<br>
+      <b>ANTIMATTER</b> … 反物質で買う上級改良。転生「反物質化」でAMを得ます。<br>
+      <b>TIME</b> … 時間律の破片で買う改良。ゲームの進み方が速くなります。<br>
+      <b>AUTOMATION</b> … 条件を満たすと自動購入などが動きます。<br>
+      <b>ACHIEVEMENTS</b> … 実績と称号。<br>
+      <b>PLAY VIEW</b> … 週課題・熟練・遺物・研究などのやりこみ一覧です。</p>
+      <p style="color:#ffea00; font-weight:800; margin:12px 0 4px;">転生</p>
+      <p>左の <b>反物質化 / 時間軸の切断 / 銀河系の統合</b> で下の層をリセットし、上位の資源を残します。転生してもレガシーや遺物などのやりこみ記録は残ります。</p>
+      <p style="color:#ffea00; font-weight:800; margin:12px 0 4px;">スキルとイベント</p>
+      <p><b>フィーバー</b> はレベル制です。使うほど経験が溜まり、効果と時間が伸びます。<b>シールド</b> は次のアンラッキーを1回防ぎます。<b>イベント召喚</b> はラッキー寄りのイベントを呼びます。<br>
+      宇宙イベントは実時間で間隔が空きます。クイズイベントは正解で +100 E、ミスで -1000 E です。</p>
+      <p style="color:#ffea00; font-weight:800; margin:12px 0 4px;">PLAY VIEW（左とタブ）</p>
+      <p>左カラムの PLAY VIEW はいまの進捗の要約です。中央タブの PLAY VIEW は詳細です。<br>
+      デイリー3種、週課題（週替わり）、熟練8本、遺物、研究ポイント、レガシーレベル、図鑑、星座、章があります。研究ポイントはタブ内の理論と交換できます。</p>
+      <p style="color:#ffea00; font-weight:800; margin:12px 0 4px;">数字について</p>
+      <p>エネルギーはとても大きくなるので、decimal.js で計算しています。反物質や時間律の高い番号も同じ仕組みです。画質を下げると軽くなります。</p>
+      <p style="color:#9ca3af; margin-top:12px;">© 2026 HTsatoweb / INFINITY MATRIX OMEGA</p>
+    </div>
+  </div>
+</div>
+<script>
+window.toggleAboutGame = function(force){
+  const el = document.getElementById("aboutGameOverlay");
+  if (!el) return;
+  const open = (force === true) || (force !== false && el.style.display !== "flex");
+  el.style.display = open ? "flex" : "none";
+  el.setAttribute("aria-hidden", open ? "false" : "true");
+};
+document.addEventListener("keydown", function(e){
+  if (e.key === "Escape") {
+    const el = document.getElementById("aboutGameOverlay");
+    if (el && el.style.display === "flex") toggleAboutGame(false);
+  }
+});
+(function(){
+  const el = document.getElementById("aboutGameOverlay");
+  if (!el) return;
+  el.addEventListener("click", function(e){ if (e.target === el) toggleAboutGame(false); });
+})();
+</script>
+
+
+<div id="factoryDetailOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:100040;justify-content:center;align-items:center;padding:15px;box-sizing:border-box;">
+  <div style="background:rgba(15,10,25,.98);border:1px solid var(--border-strong,#444);border-radius:8px;width:100%;max-width:440px;max-height:min(80vh,560px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 25px rgba(0,0,0,.6);">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:rgba(10,6,20,.9);border-bottom:1px solid var(--border-weak,#333);">
+      <span id="facDetTitle" style="font-size:.85rem;font-weight:800;color:var(--color-energy);">施設</span>
+      <button type="button" onclick="closeFactoryDetail()" style="background:none;border:none;color:#aaa;font-size:1.1rem;cursor:pointer;">✕</button>
+    </div>
+    <div style="padding:14px 16px;overflow-y:auto;font-size:.74rem;line-height:1.65;color:#d4d4d8;">
+      <p id="facDetDesc" style="margin:0 0 10px;"></p>
+      <div id="facDetStats" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;"></div>
+      <div style="background:rgba(0,0,0,.28);border:1px solid rgba(0,255,204,.22);border-radius:8px;padding:8px;color:#9ca3af;font-size:.68rem;">
+        所持数の右の <b style="color:#ffea00">/s</b> はその施設全体の毎秒生産です。<br>
+        コストの <b style="color:#00ffcc">E</b> はエネルギーです。Shift+クリックで説明を飛ばして購入できます。
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;padding:10px 16px;border-top:1px solid var(--border-weak,#333);">
+      <button type="button" class="btn-utility" onclick="closeFactoryDetail()" style="flex:1;">閉じる</button>
+      <button type="button" class="btn-utility" id="facDetBuy" style="flex:1;color:var(--color-energy);border-color:var(--color-energy);font-weight:800;">購入する</button>
+    </div>
+  </div>
+</div>
+<script>
+window._facDetId = 0;
+window.openFactoryDetail = function(id){
+  const f = (typeof DB_FACTORIES !== "undefined") ? DB_FACTORIES[id] : null;
+  if (!f) { if (typeof executeBuyFactory === "function") executeBuyFactory(id); return; }
+  window._facDetId = id;
+  const ov = document.getElementById("factoryDetailOverlay");
+  const title = document.getElementById("facDetTitle");
+  const desc = document.getElementById("facDetDesc");
+  const stats = document.getElementById("facDetStats");
+  const buy = document.getElementById("facDetBuy");
+  const count = (window.game && game.facCounts && game.facCounts[id]) || 0;
+  let cost = "—", cps = "—", one = "—";
+  try { if (typeof getFactoryCost === "function") cost = formatValue(getFactoryCost(id)); } catch(e){}
+  try { if (typeof getFactoryCps === "function") cps = formatValue(getFactoryCps(id)); } catch(e){}
+  try {
+    if (typeof D === "function" && f.baseCps != null) {
+      const g = (typeof getGlobalProductionMultiplier === "function") ? getGlobalProductionMultiplier() : 1;
+      one = formatValue(D(f.baseCps).mul(g));
+    }
+  } catch(e){}
+  if (title) title.textContent = (f.name || ("施設 #"+(id+1)));
+  if (desc) desc.textContent = f.desc || "この施設はエネルギーを自動で作ります。";
+  if (stats) stats.innerHTML =
+    "<div class='pv-item on'><b>所持</b>"+count+" 基</div>"+
+    "<div class='pv-item'><b>次のコスト</b>"+cost+" E</div>"+
+    "<div class='pv-item'><b>1基あたり</b>約 "+one+" /s</div>"+
+    "<div class='pv-item'><b>合計生産</b>"+cps+" /s</div>";
+  if (buy) buy.onclick = function(){
+    if (typeof executeBuyFactory === "function") executeBuyFactory(id);
+    openFactoryDetail(id);
+  };
+  if (ov) { ov.style.display = "flex"; ov.setAttribute("aria-hidden","false"); }
+};
+window.closeFactoryDetail = function(){
+  const ov = document.getElementById("factoryDetailOverlay");
+  if (ov) { ov.style.display = "none"; ov.setAttribute("aria-hidden","true"); }
+};
+document.addEventListener("keydown", function(e){
+  if (e.key === "Escape") closeFactoryDetail();
+});
+(function(){
+  const ov = document.getElementById("factoryDetailOverlay");
+  if (ov) ov.addEventListener("click", function(e){ if (e.target === ov) closeFactoryDetail(); });
 })();
 </script>
 
