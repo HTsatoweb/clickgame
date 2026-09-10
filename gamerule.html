@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>拡張版 ModAPI 完全リファレンス & 実装ガイド</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 15mm 12mm;
+            background-color: #f7f9fa;
+        }
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+            color: #2c3e50;
+            line-height: 1.6;
+            font-size: 10.5pt;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f9fa;
+        }
+        .header-banner {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: #ffffff;
+            margin: -15mm -12mm 20px -12mm;
+            padding: 25px 15mm;
+            border-bottom: 4px solid #1abc9c;
+        }
+        .header-banner h1 {
+            margin: 0 0 8px 0;
+            font-size: 20pt;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+        .header-banner p {
+            margin: 0;
+            font-size: 11pt;
+            color: #ecf0f1;
+            opacity: 0.9;
+        }
+        h2 {
+            font-size: 14pt;
+            color: #2c3e50;
+            border-left: 4px solid #1abc9c;
+            padding-left: 8px;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            page-break-after: avoid;
+        }
+        h3 {
+            font-size: 11.5pt;
+            color: #34495e;
+            margin-top: 16px;
+            margin-bottom: 6px;
+            page-break-after: avoid;
+        }
+        p {
+            margin: 0 0 10px 0;
+        }
+        ul, ol {
+            margin: 0 0 10px 0;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            font-size: 9.5pt;
+            background: #ffffff;
+        }
+        th, td {
+            border: 1px solid #d1d8dd;
+            padding: 8px 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background-color: #eaeded;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #fcfcfc;
+        }
+        .code-block {
+            background-color: #1e1e1e;
+            color: #dcdcdc;
+            font-family: Consolas, Monaco, 'Courier New', monospace;
+            padding: 10px 12px;
+            border-radius: 4px;
+            font-size: 9pt;
+            white-space: pre-wrap;
+            word-break: break-all;
+            margin-bottom: 12px;
+            border: 1px solid #333333;
+        }
+        .code-keyword { color: #569cd6; }
+        .code-string { color: #ce9178; }
+        .code-function { color: #dcdcaa; }
+        .code-comment { color: #6a9955; }
+        .math {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            font-weight: bold;
+            color: #2980b9;
+        }
+        .callout {
+            background-color: #e8f8f5;
+            border-left: 4px solid #1abc9c;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            font-size: 10pt;
+        }
+        .section-box {
+            background: #ffffff;
+            border: 1px solid #d1d8dd;
+            border-radius: 4px;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header-banner">
+    <h1>拡張版 ModAPI 完全リファレンス & 実装ガイド</h1>
+    <p>放置ゲームの限界値・計算精度制御および全エンドポイントの具体的な使用例集</p>
+</div>
+
+<div class="callout">
+    <strong>このドキュメントについて:</strong> 本ガイドでは、追加された新機能（エネルギー閾値やDecimal精度変更）を含むすべての <code>window.ModAPI</code> の仕様、分類ごとの操作方法、および実践的なMODコードの書き方を網羅しています。
+</div>
+
+<h2>1. 今回追加された新機能（限界値・計算精度の動的制御）</h2>
+<div class="section-box">
+    <p>ゲームの天井であるエネルギー限界値や、巨大数計算を支える <code>decimal.js</code> の内部パラメータを外側から安全に書き換え・取得できるようになりました。</p>
+    <ul>
+        <li><strong>エネルギー終了閾値 (<code>Ending Energy Threshold</code>):</strong> ゲームクリアや特殊演出のトリガーとなる目標エネルギー値の変更・取得。</li>
+        <li><strong>無限大判定の限界値 (<code>Infinity Decimal Limit</code>):</strong> どこまでを有限の数値として扱い、どこからを無限とみなすかの上限値。</li>
+        <li><strong>Decimal計算精度の動的変更 (<code>Decimal Config</code>):</strong> 演算精度（<span class="math">precision</span>）や丸めモード、指数表現の閾値を変更し、重い処理の軽量化や高精度化を動的に行えます。</li>
+    </ul>
+</div>
+
+<div class="code-block"><span class="code-comment">// --- 新機能の操作例 ---</span>
+<span class="code-comment">// 1. 計算精度を軽くするために 16 に下げる</span>
+window.ModAPI.setDecimalConfig({ precision: <span class="code-keyword">16</span> });
+
+<span class="code-comment">// 2. 現在のDecimal設定を確認する</span>
+console.log(window.ModAPI.getDecimalConfig());
+
+<span class="code-comment">// 3. クリア条件・終了エネルギーの閾値を大幅に引き上げる</span>
+window.ModAPI.setEndingEnergyThreshold(<span class="code-string">"1e5000"</span>);
+
+<span class="code-comment">// 4. 無限大のしきい値を変更する</span>
+window.ModAPI.setInfinityDecimalLimit(<span class="code-string">"1e4000"</span>);</div>
+
+<h2>2. ModAPI 全エンドポイント一覧と使い方</h2>
+
+<table>
+    <tr>
+        <th>カテゴリ</th>
+        <th>主要関数名</th>
+        <th>引数 / 戻り値</th>
+        <th>説明・動作</th>
+    </tr>
+    <tr>
+        <td rowspan="5"><strong>エネルギー管理</strong><br>(1-5)</td>
+        <td><code>getEnergy()</code></td>
+        <td>引数なし / 戻り値: Decimal</td>
+        <td>現在のエネルギー量を Decimal 型で取得します。</td>
+    </tr>
+    <tr>
+        <td><code>setEnergy(v)</code></td>
+        <td>引数: <code>v</code> (数値/文字列/Decimal)</td>
+        <td>エネルギーを指定した値に直接書き換えます（負数は0に補正）。</td>
+    </tr>
+    <tr>
+        <td><code>addEnergy(v)</code></td>
+        <td>引数: <code>v</code></td>
+        <td>現在のエネルギーに指定した値eyを加算します。</td>
+    </tr>
+    <tr>
+        <td><code>subEnergy(v)</code></td>
+        <td>引数: <code>v</code></td>
+        <td>現在のエネルギーから指定した値を減算します（0未満にはなりません）。</td>
+    </tr>
+    <tr>
+        <td><code>clearEnergy()</code></td>
+        <td>引数なし</td>
+        <td>エネルギーを 0 にリセットします。</td>
+    </tr>
+
+    <tr>
+        <td rowspan="5"><strong>反物質 (Antimatter)</strong><br>(6-10)</td>
+        <td><code>getAntimatter()</code></td>
+        <td>引数なし / 戻り値: 数値/Decimal</td>
+        <td>現在の反物質の量を取得します。</td>
+    </tr>
+    <tr>
+        <td><code>setAntimatter(v)</code></td>
+        <td>引数: <code>v</code> (数値)</td>
+        <td>反物質の量を直接設定します。</td>
+    </tr>
+    <tr>
+        <td><code>addAntimatter(v)</code> / <code>subAntimatter(v)</code></td>
+        <td>引数: <code>v</code> (数値)</td>
+        <td>反物質を加算・減算します。</td>
+    </tr>
+    <tr>
+        <td><code>clearAntimatter()</code></td>
+        <td>引数なし</td>
+        <td>反物質を 0 にリセットします。</td>
+    </tr>
+
+    <tr>
+        <td rowspan="5"><strong>タイムシャード (Time Shards)</strong><br>(11-15)</td>
+        <td><code>getTimeShards()</code></td>
+        <td>引数なし</td>
+        <td>タイムシャードの現在値を取得します。</td>
+    </tr>
+    <tr>
+        <td><code>setTimeShards(v)</code> / <code>addTimeShards(v)</code> / <code>subTimeShards(v)</code></td>
+        <td>引数: <code>v</code></td>
+        <td>タイムシャードの値を設定・加算・減算します。</td>
+    </tr>
+    <tr>
+        <td><code>clearTimeShards()</code></td>
+        <td>引数なし</td>
+        <td>タイムシャードを 0 にリセットします。</td>
+    </tr>
+
+    <tr>
+        <td rowspan="4"><strong>銀河ノード (Galaxy Nodes)</strong><br>(16-20)</td>
+        <td><code>getGalaxyNodes()</code></td>
+        <td>引数なし</td>
+        <td>銀河ノードの現在値を取得します。</td>
+    </tr>
+    <tr>
+        <td><code>setGalaxyNodes(v)</code> / <code>addGalaxyNodes(v)</code> / <code>subGalaxyNodes(v)</code></td>
+        <td>引数: <code>v</code></td>
+        <td>銀河ノードの値を設定・加算・減算します。</td>
+    </tr>
+    <tr>
+        <td><code>clearGalaxyNodes()</code></td>
+        <td>引数なし</td>
+        <td>銀河ノードを 0 にリセットします。</td>
+    </tr>
+
+    <tr>
+        <td rowspan="3"><strong>ファクトリー・アップグレード</strong><br>(21-34)</td>
+        <td><code>getFactoryCount(id)</code> / <code>setFactoryCount(id, v)</code> / <code>addFactoryCount(id, v)</code></td>
+        <td>引数: <code>id</code> (数値), <code>v</code> (数値)</td>
+        <td>インダストリアルファクトリーの保有数操作を行います。</td>
+    </tr>
+    <tr>
+        <td><code>getUpgradeLevel(id)</code> / <code>setUpgradeLevel(id, v)</code></td>
+        <td>引数: <code>id</code>, <code>v</code></td>
+        <td>通常アップグレードのレベル操作を行います。</td>
+    </tr>
+    <tr>
+        <td><code>setAllUpgradesToMax()</code><br><code>setAllAmUpgradesToMax()</code><br><code>setAllTlUpgradesToMax()</code></td>
+        <td>引数なし</td>
+        <td>対応するすべてのアップグレードを一括で最大レベルにします。</td>
+    </tr>
+
+    <tr>
+        <td rowspan="3"><strong>高度な計算・予測</strong><br>(36-46)</td>
+        <td><code>getCalculatedCps()</code></td>
+        <td>引数なし</td>
+        <td>現在の1秒あたりの総生産量 (CPS) を取得します。</td>
+    </tr>
+    <tr>
+        <td><code>getCalculatedGameSpeed()</code> / <code>getCalculatedProductionMultiplier()</code></td>
+        <td>引数なし</td>
+        <td>ゲームの速度倍率や全体生産倍率を取得します。</td>
+    </tr>
+    <tr>
+        <td><code>getFutureEnergyEstimate(seconds)</code></td>
+        <td>引数: <code>seconds</code> (秒数)</td>
+        <td>指定秒数経過した後のエネルギー予測値を算出します。</td>
+    </tr>
+
+    <tr>
+        <td rowspan="3"><strong>自動化・プリステージ・システム</strong><br>(47-56)</td>
+        <td><code>executePrestigeAmShift(forcedGain)</code></td>
+        <td>引数: <code>forcedGain</code> (任意)</td>
+        <td>反物質リセット（プレステージ）を実行します。</td>
+    </tr>
+    <tr>
+        <td><code>setAutomationFactoryState(bool)</code><br><code>setAutomationUpgradeState(bool)</code> 등</td>
+        <td>引数: <code>bool</code> (true/false)</td>
+        <td>各オートメーション機能の有効・無効を切り替えます。</td>
+    </tr>
+    <tr>
+        <td><code>executeSaveSerialization()</code> / <code>executeHardResetWipe()</code></td>
+        <td>引数なし</td>
+        <td>手動セーブの実行、またはハードリセット（全データ消去）を行います。</td>
+    </tr>
+
+    <tr>
+        <td><strong>フック・イベント</strong><br>(57-65)</td>
+        <td><code>registerHook(hookName, callback)</code></td>
+        <td>引数: <code>hookName</code> (文字列), <code>callback</code> (関数)</td>
+        <td>ゲーム内イベント（onTick, onCoreClick, onBuyFactory 等）に独自の処理を割り込みさせます。</td>
+    </tr>
+</table>
+
+<h2>3. 実践：MOD作成の具体例</h2>
+<div class="section-box">
+    <h3>例1: 自動チート・オートクリッカーMOD（毎秒エネルギーを自動加算 & 自動アップグレード）</h3>
+    <div class="code-block"><span class="code-comment">// 毎秒のティックイベントにフックを登録する</span>
+window.ModAPI.registerHook(<span class="code-string">'onTick'</span>, () => {
+    <span class="code-comment">// 毎秒 1e10 のエネルギーを自動で追加する</span>
+    window.ModAPI.addEnergy(<span class="code-string">"1e10"</span>);
+    
+    <span class="code-comment">// 資産が潤沢になったらすべてのアップグレードを自動で最大にする（お好みで）</span>
+    if (window.ModAPI.getEnergy().gte(<span class="code-string">"1e15"</span>)) {
+        window.ModAPI.setAllUpgradesToMax();
+    }
+});
+console.log(<span class="code-string">"[MyMod] Auto-Energy & Max-Upgrade Mod loaded successfully!"</span>);</div>
+</div>
+
+<div class="section-box">
+    <h3>例2: パフォーマンス軽量化 & 限界突破MOD（計算精度変更 ＆ 超・長期放置対応）</h3>
+    <div class="code-block"><span class="code-comment">// 1. 計算精度を落として動作を爆速・軽量化し、巨大数対応を拡張する</span>
+window.ModAPI.setDecimalConfig({
+    precision: <span class="code-keyword">14</span>,      <span class="code-comment">// 精度を少し下げて負荷を軽減</span>
+    toExpNeg: <span class="code-keyword">-9</span>,
+    toExpPos: <span class="code-keyword">9</span>
+});
+
+<span class="code-comment">// 2. 終了エネルギーの限界値を遥か彼方へ引き上げ、まだまだ遊べるようにする</span>
+window.ModAPI.setEndingEnergyThreshold(<span class="code-string">"1e10000"</span>);
+window.ModAPI.setInfinityDecimalLimit(<span class="code-string">"1e9000"</span>);
+
+console.log(<span class="code-string">"[PerformanceMod] Precision optimized and energy threshold extended!"</span>);</div>
+</div>
+
+<div class="section-box">
+    <h3>例3: クリック時ボーナス付与フックMOD</h3>
+    <div class="code-block"><span class="code-comment">// コアクリック時に発動するフック</span>
+window.ModAPI.registerHook(<span class="code-string">'onCoreClick'</span>, (event) => {
+    <span class="code-comment">// クリックするたびに追加のタイムシャードをボーナス付与する</span>
+    window.ModAPI.addTimeShards(<span class="code-keyword">5</span>);
+    console.log(<span class="code-string">"[BonusMod] Click detected! Awarded +5 Time Shards."</span>);
+});</div>
+</div>
+
+</body>
+</html>
