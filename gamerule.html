@@ -2,7 +2,7 @@
 <html lang="ja" id="htmlRoot">
 <head>
     <meta charset="UTF-8">
-    <title>Infinity Matrix Omega - ModAPI Technical Reference</title>
+    <title>Infinity Matrix Omega - Complete ModAPI Technical Reference</title>
     <style>
         :root {
             --bg-color: #0d0914;
@@ -27,7 +27,7 @@
             padding: 20px;
         }
         .container {
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
         }
         .header-banner {
@@ -189,20 +189,20 @@
             </select>
             <a href="index.html" class="btn-back" data-i18n="backBtn">◀ index.html に戻る</a>
         </div>
-        <h1 data-i18n="title">Infinity Matrix Omega - Advanced ModAPI Specification</h1>
-        <p data-i18n="subtitle">プロフェッショナルMOD開発者のための内部構造、全エンドポイント詳細、およびイベントフック応用リファレンス</p>
+        <h1 data-i18n="title">Infinity Matrix Omega - Complete ModAPI Technical Reference</h1>
+        <p data-i18n="subtitle">プロフェッショナルMOD開発者のための全エンドポイント、限界値・計算精度制御システム、およびイベントフック完全拡張リファレンス</p>
     </div>
 
     <div class="callout" data-i18n="calloutText">
-        <strong>アーキテクチャ概要:</strong> <code>window.ModAPI</code> はゲームのメインスレッドおよびグローバルスコープ（<code>game</code>オブジェクト、各種計算関数）と完全に同期しています。すべての副作用を伴う操作の後は自動的に <code>refreshUI()</code> がコールされ、画面が即座に再描画されます。
+        <strong>アーキテクチャ概要:</strong> <code>window.ModAPI</code> はゲームのメインスレッドおよびグローバルスコープ（<code>game</code>オブジェクト、各種計算関数、<code>Decimal</code>コンテキスト）と完全に同期しています。新規追加された限界値（Threshold）および精度管理（Decimal Config）APIにより、極限の数値シミュレーションやエンドレスモード拡張が完全にサポートされます。
     </div>
 
-    <h2 data-i18n="sec1Title">1. 内部データ構造と安全な型ハンドリング</h2>
+    <h2 data-i18n="sec1Title">1. 内部データ構造・型安全性と新規拡張モジュール</h2>
     <div class="section-box">
-        <p data-i18n="sec1Desc">本ゲームでは、肥大化する数値を扱うために <code>decimal.js</code>（ラップ関数 <code>D()</code>）を採用しています。</p>
+        <p data-i18n="sec1Desc">本システムでは、肥大化する数値を扱うために <code>decimal.js</code>（ラップ関数 <code>D()</code>）を採用し、状態変化のたびに自動的に <code>refreshUI()</code> がコールされます。</p>
         <ul>
-            <li><strong data-i18n="sec1Li1Head">エネルギー (<code>game.energy</code>):</strong> <span data-i18n="sec1Li1Desc">内部では <code>Decimal</code> インスタンスとして保持されます。<code>setEnergy</code> 等に渡す際は数値、文字列、Decimalオブジェクトのいずれも許容されますが、内部で自動的に <code>decMax0()</code> を通るため負数になることはありません。</span></li>
-            <li><strong data-i18n="sec1Li2Head">反物質・タイムシャード・銀河ノード:</strong> <span data-i18n="sec1Li2Desc">それぞれ数値またはDecimalで管理されており、型安全なバリデーション（<code>typeof v === 'number' && !isNaN(v)</code>）を経由して代入されます。</span></li>
+            <li><strong data-i18n="sec1Li1Head">エネルギー・限界値管理 (<code>currentEnergyThreshold</code> / <code>infinityDecimal</code>):</strong> <span data-i18n="sec1Li1Desc">ゲームの勝利条件やオーバーフロー上限を動的に変更するためのステートが拡張されました。文字列・数値・Decimalオブジェクトのいずれも安全にバリデーションされます。</span></li>
+            <li><strong data-i18n="sec1Li2Head">計算精度制御 (<code>Decimal.set()</code> ラッパー):</strong> <span data-i18n="sec1Li2Desc"><code>precision</code>, <code>rounding</code>, <code>toExpNeg</code>, <code>toExpPos</code> などの小数・指数演算パラメータを外部から動的にチューニング可能です。</span></li>
         </ul>
     </div>
 
@@ -217,32 +217,20 @@
             <th data-i18n="thDesc">詳細仕様・エラーハンドリング</th>
         </tr>
         <tr>
-            <td><code>getEnergy()</code></td>
-            <td data-i18n="argNone">なし</td>
-            <td><code>Decimal</code></td>
-            <td data-i18n="descGetEnergy">現在のエネルギーインスタンスを直接返します。参照渡しのため直接書き換えは厳禁です。</td>
-        </tr>
-        <tr>
-            <td><code>setEnergy(v)</code></td>
+            <td><code>getEnergy() / setEnergy(v) / addEnergy(v) / subEnergy(v) / clearEnergy()</code></td>
             <td data-i18n="argVal"><code>v</code> (数値 / 文字列 / Decimal)</td>
-            <td data-i18n="retNone">なし</td>
-            <td data-i18n="descSetEnergy"><code>decMax0(v)</code> でクランプ処理後、代入と <code>refreshUI()</code> を実行。</td>
+            <td><code>Decimal</code> / <span data-i18n="retNone">なし</span></td>
+            <td data-i18n="descEnergy">エネルギーの取得・クランプ付き代入・加減算およびクリアを実行。変更時は自動でUIを再描画。</td>
         </tr>
         <tr>
-            <td><code>addEnergy(v) / subEnergy(v)</code></td>
-            <td data-i18n="argVal"><code>v</code> (数値 / 文字列 / Decimal)</td>
-            <td data-i18n="retNone">なし</td>
-            <td data-i18n="descCalcEnergy">Decimal演算による加減算を行います。減算時は 0 未満にならないよう自動調整されます。</td>
-        </tr>
-        <tr>
-            <td><code>getAntimatter() / setAntimatter(v)</code></td>
+            <td><code>getAntimatter() / setAntimatter(v) 等</code></td>
             <td data-i18n="argNum"><code>v</code> (数値)</td>
-            <td data-i18n="retNum">数値</td>
-            <td data-i18n="descAntimatter">反物質の取得およびバリデーション付き代入。NaNや非数値を完全に弾きます。</td>
+            <td>数値 / <span data-i18n="retNone">なし</span></td>
+            <td data-i18n="descAntimatter">反物質、タイムシャード、銀河ノードの各リソース管理。NaNや非数値を完全にブロック。</td>
         </tr>
     </table>
 
-    <h3 data-i18n="subSec2Title">■ ファクトリー・アップグレード系API</h3>
+    <h3 data-i18n="subSec2Title">■ ファクトリー・アップグレード・自動化・セッション系API</h3>
     <table>
         <tr>
             <th data-i18n="thMethod">メソッド名</th>
@@ -251,26 +239,26 @@
             <th data-i18n="thDesc">詳細仕様・エラーハンドリング</th>
         </tr>
         <tr>
-            <td><code>getFactoryCount(id)</code></td>
-            <td data-i18n="argId"><code>id</code> (整数)</td>
-            <td data-i18n="retNum">数値</td>
-            <td data-i18n="descFactoryGet">指定IDのファクトリー保有数を返します。存在しないIDの場合は <code>0</code> を安全に返却。</td>
-        </tr>
-        <tr>
-            <td><code>setFactoryCount(id, v)</code></td>
+            <td><code>getFactoryCount(id) / setFactoryCount(id, v) / addFactoryCount(id, v)</code></td>
             <td data-i18n="argIdVal"><code>id</code>, <code>v</code> (整数)</td>
-            <td data-i18n="retNone">なし</td>
-            <td data-i18n="descFactorySet">配列の境界値チェック（<code>0 &lt;= id &lt; game.facCounts.length</code>）を通過した場のみ代入。</td>
+            <td>数値 / <span data-i18n="retNone">なし</span></td>
+            <td data-i18n="descFactory">配列境界チェック（<code>0 &lt;= id &lt; game.facCounts.length</code>）を通過した安全な操作。</td>
         </tr>
         <tr>
-            <td><code>setAllUpgradesToMax()</code>等</td>
+            <td><code>setAllUpgradesToMax() / setAllAmUpgradesToMax() / setAllTlUpgradesToMax()</code></td>
             <td data-i18n="argNone">なし</td>
             <td data-i18n="retNone">なし</td>
-            <td data-i18n="descUpgMax">対応するデータベース（<code>DB_UPGRADES</code>等）の <code>max</code> プロパティを全スロットに適用します。</td>
+            <td data-i18n="descUpgMax">対応データベース（<code>DB_UPGRADES</code>等）の <code>max</code> プロパティを全スロットに一括適用。</td>
+        </tr>
+        <tr>
+            <td><code>setAutomationFactoryState(bool) 等</code></td>
+            <td data-i18n="argBool"><code>bool</code> (真偽値)</td>
+            <td data-i18n="retNone">なし</td>
+            <td data-i18n="descAuto">ファクトリー、アップグレード、反物質、転生の自動化フラグ（<code>autoFacEnabled</code> 等）を制御。</td>
         </tr>
     </table>
 
-    <h3 data-i18n="subSec3Title">■ 動的計算・予測系API</h3>
+    <h3 data-i18n="subSec3Title">■ 動的計算・予測・プレステージ・システム系API</h3>
     <table>
         <tr>
             <th data-i18n="thMethod">メソッド名</th>
@@ -279,20 +267,20 @@
             <th data-i18n="thDesc">詳細仕様・エラーハンドリング</th>
         </tr>
         <tr>
-            <td><code>getCalculatedCps()</code></td>
-            <td data-i18n="argNone">なし</td>
-            <td><code>Decimal</code> / 数値</td>
-            <td data-i18n="descCps">現在の生産倍率やゲームスピードをすべて加味した真の1秒あたり生産量を算出します。</td>
-        </tr>
-        <tr>
-            <td><code>getFutureEnergyEstimate(seconds)</code></td>
+            <td><code>getCalculatedCps() / getCalculatedClickPower() / getFutureEnergyEstimate(seconds)</code></td>
             <td data-i18n="argSec"><code>seconds</code> (数値)</td>
-            <td><code>Decimal</code></td>
-            <td data-i18n="descFuture">現在から指定秒数経過したときの予測エネルギー量を即時計算します（シミュレーション用）。</td>
+            <td><code>Decimal</code> / 数値</td>
+            <td data-i18n="descCalc">真のCPSやゲームスピードを加味した予測エネルギー量をミリ秒単位でシミュレーション。</td>
+        </tr>
+        <tr>
+            <td><code>executePrestigeAmShift(forcedGain) / executeSaveSerialization() / executeHardResetWipe()</code></td>
+            <td data-i18n="argForced"><code>forcedGain</code> (オプション)</td>
+            <td>各種 / <span data-i18n="retNone">なし</span></td>
+            <td data-i18n="descPrestige">プレステージ発動、手動セーブシリアライズ、および全データ初期化（ハードリセット）の実行。</td>
         </tr>
     </table>
 
-    <h3 data-i18n="subSec4Title">■ 限界値・計算精度制御API (New)</h3>
+    <h3 data-i18n="subSec4Title">■ 限界値・計算精度制御API (完全新規拡張)</h3>
     <table>
         <tr>
             <th data-i18n="thMethod">メソッド名</th>
@@ -301,65 +289,68 @@
             <th data-i18n="thDesc">詳細仕様・エラーハンドリング</th>
         </tr>
         <tr>
-            <td><code>setEndingEnergyThreshold(v)</code></td>
+            <td><code>getEndingEnergyThreshold() / setEndingEnergyThreshold(v)</code></td>
             <td data-i18n="argStrNum"><code>v</code> (文字列 / 数値)</td>
-            <td data-i18n="retNone">なし</td>
-            <td data-i18n="descThreshold">クリア条件の閾値を動的に上書きします。長期トリアージやエンドレス化に必須。</td>
+            <td>文字列 / <span data-i18n="retNone">なし</span></td>
+            <td data-i18n="descThreshold">クリア条件の閾値を動的変更。長期トリアージやエンドレスMODの構築に必須。</td>
         </tr>
         <tr>
-            <td><code>setDecimalConfig(configObj)</code></td>
+            <td><code>getInfinityDecimalLimit() / setInfinityDecimalLimit(v)</code></td>
+            <td data-i18n="argStrNumDec"><code>v</code> (文字列 / 数値 / Decimal)</td>
+            <td>文字列 / <span data-i18n="retNone">なし</span></td>
+            <td data-i18n="descInfinity">ゲーム全体の最大限界値（Infinity上限）を書き換え、超巨大数値表現の拡張を許可。</td>
+        </tr>
+        <tr>
+            <td><code>getDecimalConfig() / setDecimalConfig(configObj)</code></td>
             <td data-i18n="argObj"><code>configObj</code> (オブジェクト)</td>
-            <td><code>boolean</code></td>
-            <td data-i18n="descDecimal"><code>Decimal.set(configObj)</code> をラップ。精度（precision）や丸めモードを変更可能。</td>
+            <td>オブジェクト / <code>boolean</code></td>
+            <td data-i18n="descDecimal"><code>Decimal.set()</code>をラップ。<code>precision</code>（精度）や丸めモードを動的変更。</td>
         </tr>
     </table>
 
-    <h2 data-i18n="sec3Title">3. イベントフックシステム (Hooks) の徹底活用</h2>
+    <h2 data-i18n="sec3Title">3. イベントフックシステム (Hooks) の拡張と詳細</h2>
     <div class="section-box">
-        <p data-i18n="sec3Desc"><code>window.ModAPI.registerHook(hookName, callback)</code> を使用することで、ゲームのコアロジックを書き換えることなく独自のリスナーを差し込むことができます。</p>
-        
+        <p data-i18n="sec3Desc"><code>window.ModAPI.registerHook(hookName, callback)</code> を使用することで、コアロジックを改変せずに独自のリスナーを安全に登録できます。</p>
         <h3 data-i18n="hookListTitle">サポートされているフック一覧</h3>
         <ul>
-            <li><strong>onTick:</strong> <span data-i18n="hookTick">メインゲームループの1フレーム（毎秒複数回、またはティック毎）ごとに発火。</span></li>
-            <li><strong>onCoreClick:</strong> <span data-i18n="hookClick">プレイヤーが中央のコアをクリックした瞬間に発火（イベント引数を取得可能）。</span></li>
-            <li><strong>onPrestigeAm / onPrestigeTl / onPrestigeGx:</strong> <span data-i18n="hookPrestige">各種プレステージ（転生）実行時に発火。</span></li>
+            <li><strong>onTick:</strong> <span data-i18n="hookTick">メインゲームループの1フレームごとに発火。</span></li>
+            <li><strong>onCoreClick:</strong> <span data-i18n="hookClick">プレイヤーが中央コアをクリックした瞬間に発火。</span></li>
+            <li><strong>onPrestigeAm / onPrestigeTl / onPrestigeGx:</strong> <span data-i18n="hookPrestige">各種プレステージ実行時に発火。</span></li>
             <li><strong>onBuyFactory / onBuyUpgrade:</strong> <span data-i18n="hookBuy">施設やアップグレード購入時に発火。</span></li>
             <li><strong>onSave:</strong> <span data-i18n="hookSave">セーブシリアライズ実行時に発火。</span></li>
+            <li><strong>onAchievement <span style="color:var(--color-energy);">(New)</span>:</strong> <span data-i18n="hookAchieve">実績達成時やアチーブメント解除トリガー時に発火。</span></li>
         </ul>
     </div>
 
-    <h2 data-i18n="sec4Title">4. 高度なプロフェッショナルMODの実装例</h2>
-    
+    <h2 data-i18n="sec4Title">4. 拡張APIを活用したプロフェッショナルMODの実装例</h2>
     <div class="section-box">
-        <h3 data-i18n="codeBoxTitle">応用例: 高度な自動売買 & カスタム実績トラッカーMOD</h3>
-        <div class="code-block"><span class="code-comment">// 1. カスタムステータスの保持用オブジェクト</span>
-const CustomModState = {
-    totalBonusEarned: <span class="code-keyword">0</span>,
-    lastCheckedCps: <span class="code-keyword">0</span>
-};
+        <h3 data-i18n="codeBoxTitle">応用例: 精度チューニング & 無限エンドレス化オーバーライドMOD</h3>
+        <div class="code-block"><span class="code-comment">// 1. 計算精度の動的向上とInfinity上限の引き上げ</span>
+window.ModAPI.setDecimalConfig({
+    precision: <span class="code-keyword">50</span>, <span class="code-comment">// 精度を50桁に拡張</span>
+    rounding: <span class="code-keyword">4</span>    <span class="code-comment">// HALF_UP 丸めモード</span>
+});
 
-<span class="code-comment">// 2. onTick フックを用いた毎秒の監視と自動最適化ロジック</span>
+window.ModAPI.setInfinityDecimalLimit(<span class="code-string">"1e1000000"</span>); <span class="code-comment">// 上限を1e1,000,000に拡張</span>
+window.ModAPI.setEndingEnergyThreshold(<span class="code-string">"1e5000"</span>);     <span class="code-comment">// クリア条件を先送り</span>
+
+<span class="code-comment">// 2. 新規追加された onAchievement フックの利用例</span>
+window.ModAPI.registerHook(<span class="code-string">'onAchievement'</span>, (achievementId) => {
+    console.log(<span class="code-string">"[ProMod] Achievement unlocked! ID:"</span>, achievementId);
+    <span class="code-comment">// 達成ボーナスとしてタイムシャードを自動付与</span>
+    window.ModAPI.addTimeShards(<span class="code-keyword">100</span>);
+});
+
+<span class="code-comment">// 3. onTick によるカスタムCPSモニタリング</span>
 window.ModAPI.registerHook(<span class="code-string">'onTick'</span>, () => {
-    const currentCps = window.ModAPI.getCalculatedCps();
-    
-    <span class="code-comment">// 生産効率が急上昇したときにコンソールへログ出力</span>
-    if (currentCps.gt(CustomModState.lastCheckedCps * <span class="code-keyword">2</span>)) {
-        console.log(<span class="code-string">"[ProMod] Production doubled! Current CPS:"</span>, currentCps.toString());
+    const cps = window.ModAPI.getCalculatedCps();
+    if (cps.gte(<span class="code-string">"1e100"</span>)) {
+        <span class="code-comment">// 爆発的生産フェーズに入った場合の自動最適化</span>
+        window.ModAPI.setAutomationFactoryState(<span class="code-keyword">true</span>);
     }
-    CustomModState.lastCheckedCps = currentCps.toNumber();
 });
 
-<span class="code-comment">// 3. クリック時のインターセプトとボーナス付与</span>
-window.ModAPI.registerHook(<span class="code-string">'onCoreClick'</span>, (e) => {
-    <span class="code-comment">// クリックパワーの10%をタイムシャードに変換して加算する</span>
-    const clickPower = window.ModAPI.getCalculatedClickPower();
-    const bonus = D(clickPower).mul(<span class="code-keyword">0.1</span>);
-    
-    window.ModAPI.addTimeShards(bonus.toNumber());
-    CustomModState.totalBonusEarned += bonus.toNumber();
-});
-
-console.log(<span class="code-string">"[ProMod] Advanced hooks and state trackers initialized successfully."</span>);</div>
+console.log(<span class="code-string">"[ProMod] Precision and Limit override mod successfully loaded."</span>);</div>
     </div>
 
 </div>
@@ -368,20 +359,20 @@ console.log(<span class="code-string">"[ProMod] Advanced hooks and state tracker
 const translations = {
     ja: {
         backBtn: "◀ index.html に戻る",
-        title: "Infinity Matrix Omega - Advanced ModAPI Specification",
-        subtitle: "プロフェッショナルMOD開発者のための内部構造、全エンドポイント詳細、およびイベントフック応用リファレンス",
-        calloutText: "<strong>アーキテクチャ概要:</strong> <code>window.ModAPI</code> はゲームのメインスレッドおよびグローバルスコープ（<code>game</code>オブジェクト、各種計算関数）と完全に同期しています。すべての副作用を伴う操作の後は自動的に <code>refreshUI()</code> がコールされ、画面が即座に再描画されます。",
-        sec1Title: "1. 内部データ構造と安全な型ハンドリング",
-        sec1Desc: "本ゲームでは、肥大化する数値を扱うために <code>decimal.js</code>（ラップ関数 <code>D()</code>）を採用しています。",
-        sec1Li1Head: "エネルギー (<code>game.energy</code>):",
-        sec1Li1Desc: "内部では <code>Decimal</code> インスタンスとして保持されます。<code>setEnergy</code> 等に渡す際は数値、文字列、Decimalオブジェクトのいずれも許容されますが、内部で自動的に <code>decMax0()</code> を通るため負数になることはありません。",
-        sec1Li2Head: "反物質・タイムシャード・銀河ノード:",
-        sec1Li2Desc: "それぞれ数値またはDecimalで管理されており、型安全なバリデーション（<code>typeof v === 'number' && !isNaN(v)</code>）を経由して代入されます。",
+        title: "Infinity Matrix Omega - Complete ModAPI Technical Reference",
+        subtitle: "プロフェッショナルMOD開発者のための全エンドポイント、限界値・計算精度制御システム、およびイベントフック完全拡張リファレンス",
+        calloutText: "<strong>アーキテクチャ概要:</strong> <code>window.ModAPI</code> はゲームのメインスレッドおよびグローバルスコープ（<code>game</code>オブジェクト、各種計算関数、<code>Decimal</code>コンテキスト）と完全に同期しています。新規追加された限界値（Threshold）および精度管理（Decimal Config）APIにより、極限の数値シミュレーションやエンドレスモード拡張が完全にサポートされます。",
+        sec1Title: "1. 内部データ構造・型安全性と新規拡張モジュール",
+        sec1Desc: "本システムでは、肥大化する数値を扱うために <code>decimal.js</code>（ラップ関数 <code>D()</code>）を採用し、状態変化のたびに自動的に <code>refreshUI()</code> がコールされます。",
+        sec1Li1Head: "エネルギー・限界値管理 (<code>currentEnergyThreshold</code> / <code>infinityDecimal</code>):",
+        sec1Li1Desc: "ゲームの勝利条件やオーバーフロー上限を動的に変更するためのステートが拡張されました。文字列・数値・Decimalオブジェクトのいずれも安全にバリデーションされます。",
+        sec1Li2Head: "計算精度制御 (<code>Decimal.set()</code> ラッパー):",
+        sec1Li2Desc: "<code>precision</code>, <code>rounding</code>, <code>toExpNeg</code>, <code>toExpPos</code> などの小数・指数演算パラメータを外部から動的にチューニング可能です。",
         sec2Title: "2. 全エンドポイント詳細リファレンス",
         subSec1Title: "■ 資源管理・操作系API",
-        subSec2Title: "■ ファクトリー・アップグレード系API",
-        subSec3Title: "■ 動的計算・予測系API",
-        subSec4Title: "■ 限界値・計算精度制御API (New)",
+        subSec2Title: "■ ファクトリー・アップグレード・自動化・セッション系API",
+        subSec3Title: "■ 動的計算・予測・プレステージ・システム系API",
+        subSec4Title: "■ 限界値・計算精度制御API (完全新規拡張)",
         thMethod: "メソッド名",
         thArgs: "引数",
         thReturn: "戻り値",
@@ -390,50 +381,51 @@ const translations = {
         retNone: "なし",
         argVal: "v (数値 / 文字列 / Decimal)",
         argNum: "v (数値)",
-        retNum: "数値",
-        argId: "id (整数)",
         argIdVal: "id, v (整数)",
+        argBool: "bool (真偽値)",
         argSec: "seconds (数値)",
+        argForced: "forcedGain (オプション)",
         argStrNum: "v (文字列 / 数値)",
+        argStrNumDec: "v (文字列 / 数値 / Decimal)",
         argObj: "configObj (オブジェクト)",
-        descGetEnergy: "現在のエネルギーインスタンスを直接返します。参照渡しのため直接書き換えは厳禁です。",
-        descSetEnergy: "<code>decMax0(v)</code> でクランプ処理後、代入と <code>refreshUI()</code> を実行。",
-        descCalcEnergy: "Decimal演算による加減算を行います。減算時は 0 未満にならないよう自動調整されます。",
-        descAntimatter: "反物質の取得およびバリデーション付き代入。NaNや非数値を完全に弾きます。",
-        descFactoryGet: "指定IDのファクトリー保有数を返します。存在しないIDの場合は <code>0</code> を安全に返却。",
-        descFactorySet: "配列の境界値チェック（<code>0 &lt;= id &lt; game.facCounts.length</code>）を通過した場のみ代入。",
-        descUpgMax: "対応するデータベース（<code>DB_UPGRADES</code>等）の <code>max</code> プロパティを全スロットに適用します。",
-        descCps: "現在の生産倍率やゲームスピードをすべて加味した真の1秒あたり生産量を算出します。",
-        descFuture: "現在から指定秒数経過したときの予測エネルギー量を即時計算します（シミュレーション用）。",
-        descThreshold: "クリア条件の閾値を動的に上書きします。長期トリアージやエンドレス化に必須。",
-        descDecimal: "<code>Decimal.set(configObj)</code> をラップ。精度（precision）や丸めモードを変更可能。",
-        sec3Title: "3. イベントフックシステム (Hooks) の徹底活用",
-        sec3Desc: "<code>window.ModAPI.registerHook(hookName, callback)</code> を使用することで、ゲームのコアロジックを書き換えることなく独自のリスナーを差し込むことができます。",
+        descEnergy: "エネルギーの取得・クランプ付き代入・加減算およびクリアを実行。変更時は自動でUIを再描画。",
+        descAntimatter: "反物質、タイムシャード、銀河ノードの各リソース管理。NaNや非数値を完全にブロック。",
+        descFactory: "配列境界チェック（<code>0 &lt;= id &lt; game.facCounts.length</code>）を通過した安全な操作。",
+        descUpgMax: "対応データベース（<code>DB_UPGRADES</code>等）の <code>max</code> プロパティを全スロットに一括適用。",
+        descAuto: "ファクトリー、アップグレード、反物質、転生の自動化フラグ（<code>autoFacEnabled</code> 等）を制御。",
+        descCalc: "真のCPSやゲームスピードを加味した予測エネルギー量をミリ秒単位でシミュレーション。",
+        descPrestige: "プレステージ発動、手動セーブシリアライズ、および全データ初期化（ハードリセット）の実行。",
+        descThreshold: "クリア条件の閾値を動的変更。長期トリアージやエンドレスMODの構築に必須。",
+        descInfinity: "ゲーム全体の最大限界値（Infinity上限）を書き換え、超巨大数値表現の拡張を許可。",
+        descDecimal: "<code>Decimal.set()</code>をラップ。<code>precision</code>（精度）や丸めモードを動的変更。",
+        sec3Title: "3. イベントフックシステム (Hooks) の拡張と詳細",
+        sec3Desc: "<code>window.ModAPI.registerHook(hookName, callback)</code> を使用することで、コアロジックを改変せずに独自のリスナーを安全に登録できます。",
         hookListTitle: "サポートされているフック一覧",
-        hookTick: "メインゲームループの1フレーム（毎秒複数回、またはティック毎）ごとに発火。",
-        hookClick: "プレイヤーが中央のコアをクリックした瞬間に発火（イベント引数を取得可能）。",
-        hookPrestige: "各種プレステージ（転生）実行時に発火。",
+        hookTick: "メインゲームループの1フレームごとに発火。",
+        hookClick: "プレイヤーが中央コアをクリックした瞬間に発火。",
+        hookPrestige: "各種プレステージ実行時に発火。",
         hookBuy: "施設やアップグレード購入時に発火。",
         hookSave: "セーブシリアライズ実行時に発火。",
-        sec4Title: "4. 高度なプロフェッショナルMODの実装例",
-        codeBoxTitle: "応用例: 高度な自動売買 & カスタム実績トラッカーMOD"
+        hookAchieve: "実績達成時やアチーブメント解除トリガー時に発火。",
+        sec4Title: "4. 拡張APIを活用したプロフェッショナルMODの実装例",
+        codeBoxTitle: "応用例: 精度チューニング & 無限エンドレス化オーバーライドMOD"
     },
     en: {
         backBtn: "◀ Back to index.html",
-        title: "Infinity Matrix Omega - Advanced ModAPI Specification",
-        subtitle: "Internal architecture, full endpoint details, and event hook reference for professional modders",
-        calloutText: "<strong>Architecture Overview:</strong> <code>window.ModAPI</code> is fully synchronized with the game's main thread and global scope (<code>game</code> object, calculation functions). After any side-effect operation, <code>refreshUI()</code> is automatically called to instantly re-render the screen.",
-        sec1Title: "1. Internal Data Structures & Type Safety",
-        sec1Desc: "This game employs <code>decimal.js</code> (wrapped via function <code>D()</code>) to handle scaling numbers.",
-        sec1Li1Head: "Energy (<code>game.energy</code>):",
-        sec1Li1Desc: "Maintained internally as a <code>Decimal</code> instance. When passing values to <code>setEnergy</code>, numbers, strings, or Decimal objects are accepted, but they pass through <code>decMax0()</code> so they never become negative.",
-        sec1Li2Head: "Antimatter, Time Shards, Galaxy Nodes:",
-        sec1Li2Desc: "Managed as numbers or Decimals, assigned through type-safe validation (<code>typeof v === 'number' && !isNaN(v)</code>).",
+        title: "Infinity Matrix Omega - Complete ModAPI Technical Reference",
+        subtitle: "Full endpoint, limit & precision control system, and advanced event hook reference for professional modders",
+        calloutText: "<strong>Architecture Overview:</strong> <code>window.ModAPI</code> is fully synchronized with the game's main thread and global scope (<code>game</code> object, calculation functions, <code>Decimal</code> context). Newly added limit (Threshold) and precision management (Decimal Config) APIs fully support extreme numerical simulations and endless mode extensions.",
+        sec1Title: "1. Internal Data Structures, Type Safety & New Extension Modules",
+        sec1Desc: "This system employs <code>decimal.js</code> (wrapped via <code>D()</code>) to handle scaling numbers, automatically triggering <code>refreshUI()</code> on state changes.",
+        sec1Li1Head: "Energy & Limit Management (<code>currentEnergyThreshold</code> / <code>infinityDecimal</code>):",
+        sec1Li1Desc: "States for dynamically altering win conditions or overflow caps have been expanded. Strings, numbers, and Decimal objects are safely validated.",
+        sec1Li2Head: "Calculation Precision Control (<code>Decimal.set()</code> Wrapper):",
+        sec1Li2Desc: "Allows external dynamic tuning of decimal and exponential parameters such as <code>precision</code>, <code>rounding</code>, <code>toExpNeg</code>, and <code>toExpPos</code>.",
         sec2Title: "2. Full Endpoint Detailed Reference",
         subSec1Title: "■ Resource Management & Operation API",
-        subSec2Title: "■ Factory & Upgrade API",
-        subSec3Title: "■ Dynamic Calculation & Prediction API",
-        subSec4Title: "■ Limit & Calculation Precision Control API (New)",
+        subSec2Title: "■ Factory, Upgrade, Automation & Session API",
+        subSec3Title: "■ Dynamic Calculation, Prediction, Prestige & System API",
+        subSec4Title: "■ Limit & Calculation Precision Control API (New Extension)",
         thMethod: "Method Name",
         thArgs: "Arguments",
         thReturn: "Return Value",
@@ -442,50 +434,51 @@ const translations = {
         retNone: "None",
         argVal: "v (Number / String / Decimal)",
         argNum: "v (Number)",
-        retNum: "Number",
-        argId: "id (Integer)",
         argIdVal: "id, v (Integer)",
+        argBool: "bool (Boolean)",
         argSec: "seconds (Number)",
+        argForced: "forcedGain (Optional)",
         argStrNum: "v (String / Number)",
+        argStrNumDec: "v (String / Number / Decimal)",
         argObj: "configObj (Object)",
-        descGetEnergy: "Returns the current energy instance directly. Direct mutation is strictly forbidden due to pass-by-reference.",
-        descSetEnergy: "Executes clamping via <code>decMax0(v)</code>, assigns value, and triggers <code>refreshUI()</code>.",
-        descCalcEnergy: "Performs addition/subtraction using Decimal arithmetic. Automatically clamped to prevent negative values.",
-        descAntimatter: "Retrieves antimatter and validates assignment. Completely blocks NaN and non-numbers.",
-        descFactoryGet: "Returns factory ownership count for the specified ID. Safely returns <code>0</code> if ID doesn't exist.",
-        descFactorySet: "Assigns only if passing boundary checks (<code>0 &lt;= id &lt; game.facCounts.length</code>).",
-        descUpgMax: "Applies the <code>max</code> property from corresponding databases (e.g., <code>DB_UPGRADES</code>) to all slots.",
-        descCps: "Calculates true production per second factoring in global production multipliers and game speed.",
-        descFuture: "Instantly computes estimated energy after a given number of seconds (for simulations).",
-        descThreshold: "Dynamically overrides clear-condition thresholds. Essential for long-term triage or endless modes.",
-        descDecimal: "Wraps <code>Decimal.set(configObj)</code>. Allows dynamic tuning of precision and rounding modes.",
-        sec3Title: "3. Event Hook System (Hooks)",
-        sec3Desc: "Using <code>window.ModAPI.registerHook(hookName, callback)</code>, you can insert custom listeners without altering game core logic.",
+        descEnergy: "Retrieves, clamps/assigns, adds/subtracts, or clears energy. Automatically re-renders UI on changes.",
+        descAntimatter: "Manages antimatter, time shards, and galaxy nodes. Completely blocks NaN and non-numbers.",
+        descFactory: "Safe operations passing array boundary checks (<code>0 &lt;= id &lt; game.facCounts.length</code>).",
+        descUpgMax: "Applies <code>max</code> property from corresponding databases (e.g., <code>DB_UPGRADES</code>) to all slots.",
+        descAuto: "Controls automation flags for factories, upgrades, antimatter, and prestiges (<code>autoFacEnabled</code>, etc.).",
+        descCalc: "Simulates true CPS and game speed adjusted projected energy in millisecond precision.",
+        descPrestige: "Executes prestige shifts, manual save serialization, and hard reset data wipes.",
+        descThreshold: "Dynamically overrides clear-condition thresholds. Essential for long triage or endless mods.",
+        descInfinity: "Rewrites the global max limit (Infinity cap), permitting ultra-large numeric expressions.",
+        descDecimal: "Wraps <code>Decimal.set()</code>. Dynamically alters <code>precision</code> and rounding modes.",
+        sec3Title: "3. Event Hook System (Hooks) Expansion & Details",
+        sec3Desc: "Using <code>window.ModAPI.registerHook(hookName, callback)</code>, you can securely register custom listeners without tampering with core logic.",
         hookListTitle: "Supported Hooks",
-        hookTick: "Fired every frame of the main game loop (multiple times per second or per tick).",
-        hookClick: "Fired the moment the player clicks the central core (event arguments available).",
-        hookPrestige: "Fired upon executing various prestige (reset) types.",
+        hookTick: "Fired every frame of the main game loop.",
+        hookClick: "Fired the moment the player clicks the central core.",
+        hookPrestige: "Fired upon executing various prestige types.",
         hookBuy: "Fired when purchasing facilities or upgrades.",
         hookSave: "Fired during save serialization execution.",
-        sec4Title: "4. Advanced Professional Mod Implementation Examples",
-        codeBoxTitle: "Example: Advanced Auto-Trading & Custom Achievement Tracker Mod"
+        hookAchieve: "Fired upon unlocking achievements or achievement triggers.",
+        sec4Title: "4. Professional Mod Implementation Examples Using Extended APIs",
+        codeBoxTitle: "Example: Precision Tuning & Infinite Endless Override Mod"
     },
     cn: {
         backBtn: "◀ 返回 index.html",
-        title: "Infinity Matrix Omega - 高级 ModAPI 规范说明书",
-        subtitle: "面向专业 Mod 开发者内部架构、全端点详情及事件钩子参考指南",
-        calloutText: "<strong>架构概述:</strong> <code>window.ModAPI</code> 与游戏主线程及全局作用域（<code>game</code> 对象、计算函数）完全同步。所有带有副作用的操作执行后都会自动调用 <code>refreshUI()</code> 以实时刷新界面。",
-        sec1Title: "1. 内部数据结构与安全类型处理",
-        sec1Desc: "本项目采用 <code>decimal.js</code>（通过包装函数 <code>D()</code>）来处理超大数值。",
-        sec1Li1Head: "能量 (<code>game.energy</code>):",
-        sec1Li1Desc: "内部作为 <code>Decimal</code> 实例保存。传给 <code>setEnergy</code> 等接口时支持数字、字符串或 Decimal 对象，由于内部自动经过 <code>decMax0()</code> 处理，因此绝不会出现负数。",
-        sec1Li2Head: "反物质、时间碎片、星系节点:",
-        sec1Li2Desc: "分别由数字或 Decimal 管理，并通过类型安全验证（<code>typeof v === 'number' && !isNaN(v)</code>）后赋值。",
-        sec2Title: "2. 全端点详细参考",
+        title: "Infinity Matrix Omega - 完全版 ModAPI 技术参考手册",
+        subtitle: "面向专业 Mod 開発者的全端点、极限值与计算精度控制系统、以及事件钩子完全扩展参考指南",
+        calloutText: "<strong>架构概述:</strong> <code>window.ModAPI</code> 与游戏主线程及全局作用域（<code>game</code> 对象、计算函数、<code>Decimal</code> 上下文）完全同步。新增的极限值（Threshold）与精度管理（Decimal Config）API 完美支持极限数值模拟与无尽模式扩展。",
+        sec1Title: "1. 内部数据结构、类型安全性与新增扩展模块",
+        sec1Desc: "本项目采用 <code>decimal.js</code>（通过包装函数 <code>D()</code>）来处理超大数值，状态变更时会自动触发 <code>refreshUI()</code>。",
+        sec1Li1Head: "能量与极限值管理 (<code>currentEnergyThreshold</code> / <code>infinityDecimal</code>):",
+        sec1Li1Desc: "扩展了动态修改胜利条件或溢出上限的状态。字符串、数字和 Decimal 对象均经过安全验证。",
+        sec1Li2Head: "计算精度控制 (<code>Decimal.set()</code> 包装器):",
+        sec1Li2Desc: "可从外部动态调整 <code>precision</code>、<code>rounding</code>、<code>toExpNeg</code>、<code>toExpPos</code> 等小数与指数运算参数。",
+        sec2Title: "2. 全端点详细参考指南",
         subSec1Title: "■ 资源管理与操作 API",
-        subSec2Title: "■ 工厂与升级 API",
-        subSec3Title: "■ 动态计算与预测 API",
-        subSec4Title: "■ 极限值与计算精度控制 API (New)",
+        subSec2Title: "■ 工厂、升级、自动化与会话 API",
+        subSec3Title: "■ 动态计算、预测、转生与系统 API",
+        subSec4Title: "■ 极限值与计算精度控制 API (全新扩展)",
         thMethod: "方法名称",
         thArgs: "参数",
         thReturn: "返回值",
@@ -494,50 +487,51 @@ const translations = {
         retNone: "无",
         argVal: "v (数字 / 字符串 / Decimal)",
         argNum: "v (数字)",
-        retNum: "数字",
-        argId: "id (整数)",
         argIdVal: "id, v (整数)",
+        argBool: "bool (布尔值)",
         argSec: "seconds (数字)",
+        argForced: "forcedGain (可选)",
         argStrNum: "v (字符串 / 数字)",
+        argStrNumDec: "v (字符串 / 数字 / Decimal)",
         argObj: "configObj (对象)",
-        descGetEnergy: "直接返回当前的能量实例。由于是引用传递，严禁直接篡改。",
-        descSetEnergy: "经 <code>decMax0(v)</code> 夹逼处理后赋值，并执行 <code>refreshUI()</code>。",
-        descCalcEnergy: "使用 Decimal 运算进行加减。减法时会自动调整以防止小于 0。",
-        descAntimatter: "获取反物质及带验证赋值。彻底拦截 NaN 与非数字。",
-        descFactoryGet: "返回指定 ID 的工厂持有数量。若 ID 不存在则安全返回 <code>0</code>。",
-        descFactorySet: "仅在通过边界检查（<code>0 &lt;= id &lt; game.facCounts.length</code>）时赋值。",
-        descUpgMax: "将对应数据库（如 <code>DB_UPGRADES</code>）的 <code>max</code> 属性应用至所有槽位。",
-        descCps: "计算计入所有生产倍率与游戏速度后的真实每秒产量。",
-        descFuture: "即时计算指定秒数后的预计能量（用于模拟计算）。",
-        descThreshold: "动态覆盖通关条件阈值。对长期放置或无尽模式至关重要。",
-        descDecimal: "封装 <code>Decimal.set(configObj)</code>。可调整精度（precision）与舍入模式。",
-        sec3Title: "3. 事件钩子系统 (Hooks) 的深度应用",
-        sec3Desc: "使用 <code>window.ModAPI.registerHook(hookName, callback)</code> 可以在不修改游戏核心逻辑的前提下嵌入自定义监听器。",
+        descEnergy: "执行能量的获取、夹逼赋值、加减运算及清除。变更时自动刷新界面。",
+        descAntimatter: "管理反物质、时间碎片与星系节点。彻底拦截 NaN 与非数字。",
+        descFactory: "通过边界检查（<code>0 &lt;= id &lt; game.facCounts.length</code>）的安全操作。",
+        descUpgMax: "将对应数据库（如 <code>DB_UPGRADES</code>）的 <code>max</code> 属性批量应用至所有槽位。",
+        descAuto: "控制工厂、升级、反物质及转生的自动化标志（<code>autoFacEnabled</code> 等）。",
+        descCalc: "模拟计入真实 CPS 与游戏速度的毫秒级预计能量。",
+        descPrestige: "执行转生、手动存档序列化及全数据重置（硬重置）。",
+        descThreshold: "动态覆盖通关条件阈值。对长期放置或无尽 MOD 搭建至关重要。",
+        descInfinity: "改写全局最大极限值（Infinity 上限），允许超大数值表现扩展。",
+        descDecimal: "封装 <code>Decimal.set()</code>。动态调整精度与舍入模式。",
+        sec3Title: "3. 事件钩子系统 (Hooks) 的扩展与详情",
+        sec3Desc: "使用 <code>window.ModAPI.registerHook(hookName, callback)</code> 可以在不修改核心逻辑的前提下安全注册自定义监听器。",
         hookListTitle: "支持的钩子列表",
-        hookTick: "主游戏循环每帧（每秒多次或每次 tick）触发。",
-        hookClick: "玩家点击中央核心瞬间触发（可获取事件参数）。",
-        hookPrestige: "执行各类转生（Prestige）时触发。",
+        hookTick: "主游戏循环每帧触发。",
+        hookClick: "玩家点击中央核心瞬间触发。",
+        hookPrestige: "执行各类转生时触发。",
         hookBuy: "购买建筑或升级时触发。",
         hookSave: "执行存档序列化时触发。",
-        sec4Title: "4. 高级专业 Mod 实现示例",
-        codeBoxTitle: "应用示例: 高级自动交易与自定义成就追踪 Mod"
+        hookAchieve: "达成成就或解锁成就触发器时触发。",
+        sec4Title: "4. 利用扩展 API 的专业 Mod 实现示例",
+        codeBoxTitle: "应用示例: 精度调优与无限无尽化覆盖 Mod"
     },
     kr: {
         backBtn: "◀ index.html로 돌아가기",
-        title: "Infinity Matrix Omega - 고급 ModAPI 명세서",
-        subtitle: "전문 모드 개발자를 위한 내부 구조, 전체 엔드포인트 상세 및 이벤트 훅 참조 가이드",
-        calloutText: "<strong>아키텍처 개요:</strong> <code>window.ModAPI</code>는 게임의 메인 스레드 및 전역 스코프(<code>game</code> 객체, 각종 계산 함수)와 완벽히 동기화됩니다. 부수 효과가 발생하는 모든 작업 후에는 자동으로 <code>refreshUI()</code>가 호출되어 화면이 즉시 렌더링됩니다.",
-        sec1Title: "1. 내부 데이터 구조 및 타입 안전성",
-        sec1Desc: "본 게임은 거대 숫자를 다루기 위해 <code>decimal.js</code>(랩 함수 <code>D()</code>)를 채택하고 있습니다.",
-        sec1Li1Head: "에너지 (<code>game.energy</code>):",
-        sec1Li1Desc: "내부적으로 <code>Decimal</code> 인스턴스로 유지됩니다. <code>setEnergy</code> 등에 전달할 때는 숫자, 문자열, Decimal 객체 모두 허용되며 내부에서 자동으로 <code>decMax0()</code>를 거치므로 음수가 되지 않습니다.",
-        sec1Li2Head: "반물질, 타임 샤드, 갤럭시 노드:",
-        sec1Li2Desc: "각각 숫자 또는 Decimal로 관리되며 타입 안전 검증(<code>typeof v === 'number' && !isNaN(v)</code>)을 거쳐 대입됩니다.",
+        title: "Infinity Matrix Omega - 완전판 ModAPI 기술 명세서",
+        subtitle: "전문 모드 개발자를 위한 전체 엔드포인트, 한계값·계산 정밀도 제어 시스템 및 이벤트 훅 완전 확장 참조 가이드",
+        calloutText: "<strong>아키텍처 개요:</strong> <code>window.ModAPI</code>는 게임의 메인 스레드 및 전역 스코프(<code>game</code> 객체, 계산 함수, <code>Decimal</code> 컨텍스트)와 완벽히 동기화됩니다. 새로 추가된 한계값(Threshold) 및 정밀도 관리(Decimal Config) API를 통해 극한의 수치 시뮬레이션 및 무단 무한 모드 확장이 완전히 지원됩니다.",
+        sec1Title: "1. 내부 데이터 구조·타입 안전성 및 신규 확장 모듈",
+        sec1Desc: "본 시스템은 거대 숫자를 다루기 위해 <code>decimal.js</code>(랩 함수 <code>D()</code>)를 채택하고 있으며, 상태 변화 시 자동으로 <code>refreshUI()</code>가 호출됩니다.",
+        sec1Li1Head: "에너지 및 한계값 관리 (<code>currentEnergyThreshold</code> / <code>infinityDecimal</code>):",
+        sec1Li1Desc: "게임의 클리어 조건이나 오버플로우 상한을 동적으로 변경하기 위한 상태가 확장되었습니다. 문자열, 숫자, Decimal 객체 모두 안전하게 검증됩니다.",
+        sec1Li2Head: "계산 정밀도 제어 (<code>Decimal.set()</code> 래퍼):",
+        sec1Li2Desc: "<code>precision</code>, <code>rounding</code>, <code>toExpNeg</code>, <code>toExpPos</code> 등의 소수 및 지수 연산 파라미터를 외부에서 동적으로 튜닝할 수 있습니다.",
         sec2Title: "2. 전체 엔드포인트 상세 레퍼런스",
         subSec1Title: "■ 자원 관리 및 조작 API",
-        subSec2Title: "■ 팩토리 및 업그레이드 API",
-        subSec3Title: "■ 동적 계산 및 예측 API",
-        subSec4Title: "■ 한계값 및 계산 정밀도 제어 API (New)",
+        subSec2Title: "■ 팩토리, 업그레이드, 자동화 및 세션 API",
+        subSec3Title: "■ 동적 계산, 예측, 프레스티지 및 시스템 API",
+        subSec4Title: "■ 한계값 및 계산 정밀도 제어 API (신규 확장)",
         thMethod: "메서드명",
         thArgs: "인수",
         thReturn: "반환값",
@@ -546,33 +540,34 @@ const translations = {
         retNone: "없음",
         argVal: "v (숫자 / 문자열 / Decimal)",
         argNum: "v (숫자)",
-        retNum: "숫자",
-        argId: "id (정수)",
         argIdVal: "id, v (정수)",
+        argBool: "bool (불리언)",
         argSec: "seconds (숫자)",
+        argForced: "forcedGain (선택)",
         argStrNum: "v (문자열 / 숫자)",
+        argStrNumDec: "v (문자열 / 숫자 / Decimal)",
         argObj: "configObj (객체)",
-        descGetEnergy: "현재 에너지 인스턴스를 직접 반환합니다. 참조에 의한 전달이므로 직접 변조는 절대 금지됩니다.",
-        descSetEnergy: "<code>decMax0(v)</code>로 클램핑 처리 후 대입하고 <code>refreshUI()</code>를 실행합니다.",
-        descCalcEnergy: "Decimal 연산을 통한 가감산을 수행합니다. 뺄셈 시 0 미만이 되지 않도록 자동 보정됩니다.",
-        descAntimatter: "반물질 취득 및 유효성 검증된 대입. NaN 및 비숫자를 완전히 차단합니다.",
-        descFactoryGet: "지정 ID의 팩토리 보유 수를 반환합니다. 존재하지 않는 ID인 경우 <code>0</code>을 안전하게 반환.",
-        descFactorySet: "배열 경계 검사(<code>0 &lt;= id &lt; game.facCounts.length</code>)를 통과한 경우에만 대입.",
-        descUpgMax: "대응하는 데이터베이스(<code>DB_UPGRADES</code> 등)의 <code>max</code> 속성을 모든 슬롯에 적용합니다.",
-        descCps: "현재 생산 배율 및 게임 속도를 모두 반영한 진정한 초당 생산량을 산출합니다.",
-        descFuture: "현재부터 지정된 초가 지난 후의 예상 에너지량을 즉시 계산합니다(시뮬레이션용).",
-        descThreshold: "클리어 조건의 한계값을 동적으로 오버라이드합니다. 장기 플레이나 무한 모드에 필수.",
-        descDecimal: "<code>Decimal.set(configObj)</code>를 래핑. 정밀도(precision) 및 반올림 모드 변경 가능.",
-        sec3Title: "3. 이벤트 훅 시스템 (Hooks) 활용",
-        sec3Desc: "<code>window.ModAPI.registerHook(hookName, callback)</code>을 사용하여 게임 코어 로직을 수정하지 않고 독자적인 리스너를 삽입할 수 있습니다.",
+        descEnergy: "에너지 취득, 클램핑 대입, 가감산 및 클리어 실행. 변경 시 자동으로 UI 재렌더링.",
+        descAntimatter: "반물질, 타임 샤드, 갤럭시 노드 리소스 관리. NaN 및 비숫자를 완벽히 차단.",
+        descFactory: "배열 경계 검사(<code>0 &lt;= id &lt; game.facCounts.length</code>)를 통과한 안전한 조작.",
+        descUpgMax: "대응 데이터베이스(<code>DB_UPGRADES</code> 등)의 <code>max</code> 속성을 모든 슬롯에 일괄 적용.",
+        descAuto: "팩토리, 업그레이드, 반물질, 프레스티지 자동화 플래그(<code>autoFacEnabled</code> 등) 제어.",
+        descCalc: "진정한 CPS 및 게임 속도를 반영한 밀리초 단위 예상 에너지 시뮬레이션.",
+        descPrestige: "프레스티지 실행, 수동 세이브 직렬화 및 전체 데이터 초기화(하드 리셋) 실행.",
+        descThreshold: "클리어 조건 한계값을 동적 오버라이드. 장기 플레이나 무한 모드 구축에 필수.",
+        descInfinity: "게임 전체의 최대 한계값(Infinity 상한)을 재작성하여 초거대 수치 표현 확장 허용.",
+        descDecimal: "<code>Decimal.set()</code> 래핑. <code>precision</code>(정밀도) 및 반올림 모드 동적 변경.",
+        sec3Title: "3. 이벤트 훅 시스템 (Hooks) 확장 및 상세",
+        sec3Desc: "<code>window.ModAPI.registerHook(hookName, callback)</code>을 사용하여 코어 로직을 수정하지 않고 독자적인 리스너를 안전하게 등록할 수 있습니다.",
         hookListTitle: "지원되는 훅 목록",
-        hookTick: "메인 게임 루프의 1프레임(초당 여러 번 또는 틱마다)마다 발생.",
-        hookClick: "플레이어가 중앙 코어를 클릭하는 순간 발생(이벤트 인수 취득 가능).",
-        hookPrestige: "각종 프레스티지(환생) 실행 시 발생.",
+        hookTick: "메인 게임 루프의 1프레임마다 발생.",
+        hookClick: "플레이어가 중앙 코어를 클릭하는 순간 발생.",
+        hookPrestige: "각종 프레스티지 실행 시 발생.",
         hookBuy: "건물 또는 업그레이드 구매 시 발생.",
         hookSave: "세이브 직렬화 실행 시 발생.",
-        sec4Title: "4. 고급 전문 모드 구현 예시",
-        codeBoxTitle: "응용 예시: 고급 자동 거래 및 커스텀 업적 추적 모드"
+        hookAchieve: "업적 달성 또는 업적 해제 트리거 시 발생.",
+        sec4Title: "4. 확장 API를 활용한 프로フェッショナル 모드 구현 예시",
+        codeBoxTitle: "응용 예시: 정밀도 튜닝 & 무한 엔드리스 오버라이드 모드"
     }
 };
 
