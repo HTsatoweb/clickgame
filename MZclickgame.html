@@ -5,7 +5,7 @@
 <meta charset="utf-8" />
 
 <script src="decimal.min.js"></script>
-  <script>
+  <script>getEndingEnergyThreshold:
   // 1. Google翻訳の読み込み（オンラインの時だけ試す、オフラインならエラーを出さずに無視）
   // navigator.onLine を使ってネットに繋がっているか事前にチェックします
   if (navigator.onLine) {
@@ -4159,85 +4159,70 @@ function renderAutomation() {
  * VERIFIED 65+ COMPLETELY SEPARATED API ENDPOINTS ARCHITECTURE (NO ALTERATION ALLOWED)
  * ==========================================================================================
  */
+// === [追加] 限界値・計算精度管理のための設定オブジェクト ===
+// ※ ENDING_ENERGY_THRESHOLD や infinityDecimal は let または専用オブジェクトで保持すると安全です
+let currentEnergyThreshold = ENDING_ENERGY_THRESHOLD;
+
 window.ModAPI = {
-  // === [1-5] Energy Accessors ===
+  // 既存のエンドポイント（省略せずそのまま維持してください） ...
   getEnergy: () => D(game.energy),
   setEnergy: (v) => { game.energy = decMax0(v); refreshUI(); },
   addEnergy: (v) => { game.energy = D(game.energy).add(D(v)); refreshUI(); },
   subEnergy: (v) => { game.energy = decMax0(D(game.energy).sub(D(v))); refreshUI(); },
   clearEnergy: () => { game.energy = new Decimal(0); refreshUI(); },
 
-  // === [6-10] Antimatter Accessors ===
   getAntimatter: () => game.antimatter,
   setAntimatter: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.antimatter = v; refreshUI(); } },
   addAntimatter: (v) => { try { game.antimatter = D(game.antimatter).add(D(v)); refreshUI(); } catch(e){} },
   subAntimatter: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.antimatter = Math.max(0, game.antimatter - v); refreshUI(); } },
   clearAntimatter: () => { game.antimatter = 0; refreshUI(); },
 
-  // === [11-15] Time Shards Accessors ===
   getTimeShards: () => game.timeShards,
   setTimeShards: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.timeShards = v; refreshUI(); } },
   addTimeShards: (v) => { try { game.timeShards = D(game.timeShards).add(D(v)); refreshUI(); } catch(e){} },
   subTimeShards: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.timeShards = Math.max(0, game.timeShards - v); refreshUI(); } },
   clearTimeShards: () => { game.timeShards = 0; refreshUI(); },
 
-  // === [16-20] Galaxy Nodes Accessors ===
   getGalaxyNodes: () => game.galaxyNodes,
   setGalaxyNodes: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.galaxyNodes = v; refreshUI(); } },
   addGalaxyNodes: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.galaxyNodes += v; refreshUI(); } },
   subGalaxyNodes: (v) => { if(typeof v === 'number' && !isNaN(v)) { game.galaxyNodes = Math.max(0, game.galaxyNodes - v); refreshUI(); } },
   clearGalaxyNodes: () => { game.galaxyNodes = 0; refreshUI(); },
 
-// === Industrial Factory Controllers 部分の修正例 ===
-getFactoryCount: (id) => game.facCounts[id] ?? 0,
-setFactoryCount: (id, v) => { 
-  if(id >= 0 && id < game.facCounts.length && typeof v === 'number' && !isNaN(v)) { 
-    game.facCounts[id] = v; 
-    refreshUI(); 
-  } 
-},
-addFactoryCount: (id, v) => { 
-  if(id >= 0 && id < game.facCounts.length && typeof v === 'number' && !isNaN(v)) { 
-    game.facCounts[id] = (game.facCounts[id] ?? 0) + v; 
-    refreshUI(); 
-  } 
-},
+  getFactoryCount: (id) => game.facCounts[id] ?? 0,
+  setFactoryCount: (id, v) => { 
+    if(id >= 0 && id < game.facCounts.length && typeof v === 'number' && !isNaN(v)) { 
+      game.facCounts[id] = v; 
+      refreshUI(); 
+    } 
+  },
+  addFactoryCount: (id, v) => { 
+    if(id >= 0 && id < game.facCounts.length && typeof v === 'number' && !isNaN(v)) { 
+      game.facCounts[id] = (game.facCounts[id] ?? 0) + v; 
+      refreshUI(); 
+    } 
+  },
 
-// === Normal Upgrades Core Manipulation 部分の修正例 ===
-getUpgradeLevel: (id) => game.upgLevels[id] ?? 0,
-setUpgradeLevel: (id, v) => { 
-  if(id >= 0 && id < game.upgLevels.length && typeof v === 'number' && !isNaN(v)) { 
-    game.upgLevels[id] = v; 
-    refreshUI(); 
-  } 
-},
-
-  // === [26-28] Normal Upgrades Core Manipulation ===
   getUpgradeLevel: (id) => game.upgLevels[id],
   setUpgradeLevel: (id, v) => { if(id >= 0 && id < game.upgLevels.length) { game.upgLevels[id] = v; refreshUI(); } },
   setAllUpgradesToMax: () => { for(let i=0; i<game.upgLevels.length; i++) game.upgLevels[i] = DB_UPGRADES[i].max; refreshUI(); },
 
-  // === [29-31] Antimatter Upgrades Manipulation ===
   getAmUpgradeLevel: (id) => game.amUpgLevels[id],
   setAmUpgradeLevel: (id, v) => { if(id >= 0 && id < game.amUpgLevels.length) { game.amUpgLevels[id] = v; refreshUI(); } },
   setAllAmUpgradesToMax: () => { for(let i=0; i<game.amUpgLevels.length; i++) game.amUpgLevels[i] = DB_AM_UPGRADES[i].max; refreshUI(); },
 
-  // === [32-34] Timeline Upgrades Manipulation ===
   getTlUpgradeLevel: (id) => game.tlUpgLevels[id],
   setTlUpgradeLevel: (id, v) => { if(id >= 0 && id < game.tlUpgLevels.length) { game.tlUpgLevels[id] = v; refreshUI(); } },
   setAllTlUpgradesToMax: () => { for(let i=0; i<game.tlUpgLevels.length; i++) game.tlUpgLevels[i] = DB_TL_UPGRADES[i].max; refreshUI(); },
 
-  // === [35-35] Global Telemetry Statistics Reset ===
   resetSessionStatistics: () => { game.totalClicks = 0; game.sessionTime = 0; game.totalTime = 0; refreshUI(); },
 
-  // === [36-40] Advanced Mathematical Core Inquirers ===
   getCalculatedCps: () => getTotalCps(),
   getCalculatedClickPower: () => getClickPower(),
   getCalculatedGameSpeed: () => getGameSpeedMultiplier(),
   getCalculatedProductionMultiplier: () => getGlobalProductionMultiplier(),
   getFactoryCostPrice: (id) => getFactoryCost(id),
 
-  // === [41-46] Mathematical Projections & Pre-calculators ===
   getUpgradeCostPrice: (id) => getUpgradeCost(id),
   getPredictedGainAm: () => getGainAntimatter(),
   getPredictedGainTl: () => getGainTimeShards(),
@@ -4245,21 +4230,66 @@ setUpgradeLevel: (id, v) => {
   getFutureEnergyEstimate: (seconds) => D(game.energy).add(D(getTotalCps()).mul(getGameSpeedMultiplier()).mul(seconds)),
   getFactoryCpsContribution: (id) => getFactoryCps(id),
 
-  // === [47-51] System IO Architecture Commands ===
   triggerCoreClickEvent: (e) => handleCoreClick(e),
   executePrestigeAmShift: (forcedGain) => executePrestigeAm(forcedGain),
   executePrestigeTlShift: () => { game.timeShards = D(game.timeShards).add(D(getGainTimeShards())); refreshUI(); },
   executePrestigeGxShift: () => { game.galaxyNodes += getGainGalaxyNodes(); refreshUI(); },
   executeSaveSerialization: () => saveGameManual(),
 
-  // === [52-56] Core Automation Engine State Force Manipulators ===
   setAutomationFactoryState: (bool) => { game.autoFacEnabled = !!bool; refreshUI(); },
   setAutomationUpgradeState: (bool) => { game.autoUpgEnabled = !!bool; refreshUI(); },
   setAutomationAntimatterState: (bool) => { game.autoAmEnabled = !!bool; refreshUI(); },
   setAutomationPrestigeAmState: (bool) => { game.autoPrestigeAmEnabled = !!bool; refreshUI(); },
   executeHardResetWipe: () => hardResetGame(),
 
-  // === [57-65] Event Lifecycle Hook Pipeline Interceptors ===
+  // =========================================================================
+  // === [NEW] 限界値 (Limits) & 計算精度 (Precision/Decimal) の制御API群 ===
+  // =========================================================================
+
+  // 1. 限界値関連の取得・設定
+  getEndingEnergyThreshold: () => currentEnergyThreshold,
+  setEndingEnergyThreshold: (v) => {
+    currentEnergyThreshold = String(v);
+    // 必要に応じてグローバル側の定数やゲームロジックへ反映
+    console.log(`[ModAPI] Ending energy threshold updated to: ${currentEnergyThreshold}`);
+  },
+
+  getInfinityDecimalLimit: () => infinityDecimal.toString(),
+  setInfinityDecimalLimit: (v) => {
+    try {
+      infinityDecimal = D(v);
+      console.log(`[ModAPI] Infinity decimal limit updated to: ${infinityDecimal.toString()}`);
+    } catch (e) {
+      console.error("[ModAPI] Invalid infinity limit value", e);
+    }
+  },
+
+  // 2. Decimal計算精度の制御関連
+  getDecimalConfig: () => {
+    // Decimal.precision などの現在の設定を取得して返す
+    return {
+      precision: Decimal.precision,
+      rounding: Decimal.rounding,
+      toExpNeg: Decimal.toExpNeg,
+      toExpPos: Decimal.toExpPos
+    };
+  },
+
+  setDecimalConfig: (configObj) => {
+    try {
+      if (typeof configObj === 'object' && configObj !== null) {
+        Decimal.set(configObj);
+        console.log("[ModAPI] Decimal configuration successfully updated:", Decimal.precision);
+        return true;
+      }
+    } catch (e) {
+      console.error("[ModAPI] Failed to update Decimal config:", e);
+    }
+    return false;
+  },
+
+  // =========================================================================
+
   hooks: {
     onTick: [],
     onCoreClick: [],
@@ -4277,7 +4307,6 @@ setUpgradeLevel: (id, v) => {
     }
   }
 };
-
 /**
  * =========================================================================
  * MOD Installation Textarea & File Runtime Linkers
