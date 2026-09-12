@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incredible Absolute God - Download Terminal</title>
+    <style>
+        :root {
+          --bg-main: #020106;
+          --bg-panel: rgba(10, 6, 20, 0.95);
+          --border-strong: rgba(0, 255, 204, 0.4);
+          
+          --color-energy: #00ffcc;
+          --color-antimatter: #ff0055;
+          --color-timeline: #9d4edd;
+          --color-galaxy: #3a86ff;
+          --color-kimo: #39ff14;
+          
+          --text-main: #f4f4f5;
+          --text-muted: #6b7280;
+        }
+
+        * {
+          box-sizing: border-box;
+          font-family: 'Consolas', 'Fira Code', 'Courier New', monospace, system-ui;
+          user-select: none;
+        }
+
+        body {
+          margin: 0;
+          padding: 20px;
+          background-color: var(--bg-main);
+          color: var(--text-main);
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: flex-start;
+        }
+
+        .cyber-bg {
+          position: fixed;
+          inset: 0;
+          z-index: -1;
+          background: 
+            radial-gradient(circle at 20% 30%, rgba(157, 78, 221, 0.2) 0%, transparent 50%),
+            radial-gradient(circle at 80% 70%, rgba(255, 0, 85, 0.15) 0%, transparent 50%);
+        }
+
+        .download-container {
+          width: 100%;
+          max-width: 600px;
+          background: var(--bg-panel);
+          border: 1px solid var(--border-strong);
+          border-radius: 12px;
+          padding: 30px 20px;
+          margin-top: 20px;
+          margin-bottom: 40px;
+        }
+
+        .download-title {
+          font-size: 1.3rem;
+          font-weight: 900;
+          letter-spacing: 2px;
+          margin-bottom: 6px;
+          color: #fff;
+        }
+
+        .download-subtitle {
+          font-size: 0.7rem;
+          color: var(--text-muted);
+          letter-spacing: 4px;
+          margin-bottom: 25px;
+          text-transform: uppercase;
+        }
+
+        .section-header {
+          font-size: 0.8rem;
+          color: var(--color-energy);
+          letter-spacing: 2px;
+          margin: 20px 0 10px 0;
+          text-align: left;
+          border-left: 3px solid var(--color-energy);
+          padding-left: 8px;
+          text-transform: uppercase;
+        }
+
+        .menu-list {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .btn-download {
+          width: 100%;
+          padding: 16px;
+          border-radius: 6px;
+          font-size: 0.9rem;
+          font-weight: 900;
+          cursor: pointer;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          text-decoration: none;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 4px;
+          border: none;
+          outline: none;
+        }
+
+        .btn-download span.desc {
+          font-size: 0.6rem;
+          font-weight: normal;
+          opacity: 0.8;
+        }
+
+        .btn-offline {
+          background: rgba(57, 255, 20, 0.1);
+          border: 2px solid var(--color-kimo);
+          color: var(--color-kimo);
+        }
+        .btn-offline:hover {
+          background: var(--color-kimo);
+          color: #000;
+        }
+
+        .btn-light {
+          background: rgba(58, 134, 255, 0.1);
+          border: 2px solid var(--color-galaxy);
+          color: var(--color-galaxy);
+        }
+        .btn-light:hover {
+          background: var(--color-galaxy);
+          color: #fff;
+        }
+
+        .legacy-list {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .btn-legacy {
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          color: var(--text-muted);
+          padding: 10px 14px;
+          border-radius: 6px;
+          font-size: 0.75rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          cursor: pointer;
+          outline: none;
+        }
+        .btn-legacy:hover {
+          border-color: var(--color-timeline);
+          color: var(--color-timeline);
+        }
+
+        .btn-home {
+          width: 100%;
+          margin-top: 25px;
+          padding: 14px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 2px solid var(--text-muted);
+          border-radius: 6px;
+          color: var(--text-main);
+          font-size: 0.85rem;
+          font-weight: 900;
+          cursor: pointer;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          text-decoration: none;
+          display: block;
+          text-align: center;
+        }
+        .btn-home:hover {
+          border-color: var(--color-energy);
+          color: var(--color-energy);
+          background: rgba(0, 255, 204, 0.05);
+        }
+
+        /* モーダル */
+        .modal-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.85);
+          z-index: 99999;
+          display: none;
+          align-items: center;
+          justify-content: center;
+        }
+        .modal-overlay.active {
+          display: flex;
+        }
+
+        .modal-content {
+          width: 90%;
+          max-width: 400px;
+          background: #0f0819;
+          border: 2px solid var(--color-antimatter);
+          border-radius: 8px;
+          padding: 24px;
+          text-align: left;
+        }
+
+        .modal-title {
+          font-size: 0.95rem;
+          font-weight: 900;
+          color: var(--color-antimatter);
+          letter-spacing: 2px;
+          margin-bottom: 12px;
+          text-transform: uppercase;
+        }
+
+        .modal-desc {
+          font-size: 0.72rem;
+          color: #d1d5db;
+          margin-bottom: 20px;
+          line-height: 1.6;
+        }
+
+        .modal-actions {
+          display: flex;
+          gap: 10px;
+        }
+
+        .btn-modal {
+          flex: 1;
+          padding: 12px;
+          border-radius: 4px;
+          font-weight: 900;
+          font-size: 0.8rem;
+          cursor: pointer;
+          border: none;
+        }
+
+        .btn-modal-agree {
+          background: var(--color-antimatter);
+          color: #fff;
+        }
+        .btn-modal-agree:hover {
+          background: #ff1a66;
+        }
+
+        .btn-modal-cancel {
+          background: transparent;
+          border: 1px solid var(--text-muted);
+          color: var(--text-muted);
+        }
+
+        /* 非Windows用ブロック画面 */
+        #osBlockScreen {
+          position: fixed;
+          inset: 0;
+          background: #020106;
+          z-index: 999999;
+          display: none;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          padding: 20px;
+        }
+        #osBlockScreen.active {
+          display: flex;
+        }
+        .os-block-title {
+          font-size: 1.2rem;
+          font-weight: 900;
+          color: var(--color-antimatter);
+          margin-bottom: 15px;
+          letter-spacing: 2px;
+        }
+        .os-block-desc {
+          font-size: 0.85rem;
+          color: var(--text-main);
+          line-height: 1.6;
+        }
+
+        .back-link {
+          margin-top: 15px;
+          display: inline-block;
+          font-size: 0.75rem;
+          color: var(--text-muted);
+          text-decoration: none;
+        }
+        .back-link:hover {
+          color: var(--color-energy);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Windows以外のユーザーをブロックする画面 -->
+    <div id="osBlockScreen">
+        <div class="os-block-title">⚠️ ACCESS DENIED</div>
+        <div class="os-block-desc">すみませんあなたのOSでは入れません</div>
+    </div>
+
+    <div class="cyber-bg"></div>
+
+    <a id="hiddenDownloadLink" href="#" style="display: none;"></a>
+
+    <div class="download-container">
+        <div class="download-title">DOWNLOAD TERMINAL</div>
+        <div class="download-subtitle">Incredible.Absolute.God Distribution</div>
+
+        <div class="section-header">Latest Releases (Auto-Updated)</div>
+        <div class="menu-list">
+            <!-- GitHub Releases の最新に自動追従するリンク -->
+            <button class="btn-download btn-offline" onclick="openWarningModal('https://github.com/HTsatoweb/clickgame/releases/latest/download/Incredible.Absolute.God_off-line.exe')">
+                <span>⚡ Incredible.Absolute.God_off-line.exe</span>
+                <span class="desc">最新通常版 (オフラインフル機能・自動アプデ対応)</span>
+            </button>
+
+            <button class="btn-download btn-light" onclick="openWarningModal('https://github.com/HTsatoweb/clickgame/releases/latest/download/Incredible.Absolute.God.exe')">
+                <span>🌐 Incredible.Absolute.God.exe</span>
+                <span class="desc">軽量版 (WEBアセット随時取得・自動アプデ対応)</span>
+            </button>
+        </div>
+
+        <div class="section-header">Legacy / Archive Versions</div>
+        <div class="legacy-list">
+            <button class="btn-legacy" onclick="openWarningModal('https://github.com/HTsatoweb/clickgame/releases/download/v1.2.0/Incredible.Absolute.God_off-line.exe')">
+              <span>v1.2.0 (Stable Build)</span> <span>.exe</span>
+            </button>
+            <button class="btn-legacy" onclick="openWarningModal('https://github.com/HTsatoweb/clickgame/releases/download/v1.1.0/Incredible.Absolute.God_off-line.exe')">
+              <span>v1.1.0 (Legacy Build)</span> <span>.exe</span>
+            </button>
+            <button class="btn-legacy" onclick="openWarningModal('https://github.com/HTsatoweb/clickgame/releases/download/v1.0.0/Incredible.Absolute.God_off-line.exe')">
+              <span>v1.0.0 (Initial Release)</span> <span>.exe</span>
+            </button>
+        </div>
+
+        <a href="https://github.com/HTsatoweb/clickgame/releases/" target="_blank" class="back-link">📂 GitHub Releases 全てのバージョンを見る &gt;&gt;</a>
+
+        <a href="index_home.html" class="btn-home">🏠 ホームに戻る</a>
+    </div>
+
+    <div id="warningModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-title">⚠️ SECURITY WARNING</div>
+            <div class="modal-desc">
+                このソフトウェアのダウンロードおよび実行は、完全な<strong>自己責任</strong>となります。<br><br>
+                不明な実行ファイルのダウンロードやシステムへの適用に伴ういかなるトラブルや動作不良についても、制作者は一切の責任を負いません。続行しますか？
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal btn-modal-cancel" onclick="closeWarningModal()">中止する</button>
+                <button class="btn-modal btn-modal-agree" id="modalAgreeBtn">同意してDL</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // アクセス時にWindows判定を行う処理
+        (function checkOS() {
+            const ua = navigator.userAgent;
+            // Windowsが含まれていない場合はブロック画面を表示
+            if (!ua.includes('Windows')) {
+                document.getElementById('osBlockScreen').classList.add('active');
+            }
+        })();
+
+        let targetDownloadUrl = "";
+
+        function openWarningModal(url) {
+            targetDownloadUrl = url;
+            document.getElementById('warningModal').classList.add('active');
+        }
+
+        function closeWarningModal() {
+            document.getElementById('warningModal').classList.remove('active');
+            targetDownloadUrl = "";
+        }
+
+        document.getElementById('modalAgreeBtn').addEventListener('click', function() {
+            if (targetDownloadUrl) {
+                const link = document.getElementById('hiddenDownloadLink');
+                link.href = targetDownloadUrl;
+                link.click();
+            }
+            closeWarningModal();
+        });
+    </script>
+</body>
+</html>
