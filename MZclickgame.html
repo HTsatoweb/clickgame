@@ -1651,18 +1651,7 @@ body.neon-bloom .click-core-btn{box-shadow:0 0 34px rgba(0,255,204,.5),0 0 70px 
 <canvas id="neonFxOverlay" aria-hidden="true"></canvas>
 <div id="neonComboRing"></div>
 <div id="neonToast"></div>
-<div id="neonDock" class="collapsed">
-  <header id="neonDockHead"><b>NEON ENGINE</b><span id="neonFeatCount">0</span></header>
-  <div class="nd-body" id="neonDockBody">
-    <div class="nd-stats">
-      <span>FPS <b id="neonFps">--</b></span>
-      <span>GPU <b id="neonGpu">--</b></span>
-      <span>WORKER <b id="neonWk">--</b></span>
-      <span>FX <b id="neonFxN">0</b></span>
-    </div>
-    <div class="nd-grid" id="neonFeatGrid"></div>
-  </div>
-</div>
+
 <div class="copyright">&copy; 2026 HTsatoweb</div>
 <!-- ★ ここから読み込み画面 -->
 <div id="bootLoader" aria-live="polite">
@@ -1941,6 +1930,18 @@ body.neon-bloom .click-core-btn{box-shadow:0 0 34px rgba(0,255,204,.5),0 0 70px 
       <button class="btn-utility" onclick="saveGameManual()" style="white-space: nowrap;">手動セーブ</button>
       <button class="btn-utility" id="settingsMenuBtn" onclick="toggleSettingsMenu()" style="color: var(--color-upgrade); border-color: var(--color-upgrade); white-space: nowrap; font-weight: bold;">⚙️ 設定</button>
       <button class="btn-fullscreen" id="fullscreenToggleBtn">⛶ 全画面切替</button>
+        <div id="neonDock" class="collapsed">
+  <header id="neonDockHead"><b>NEON ENGINE</b><span id="neonFeatCount">0</span></header>
+  <div class="nd-body" id="neonDockBody">
+    <div class="nd-stats">
+      <span>FPS <b id="neonFps">--</b></span>
+      <span>GPU <b id="neonGpu">--</b></span>
+      <span>WORKER <b id="neonWk">--</b></span>
+      <span>FX <b id="neonFxN">0</b></span>
+    </div>
+    <div class="nd-grid" id="neonFeatGrid"></div>
+  </div>
+</div>
     </div>
   </div>
 
