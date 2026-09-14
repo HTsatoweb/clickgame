@@ -1572,86 +1572,102 @@ body.force-lightweight-all #eventOverlay.show .event-card {
 
 <style id="neonEngineCss">
 html,body{background:#010108;}
-#neonGpuBg,#neonFxOverlay{
+#neonGpuBg,#neonFxOverlay,#neonThree{
   position:fixed;inset:0;width:100%;height:100%;
-  pointer-events:none!important;border:0;display:block;
+  pointer-events:none!important;z-index:0;border:0;display:block;
 }
-#neonGpuBg{z-index:0;}
-#neonFxOverlay{z-index:1;}
-#neonComboRing,#neonToast{pointer-events:none;}
-body{
-  isolation:isolate;
-}
+#neonThree{z-index:0;}
+#neonFxOverlay{z-index:0;}
 .column-left,.column-center,.column-right{
-  position:relative;
-  z-index:4;
-  isolation:isolate;
+  position:relative;z-index:2;
 }
-.column-left{
-  background:linear-gradient(180deg,rgba(6,4,16,.42),rgba(3,2,10,.48)) !important;
-  backdrop-filter:blur(6px) saturate(1.2);
-  -webkit-backdrop-filter:blur(6px) saturate(1.2);
-}
-.column-center{
-  background:linear-gradient(180deg,rgba(0,0,8,.18),rgba(4,8,22,.26)) !important;
-}
-.column-right{
-  background:linear-gradient(180deg,rgba(8,2,12,.58),rgba(4,1,8,.64)) !important;
-}
-.click-core-btn{
-  box-shadow:0 0 24px rgba(0,255,204,.28),0 0 64px rgba(80,60,255,.18), inset 0 0 28px rgba(0,255,204,.12) !important;
-}
-#effectHUD,#funBar,#skillBar,#missionBox,#playView{position:relative;z-index:5;}
-.copyright{z-index:6 !important;bottom:8px !important;left:8px !important;max-width:46vw;}
-#pvToast{left:8px !important;bottom:28px !important;width:min(240px,42vw) !important;z-index:7 !important;}
-#neonDock{
-  position:fixed;top:10px;right:10px;bottom:auto;left:auto;
-  z-index:80;width:auto;max-width:min(300px,42vw);max-height:none;
-  background:linear-gradient(180deg,rgba(8,10,28,.94),rgba(5,7,20,.92));
-  border:1px solid rgba(0,255,204,.4);
-  border-radius:12px;color:#e5e7eb;font:11px/1.35 system-ui,sans-serif;
-  box-shadow:0 12px 36px rgba(0,0,0,.45),0 0 20px rgba(0,255,204,.12);
-  overflow:hidden;
-}
-#neonDock.collapsed{width:auto;max-width:none;}
-#neonDock.collapsed .nd-body{display:none;}
-#neonDock header{display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:pointer;user-select:none;}
-#neonDock header b{color:#00ffcc;letter-spacing:.08em;font-size:11px;}
-#neonDock header span{margin-left:auto;color:#ffea00;font-weight:800;}
-#neonDock .nd-body{padding:8px 10px 10px;overflow:auto;max-height:min(46vh,380px);}
-#neonDock .nd-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
-#neonDock button.nd{
-  appearance:none;border:1px solid rgba(0,255,204,.28);background:rgba(0,255,204,.08);
-  color:#dff;border-radius:7px;padding:5px 6px;font-size:10px;font-weight:700;cursor:pointer;
-}
-#neonDock button.nd.on{border-color:#ffea00;color:#ffea00;background:rgba(255,234,0,.1);}
-#neonDock .nd-stats{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px;color:#9ca3af;}
-#neonDock .nd-stats b{color:#00ffcc;}
+#neonComboRing,#neonToast{pointer-events:none;}
 #neonToast{
-  position:fixed;left:50%;top:14%;bottom:auto;transform:translateX(-50%);
-  z-index:90;color:#fff;background:rgba(0,0,0,.6);border:1px solid rgba(0,255,204,.45);
-  padding:6px 12px;border-radius:999px;font:700 12px/1 system-ui;opacity:0;transition:opacity .2s;
+  position:fixed;left:50%;top:12%;transform:translateX(-50%);
+  z-index:90;color:#fff;background:rgba(0,0,0,.6);border:1px solid rgba(0,255,204,.4);
+  padding:6px 12px;border-radius:999px;font:700 12px/1 system-ui;opacity:0;transition:opacity .18s;
 }
 #neonToast.show{opacity:1;}
-#neonComboRing{position:fixed;z-index:3;}
-body.neon-chroma #coreTrigger{filter:saturate(1.28) contrast(1.06);}
-body.neon-bloom .click-core-btn{box-shadow:0 0 34px rgba(0,255,204,.5),0 0 70px rgba(88,70,255,.28)!important;}
-@media (max-width:1024px){
-  #neonDock{top:auto;right:8px;bottom:8px;max-width:min(320px,94vw);z-index:80;}
-  #neonDock.collapsed{bottom:8px;right:8px;}
-  .copyright{position:relative !important;left:auto !important;bottom:auto !important;max-width:100%;margin:8px;}
-  #pvToast{left:8px !important;right:auto !important;bottom:56px !important;width:min(220px,70vw)!important;}
-  .column-left,.column-center,.column-right{backdrop-filter:none;-webkit-backdrop-filter:none;}
+#neonComboRing{position:fixed;z-index:1;display:none;}
+#neonDock{
+  position:fixed;left:8px;bottom:28px;top:auto;right:auto;z-index:30;
+  width:auto;max-width:min(280px,46vw);
+  margin:0;
+  background:rgba(8,10,24,.94);
+  border:1px solid rgba(0,255,204,.35);border-radius:12px;
+  color:#e5e7eb;font:11px/1.3 system-ui,sans-serif;
+  box-shadow:0 8px 24px rgba(0,0,0,.4);
 }
-@media (prefers-reduced-motion:reduce){
-  #neonFxOverlay,#neonGpuBg{opacity:.45;}
+#neonDock.collapsed{max-width:none;width:auto;}
+#neonDock.collapsed .nd-body{display:none !important;}
+#neonDock header{display:flex;align-items:center;gap:8px;padding:6px 9px;cursor:pointer;user-select:none;}
+#neonDock header b{color:#00ffcc;letter-spacing:.06em;font-size:11px;}
+#neonDock header .nd-fps{color:#00ffcc;font-weight:800;font-style:normal;}
+#neonDock header span{margin-left:auto;color:#ffea00;font-weight:800;}
+#neonDock .nd-body{display:block;padding:8px 9px 9px;overflow:auto;max-height:min(42vh,320px);}
+#neonDock .nd-search{width:100%;box-sizing:border-box;margin:0 0 6px;padding:5px 7px;border-radius:8px;
+  border:1px solid rgba(0,255,204,.28);background:rgba(0,0,0,.35);color:#e5e7eb;font-size:11px;}
+#neonDock .nd-cats{display:flex;flex-wrap:wrap;gap:3px;margin:0 0 6px;}
+#neonDock .nd-cats button{appearance:none;border:1px solid rgba(0,255,204,.22);background:rgba(255,255,255,.04);
+  color:#9ca3af;border-radius:999px;padding:2px 6px;font-size:10px;cursor:pointer;}
+#neonDock .nd-cats button.on{border-color:#ffea00;color:#ffea00;}
+#neonDock .nd-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;}
+#neonDock button.nd{appearance:none;border:1px solid rgba(0,255,204,.25);background:rgba(0,255,204,.07);
+  color:#dff;border-radius:6px;padding:4px 5px;font-size:10px;font-weight:700;cursor:pointer;}
+#neonDock button.nd.on{border-color:#ffea00;color:#ffea00;}
+#neonDock .nd-stats{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 6px;color:#9ca3af;}
+#neonDock .nd-stats b{color:#00ffcc;}
+@media (max-width:1024px){
+  #neonDock{left:8px;right:auto;bottom:56px;max-width:min(300px,70vw);}
 }
 </style>
 <canvas id="neonGpuBg" aria-hidden="true"></canvas>
+<canvas id="neonThree" aria-hidden="true"></canvas>
 <canvas id="neonFxOverlay" aria-hidden="true"></canvas>
 <div id="neonComboRing"></div>
 <div id="neonToast"></div>
 
+<style id="dopaArcadeCss">
+#dopaArcadeBtn{position:fixed;left:8px;bottom:64px;z-index:31;border:1px solid rgba(0,255,204,.4);
+  background:rgba(8,10,24,.94);color:#00ffcc;border-radius:10px;padding:6px 10px;font:700 11px system-ui;cursor:pointer;}
+#dopaArcade{display:none;position:fixed;inset:0;z-index:120;background:rgba(2,2,12,.72);align-items:center;justify-content:center;}
+#dopaArcade.show{display:flex;}
+#dopaArcade .box{width:min(520px,94vw);max-height:86vh;overflow:auto;background:#0b1020;border:1px solid rgba(0,255,204,.35);
+  border-radius:14px;padding:12px;color:#e5e7eb;font:12px/1.4 system-ui;}
+#dopaArcade h2{margin:0 0 8px;color:#00ffcc;font-size:14px;}
+#dopaArcade .grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+#dopaArcade .grid button{appearance:none;border:1px solid rgba(0,255,204,.28);background:rgba(0,255,204,.08);
+  color:#dff;border-radius:8px;padding:8px 6px;font-size:11px;font-weight:700;cursor:pointer;text-align:left;}
+#dopaPlay{display:none;margin-top:8px;}
+#dopaPlay.show{display:block;}
+#dopaCV{width:100%;height:220px;background:#050814;border-radius:10px;border:1px solid rgba(0,255,204,.25);}
+#dopaStat{margin-top:6px;color:#ffea00;font-weight:800;}
+</style>
+<button type="button" id="dopaArcadeBtn">ミニゲーム 50</button>
+<div id="dopaArcade" aria-hidden="true">
+  <div class="box">
+    <h2>ドパミニゲーム（おまけ） <button type="button" id="dopaClose">閉じる</button></h2>
+    <div class="grid" id="dopaGrid"></div>
+    <div id="dopaPlay">
+      <canvas id="dopaCV" width="480" height="220"></canvas>
+      <div id="dopaStat">スタート</div>
+      <button type="button" id="dopaBack">一覧へ</button>
+    </div>
+  </div>
+</div>
+<div id="neonDock" class="collapsed">
+  <header id="neonDockHead"><b>NEON ENGINE</b><i class="nd-fps">FPS <b id="neonFps">--</b></i><span id="neonFeatCount">0</span></header>
+  <div class="nd-body" id="neonDockBody">
+    <div class="nd-stats">
+      <span>GPU <b id="neonGpu">--</b></span>
+      <span>WORKER <b id="neonWk">--</b></span>
+      <span>FX <b id="neonFxN">0</b></span>
+    </div>
+    <input id="neonFeatSearch" class="nd-search" type="search" placeholder="機能を検索" />
+    <div class="nd-cats" id="neonFeatCats"></div>
+    <div class="nd-grid" id="neonFeatGrid"></div>
+  </div>
+</div>
 <div class="copyright">&copy; 2026 HTsatoweb</div>
 <!-- ★ ここから読み込み画面 -->
 <div id="bootLoader" aria-live="polite">
@@ -1862,6 +1878,7 @@ body.neon-bloom .click-core-btn{box-shadow:0 0 34px rgba(0,255,204,.5),0 0 70px 
     <button class="tab-trigger-button" onclick="switchMainTab('tab-auto')">AUTOMATION (自動化)</button>
     <button class="tab-trigger-button" onclick="switchMainTab('tab-ach'); renderAchievementsList();" style="color: var(--color-upgrade); border-color: var(--color-upgrade);">ACHIEVEMENTS (実績)</button>
     <button class="tab-trigger-button" id="tabBtnPlayview" onclick="switchMainTab('tab-playview'); if(window.renderPlayViewTab) renderPlayViewTab();" style="color: var(--color-energy);">PLAY VIEW (やりこみ)</button>
+    <button class="tab-trigger-button" id="tabBtnMini" onclick="switchMainTab('tab-mini'); if(window.MiniArcade) MiniArcade.show();" style="color:#ffea00;">MINI (ミニゲーム)</button>
   </div>
 
   <div class="center-content-viewport">
@@ -1919,6 +1936,12 @@ body.neon-bloom .click-core-btn{box-shadow:0 0 34px rgba(0,255,204,.5),0 0 70px 
       <div id="omegaRecordMount"></div>
     </div>
 
+    <div class="tab-pane" id="tab-mini">
+      <div class="pane-heading" style="color:#ffea00;">MINI ARCADE（サブ戦力ミニゲーム）</div>
+      <div class="guide-text-block">短いミニゲームで星とエネルギーを少し増やせます。本体の工場や転生はそのままです。</div>
+      <div id="miniArcadeRoot"></div>
+    </div>
+
   </div>
 </div>
   </div>
@@ -1930,18 +1953,6 @@ body.neon-bloom .click-core-btn{box-shadow:0 0 34px rgba(0,255,204,.5),0 0 70px 
       <button class="btn-utility" onclick="saveGameManual()" style="white-space: nowrap;">手動セーブ</button>
       <button class="btn-utility" id="settingsMenuBtn" onclick="toggleSettingsMenu()" style="color: var(--color-upgrade); border-color: var(--color-upgrade); white-space: nowrap; font-weight: bold;">⚙️ 設定</button>
       <button class="btn-fullscreen" id="fullscreenToggleBtn">⛶ 全画面切替</button>
-        <div id="neonDock" class="collapsed">
-  <header id="neonDockHead"><b>NEON ENGINE</b><span id="neonFeatCount">0</span></header>
-  <div class="nd-body" id="neonDockBody">
-    <div class="nd-stats">
-      <span>FPS <b id="neonFps">--</b></span>
-      <span>GPU <b id="neonGpu">--</b></span>
-      <span>WORKER <b id="neonWk">--</b></span>
-      <span>FX <b id="neonFxN">0</b></span>
-    </div>
-    <div class="nd-grid" id="neonFeatGrid"></div>
-  </div>
-</div>
     </div>
   </div>
 
@@ -5984,7 +5995,11 @@ function loadGameOnLaunch() {
 
 function hardResetGame() {
   if (confirm("🚨 全データを完全に削除して初期化しますか？")) {
-    localStorage.removeItem(STORAGE_KEY);
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    try {
+      ["omega_record_v1","omega_record_cfg_v1","omega_record_view_v1","mz_minigame_v1"].forEach(function(k){ localStorage.removeItem(k); });
+    } catch (e2) {}
+    try { if (window.OmegaSyncRecord && OmegaSyncRecord.resetData) OmegaSyncRecord.resetData(); } catch (e3) {}
     game = hydrateGameEnergy(JSON.parse(DEFAULT_GAME_STATE)); try { window.game = game; } catch (e) {}
     location.reload();
   }
@@ -10303,7 +10318,7 @@ document.addEventListener("keydown", function(e){
   var INTERVAL_CHOICES = [0, 250, 500, 1000, 2000, 5000, 10000, 30000, 60000];
   var WINDOW_CHOICES = [[10000,"10秒"],[30000,"30秒"],[120000,"2分"],[600000,"10分"],[1800000,"30分"],[10800000,"3時間"],[0,"全期間"]];
 
-  var cfg = { precision: 50, intervalMs: 250, showDots: true, overlay: true, maxPoints: 4000, paused: false, quality: "auto", exactRaw: true };
+  var cfg = { precision: 40, intervalMs: 1000, showDots: false, overlay: true, maxPoints: 1200, paused: false, quality: "low", exactRaw: true };
   var view = { metric: "energy", chart: "line", follow: true, windowMs: 120000, t0: 0, t1: 1, y0: 0, y1: 1, lockY: false };
   var data = null;
   var lastSampleAt = 0, lastPersistAt = 0, lastEnergyLog = null, lastViewPush = 0;
@@ -12178,469 +12193,1062 @@ html.wx-meteor body{box-shadow:inset 0 0 90px rgba(58,134,255,.2)}
 <script id="neonEnginePack">
 (function(){
   "use strict";
-  const FEATURES = [
-    ["gpuNebula","GPU星雲背景"],["gpuStars","GPU星フィールド"],["gpuAurora","オーロラ帯"],
-    ["gpuGrid","ホログラム格子"],["gpuVignette","ビネット"],["scanlines","走査線"],
-    ["bloom","ブルーム光"],["chroma","色収差"],["parallax","視差カメラ"],
-    ["shockwave","衝撃波"],["ripple","水面波紋"],["rings","エネルギー輪"],
-    ["sparks","火花"],["fireflies","ホタル"],["meteors","流星"],
-    ["lightning","稲妻"],["confetti","紙吹雪"],["prism","プリズム破片"],
-    ["orbit","周回粒子"],["vortex","渦"],["helix","螺旋"],
-    ["constellation","星座線"],["trail","残光トレイル"],["afterimage","残像"],
-    ["lensflare","レンズフレア"],["heatHaze","陽炎"],["pixelBurst","ピクセルバースト"],
-    ["neonRain","ネオン雨"],["quantumFoam","量子泡"],["crystal","結晶"],
-    ["pulseWave","パルス波"],["tessera","テッセラ"],["fractal","フラクタル閃光"],
-    ["cometTail","彗星尾"],["halo","コア光輪"],["sparkleText","キラキラ数値"],
-    ["comboAura","コンボオーラ"],["critFlash","クリティカル閃光"],["rankGlow","ランク発光"],
-    ["themeShift","色相シフト"],["paletteCycle","パレット循環"],["nightMode","夜空強調"],
-    ["dawnMode","夜明け"],["duskMode","夕焼け"],["auroraMode","極光モード"],
-    ["cyberMode","サイバー"],["crystalMode","クリスタル"],["voidMode","ヴォイド"],
-    ["softParticles","柔らかい粒子"],["hardParticles","硬い粒子"],["additiveBlend","加算合成"],
-    ["workerSim","Worker物理"],["workerAudio","Worker音源"],["workerStats","Worker統計"],
-    ["autoQuality","自動画質"],["batterySaver","省電力"],["mobileTune","スマホ最適化"],
-    ["hiDpr","高DPI制限"],["pauseHidden","非表示時停止"],["fpsCap","FPS上限"],
-    ["touchRipple","タッチ波"],["multiTouch","マルチタッチ火花"],["longPressPulse","長押し脈動"],
-    ["comboPitch","コンボ音程"],["critChime","クリットチャイム"],["subKick","低音キック"],
-    ["shimmer","キラ音"],["echoClick","エコー"],["stereoPan","ステレオ定位"],
-    ["softLimiter","音量リミッタ"],["uiBlip","UIクリック音"],["missionFanfare","ミッションファンファーレ"],
-    ["weatherTint","天候色"],["fogLayer","フォグ"],["dustMotes","塵"],
-    ["ember","残り火"],["snow","雪結晶"],["sakura","花びら"],
-    ["bubble","泡"],["gearSpin","歯車回転"],["runes","ルーン文字"],
-    ["barcode","走査バー"],["glitch","グリッチ"],["datastream","データストリーム"],
-    ["radar","レーダー円"],["compass","方位リング"],["clockPulse","秒針パルス"],
-    ["energyMeter","エネルギー脈"],["cpsSpark","CPS火花"],["prestigeGlow","転生予兆"],
-    ["shopPulse","購入パルス"],["tabShine","タブ光沢"],["logSpark","ログ火花"],
-    ["hudNeon","HUDネオン"],["dockPulse","ドック脈動"],["toastPop","トースト"],
-    ["screenShake","微振動"],["safeShake","弱い振動"],["haptics","触覚"],
-    ["comboBannerFX","コンボ帯"],["missionSpark","ミッション閃光"],["starBurst","星バースト"],
-    ["rainbowArc","虹弧"],["twinCore","双子コア残像"],["echoRing","残響輪"],
-    ["plasma","プラズマ"],["ionTrail","イオン軌跡"],["magnet","磁力線"],
-    ["gravityWell","重力井戸"],["timeRipple","時間波"],["spaceFold","空間折り"],
-    ["nova","ノヴァ"],["supernova","超新星"],["blackhole","ブラックホール輪"],
-    ["wormhole","ワームホール"],["satellite","衛星"],["asteroid","小惑星"],
-    ["nebulaPulse","星雲脈動"],["cosmicDust","宇宙塵"],["photon","光子"],
-    ["electron","電子軌道"],["quark","クォーク点"],["waveFunc","波動関数"],
-    ["lattice","結晶格子"],["circuit","回路線"],["nodePulse","ノード脈"],
-    ["comboFire","コンボ炎"],["iceShard","氷片"],["windSlash","風斬"],
-    ["earthCrack","地割れ光"],["waterDrop","水滴"],["leafSpin","葉回転"]
+const FEATURES = [
+    ['gpuNebula','GPU星雲背景','宇宙'],
+    ['gpuStars','GPU星フィールド','宇宙'],
+    ['gpuAurora','オーロラ帯','宇宙'],
+    ['gpuGrid','ホログラム格子','量子'],
+    ['gpuVignette','ビネット','描画'],
+    ['scanlines','走査線','描画'],
+    ['bloom','ブルーム光','描画'],
+    ['chroma','色収差','描画'],
+    ['parallax','視差カメラ','描画'],
+    ['shockwave','衝撃波','粒子'],
+    ['ripple','水面波紋','粒子'],
+    ['rings','エネルギー輪','粒子'],
+    ['sparks','火花','粒子'],
+    ['fireflies','ホタル','粒子'],
+    ['meteors','流星','宇宙'],
+    ['lightning','稲妻','天候'],
+    ['confetti','紙吹雪','粒子'],
+    ['prism','プリズム破片','粒子'],
+    ['orbit','周回粒子','量子'],
+    ['vortex','渦','粒子'],
+    ['helix','螺旋','量子'],
+    ['constellation','星座線','星座'],
+    ['trail','残光トレイル','粒子'],
+    ['afterimage','残像','描画'],
+    ['lensflare','レンズフレア','描画'],
+    ['heatHaze','陽炎','天候'],
+    ['pixelBurst','ピクセルバースト','粒子'],
+    ['neonRain','ネオン雨','天候'],
+    ['quantumFoam','量子泡','量子'],
+    ['crystal','結晶','粒子'],
+    ['pulseWave','パルス波','量子'],
+    ['tessera','テッセラ','描画'],
+    ['fractal','フラクタル閃光','描画'],
+    ['cometTail','彗星尾','宇宙'],
+    ['halo','コア光輪','クリック'],
+    ['sparkleText','キラキラ数値','UI'],
+    ['comboAura','コンボオーラ','クリック'],
+    ['critFlash','クリティカル閃光','クリック'],
+    ['rankGlow','ランク発光','UI'],
+    ['themeShift','色相シフト','色'],
+    ['paletteCycle','パレット循環','色'],
+    ['nightMode','夜空強調','色'],
+    ['dawnMode','夜明け','色'],
+    ['duskMode','夕焼け','色'],
+    ['auroraMode','極光モード','色'],
+    ['cyberMode','サイバー','色'],
+    ['crystalMode','クリスタル','色'],
+    ['voidMode','ヴォイド','色'],
+    ['softParticles','柔らかい粒子','粒子'],
+    ['hardParticles','硬い粒子','粒子'],
+    ['additiveBlend','加算合成','描画'],
+    ['workerSim','Worker物理','エンジン'],
+    ['workerAudio','Worker音源','音'],
+    ['workerStats','Worker統計','エンジン'],
+    ['autoQuality','自動画質','エンジン'],
+    ['batterySaver','省電力','エンジン'],
+    ['mobileTune','スマホ最適化','エンジン'],
+    ['hiDpr','高DPI制限','エンジン'],
+    ['pauseHidden','非表示時停止','エンジン'],
+    ['fpsCap','FPS上限','エンジン'],
+    ['touchRipple','タッチ波','クリック'],
+    ['multiTouch','マルチタッチ火花','クリック'],
+    ['longPressPulse','長押し脈動','クリック'],
+    ['comboPitch','コンボ音程','音'],
+    ['critChime','クリットチャイム','音'],
+    ['subKick','低音キック','音'],
+    ['shimmer','キラ音','音'],
+    ['echoClick','エコー','音'],
+    ['stereoPan','ステレオ定位','音'],
+    ['softLimiter','音量リミッタ','音'],
+    ['uiBlip','UIクリック音','音'],
+    ['missionFanfare','ミッションファンファーレ','音'],
+    ['weatherTint','天候色','天候'],
+    ['fogLayer','フォグ','天候'],
+    ['dustMotes','塵','粒子'],
+    ['ember','残り火','粒子'],
+    ['snow','雪結晶','天候'],
+    ['sakura','花びら','天候'],
+    ['bubble','泡','粒子'],
+    ['gearSpin','歯車回転','UI'],
+    ['runes','ルーン文字','UI'],
+    ['barcode','走査バー','UI'],
+    ['glitch','グリッチ','描画'],
+    ['datastream','データストリーム','UI'],
+    ['radar','レーダー円','UI'],
+    ['compass','方位リング','星座'],
+    ['clockPulse','秒針パルス','UI'],
+    ['energyMeter','エネルギー脈','UI'],
+    ['cpsSpark','CPS火花','クリック'],
+    ['prestigeGlow','転生予兆','UI'],
+    ['shopPulse','購入パルス','UI'],
+    ['tabShine','タブ光沢','UI'],
+    ['logSpark','ログ火花','UI'],
+    ['hudNeon','HUDネオン','UI'],
+    ['dockPulse','ドック脈動','UI'],
+    ['toastPop','トースト','UI'],
+    ['screenShake','微振動','クリック'],
+    ['safeShake','弱い振動','クリック'],
+    ['haptics','触覚','クリック'],
+    ['comboBannerFX','コンボ帯','クリック'],
+    ['missionSpark','ミッション閃光','UI'],
+    ['starBurst','星バースト','星座'],
+    ['rainbowArc','虹弧','色'],
+    ['twinCore','双子コア残像','クリック'],
+    ['echoRing','残響輪','粒子'],
+    ['plasma','プラズマ','量子'],
+    ['ionTrail','イオン軌跡','量子'],
+    ['magnet','磁力線','量子'],
+    ['gravityWell','重力井戸','宇宙'],
+    ['timeRipple','時間波','量子'],
+    ['spaceFold','空間折り','宇宙'],
+    ['nova','ノヴァ','宇宙'],
+    ['supernova','超新星','宇宙'],
+    ['blackhole','ブラックホール輪','宇宙'],
+    ['wormhole','ワームホール','宇宙'],
+    ['satellite','衛星','宇宙'],
+    ['asteroid','小惑星','宇宙'],
+    ['nebulaPulse','星雲脈動','宇宙'],
+    ['cosmicDust','宇宙塵','宇宙'],
+    ['photon','光子','量子'],
+    ['electron','電子軌道','量子'],
+    ['quark','クォーク点','量子'],
+    ['waveFunc','波動関数','量子'],
+    ['lattice','結晶格子','量子'],
+    ['circuit','回路線','UI'],
+    ['nodePulse','ノード脈','UI'],
+    ['comboFire','コンボ炎','クリック'],
+    ['iceShard','氷片','天候'],
+    ['windSlash','風斬','天候'],
+    ['earthCrack','地割れ光','天候'],
+    ['waterDrop','水滴','天候'],
+    ['leafSpin','葉回転','天候'],
+    ['x0','オリオンのベルト','星座'],
+    ['x1','オリオンの盾','星座'],
+    ['x2','北斗七星','星座'],
+    ['x3','ひしゃくの柄','星座'],
+    ['x4','カシオペヤW','星座'],
+    ['x5','はくちょうの翼','星座'],
+    ['x6','こと座の琴','星座'],
+    ['x7','さそりの鉤','星座'],
+    ['x8','南十字の軸','星座'],
+    ['x9','アンドロメダの鎖','星座'],
+    ['x10','ペガススの四辺','星座'],
+    ['x11','おおぐま座','星座'],
+    ['x12','こぐま座','星座'],
+    ['x13','北極星ロック','星座'],
+    ['x14','いての弓','星座'],
+    ['x15','ふたごの灯','星座'],
+    ['x16','おうしの角','星座'],
+    ['x17','ししのたてがみ','星座'],
+    ['x18','おとめの穂','星座'],
+    ['x19','みずがめの瓶','星座'],
+    ['x20','うおの紐','星座'],
+    ['x21','かにの殻','星座'],
+    ['x22','やぎの角','星座'],
+    ['x23','てんびんの皿','星座'],
+    ['x24','おひつじの毛','星座'],
+    ['x25','へびつかい','星座'],
+    ['x26','りゅう座の環','星座'],
+    ['x27','かんむり座','星座'],
+    ['x28','ペルセウスの剣','星座'],
+    ['x29','ケフェウスの家','星座'],
+    ['x30','りゅうこつの竜骨','星座'],
+    ['x31','ほ座の帆','星座'],
+    ['x32','とも座の船尾','星座'],
+    ['x33','ケンタウルス','星座'],
+    ['x34','おおかみ座','星座'],
+    ['x35','からす座','星座'],
+    ['x36','コップ座','星座'],
+    ['x37','うみへびの頭','星座'],
+    ['x38','こじし座','星座'],
+    ['x39','や座','星座'],
+    ['x40','いるか座','星座'],
+    ['x41','こうま座','星座'],
+    ['x42','わし座の翼','星座'],
+    ['x43','こと座ベガ','星座'],
+    ['x44','デネブ航路','星座'],
+    ['x45','アルタイル街道','星座'],
+    ['x46','夏の大三角','星座'],
+    ['x47','冬の大三角','星座'],
+    ['x48','春の大曲線','星座'],
+    ['x49','秋の四辺形','星座'],
+    ['x50','シリウス閃光','星座'],
+    ['x51','カノープス航','星座'],
+    ['x52','リゲル灯台','星座'],
+    ['x53','ベテルギウス脈','星座'],
+    ['x54','アンタレス熱核','星座'],
+    ['x55','スピカ結晶','星座'],
+    ['x56','プロキオン双子','星座'],
+    ['x57','カペラの山羊','星座'],
+    ['x58','アルデバラン眼','星座'],
+    ['x59','レグルスの心臓','星座'],
+    ['x60','フォーマルハウト','星座'],
+    ['x61','ポラリス固定','星座'],
+    ['x62','ミルキーレーン','星座'],
+    ['x63','銀河赤道','星座'],
+    ['x64','黄道十二','星座'],
+    ['x65','星座線アニメ','星座'],
+    ['x66','星図回転','星座'],
+    ['x67','星名ラベル','星座'],
+    ['x68','等級の差','星座'],
+    ['x69','変光星またたき','星座'],
+    ['x70','連星の揺れ','星座'],
+    ['x71','散開星団','星座'],
+    ['x72','球状星団','星座'],
+    ['x73','星雲印','星座'],
+    ['x74','暗黒帯','星座'],
+    ['x75','天の川の腰','星座'],
+    ['x76','南天の十字航法','星座'],
+    ['x77','北極星コンパス','星座'],
+    ['x78','星座物語カード','星座'],
+    ['x79','星座図鑑','星座'],
+    ['x80','星座シール','星座'],
+    ['x81','星座コンボ','星座'],
+    ['x82','星座ミッション印','星座'],
+    ['x83','星座テーマ空','星座'],
+    ['x84','星図グリッド','星座'],
+    ['x85','赤経目盛','星座'],
+    ['x86','赤緯目盛','星座'],
+    ['x87','子午環','星座'],
+    ['x88','観測ドーム','星座'],
+    ['x89','望遠鏡フレーム','星座'],
+    ['x90','ファインダー円','星座'],
+    ['x91','等級6まで','星座'],
+    ['x92','等級3ハイライト','星座'],
+    ['x93','重ね合わせ','量子'],
+    ['x94','量子もつれ','量子'],
+    ['x95','波動の崩壊','量子'],
+    ['x96','トンネル効果','量子'],
+    ['x97','不確定性霧','量子'],
+    ['x98','プランク泡','量子'],
+    ['x99','スピンアップ','量子'],
+    ['x100','スピンダウン','量子'],
+    ['x101','エネルギー準位','量子'],
+    ['x102','光子交換','量子'],
+    ['x103','ボソン場','量子'],
+    ['x104','フェルミ海','量子'],
+    ['x105','零点振動','量子'],
+    ['x106','カシミール隙','量子'],
+    ['x107','真空ゆらぎ','量子'],
+    ['x108','干渉縞強化','量子'],
+    ['x109','二重スリット','量子'],
+    ['x110','確率雲','量子'],
+    ['x111','軌道雲s','量子'],
+    ['x112','軌道雲p','量子'],
+    ['x113','軌道雲d','量子'],
+    ['x114','量子数n','量子'],
+    ['x115','量子数l','量子'],
+    ['x116','量子数m','量子'],
+    ['x117','パウリ排他','量子'],
+    ['x118','量子井戸','量子'],
+    ['x119','量子ドット','量子'],
+    ['x120','量子細線','量子'],
+    ['x121','ブロッホ球','量子'],
+    ['x122','位相キック','量子'],
+    ['x123','ハミルトニアン','量子'],
+    ['x124','シュレーディンガー','量子'],
+    ['x125','ディラック海','量子'],
+    ['x126','プランク長輝点','量子'],
+    ['x127','プランク時間点滅','量子'],
+    ['x128','量子テレポート風','量子'],
+    ['x129','エンタングル線','量子'],
+    ['x130','ベル対','量子'],
+    ['x131','測定フラッシュ','量子'],
+    ['x132','観測者効果','量子'],
+    ['x133','コヒーレンス','量子'],
+    ['x134','デコヒーレンス','量子'],
+    ['x135','ラビ振動','量子'],
+    ['x136','ジョセフソン','量子'],
+    ['x137','超伝導帯','量子'],
+    ['x138','クーパー対','量子'],
+    ['x139','量子ホール','量子'],
+    ['x140','トポロジカル辺','量子'],
+    ['x141','マヨラナ点','量子'],
+    ['x142','エニオン軌道','量子'],
+    ['x143','量子ウォーク','量子'],
+    ['x144','量子サイコロ','量子'],
+    ['x145','振幅の矢','量子'],
+    ['x146','位相の色','量子'],
+    ['x147','確率密度','量子'],
+    ['x148','フラックス量子','量子'],
+    ['x149','アハラノフボーム','量子'],
+    ['x150','ベリー位相','量子'],
+    ['x151','断熱定理','量子'],
+    ['x152','ランダウ準位','量子'],
+    ['x153','ツェナー効果','量子'],
+    ['x154','シュタルク分裂','量子'],
+    ['x155','ゼーマン色','量子'],
+    ['x156','超微細構造','量子'],
+    ['x157','ラムシフト','量子'],
+    ['x158','コンプトン点','量子'],
+    ['x159','光電パルス','量子'],
+    ['x160','制動放射','量子'],
+    ['x161','対生成閃光','量子'],
+    ['x162','対消滅リング','量子'],
+    ['x163','仮想粒子','量子'],
+    ['x164','ループ線','量子'],
+    ['x165','ファインマン風','量子'],
+    ['x166','頂点結合','量子'],
+    ['x167','ゲージ場','量子'],
+    ['x168','対称性の破れ','量子'],
+    ['x169','ヒッグス霞','量子'],
+    ['x170','真空期待','量子'],
+    ['x171','インスタントン','量子'],
+    ['x172','インフレーション種','量子'],
+    ['x173','量子宇宙論','量子'],
+    ['x174','波動宇宙','量子'],
+    ['x175','超新星残骸','宇宙'],
+    ['x176','パルサー点滅','宇宙'],
+    ['x177','クエーサー芯','宇宙'],
+    ['x178','暗黒物質霞','宇宙'],
+    ['x179','重力レンズ虹','宇宙'],
+    ['x180','宇宙マイクロ波','宇宙'],
+    ['x181','太陽風粒子','宇宙'],
+    ['x182','磁気圏幕','宇宙'],
+    ['x183','彗星のコマ','宇宙'],
+    ['x184','流星群','宇宙'],
+    ['x185','ペルセウス座流星','宇宙'],
+    ['x186','しし座流星','宇宙'],
+    ['x187','隕石の火球','宇宙'],
+    ['x188','黄道光','宇宙'],
+    ['x189','対日照','宇宙'],
+    ['x190','地球光','宇宙'],
+    ['x191','月の光輪','宇宙'],
+    ['x192','食のダイヤモンド','宇宙'],
+    ['x193','プロミネンス','宇宙'],
+    ['x194','コロナ質量','宇宙'],
+    ['x195','太陽黒点','宇宙'],
+    ['x196','フレア閃光','宇宙'],
+    ['x197','オーロラカーテン','宇宙'],
+    ['x198','ヴァンアレン帯','宇宙'],
+    ['x199','木星縞','宇宙'],
+    ['x200','土星の環','宇宙'],
+    ['x201','天王星の傾き','宇宙'],
+    ['x202','海王星の風','宇宙'],
+    ['x203','冥王星の心','宇宙'],
+    ['x204','衛星イオの炎','宇宙'],
+    ['x205','エウロパ氷','宇宙'],
+    ['x206','タイタン霞','宇宙'],
+    ['x207','エンケラドゥス噴','宇宙'],
+    ['x208','ガニメデ磁','宇宙'],
+    ['x209','カリスト傷','宇宙'],
+    ['x210','フォボス転','宇宙'],
+    ['x211','ダイモス砂','宇宙'],
+    ['x212','系外惑星通過','宇宙'],
+    ['x213','ホットジュピター','宇宙'],
+    ['x214','スーパーアース','宇宙'],
+    ['x215','ドリフト氷惑星','宇宙'],
+    ['x216','潮汐ロック','宇宙'],
+    ['x217','ラグランジュ点','宇宙'],
+    ['x218','ヒル圏','宇宙'],
+    ['x219','ロッシュ限界','宇宙'],
+    ['x220','降着円盤','宇宙'],
+    ['x221','ジェット噴流','宇宙'],
+    ['x222','相対論的ビーム','宇宙'],
+    ['x223','事象の地平線','宇宙'],
+    ['x224','エルゴ球','宇宙'],
+    ['x225','ペンローズ過程','宇宙'],
+    ['x226','ホーキング霧','宇宙'],
+    ['x227','情報パラドックス風','宇宙'],
+    ['x228','ワームホール口','宇宙'],
+    ['x229','宇宙ひも','宇宙'],
+    ['x230','ドメインウォール','宇宙'],
+    ['x231','磁気単極子','宇宙'],
+    ['x232','バリオン非対称','宇宙'],
+    ['x233','再電離の時代','宇宙'],
+    ['x234','初代星の光','宇宙'],
+    ['x235','銀河衝突','宇宙'],
+    ['x236','潮汐尾','宇宙'],
+    ['x237','スターバースト','宇宙'],
+    ['x238','活動銀河核','宇宙'],
+    ['x239','電波銀河ローブ','宇宙'],
+    ['x240','重力波リング','宇宙'],
+    ['x241','LISA風','宇宙'],
+    ['x242','パルサータイミング','宇宙'],
+    ['x243','標準光源','宇宙'],
+    ['x244','距離梯子','宇宙'],
+    ['x245','ハッブル流れ','宇宙'],
+    ['x246','加速膨張','宇宙'],
+    ['x247','ダークエネルギー霞','宇宙'],
+    ['x248','宇宙の網','宇宙'],
+    ['x249','フィラメント','宇宙'],
+    ['x250','ボイド洞窟','宇宙'],
+    ['x251','ローカルグループ','宇宙'],
+    ['x252','アンドロメダ接近','宇宙'],
+    ['x253','大マゼラン雲','宇宙'],
+    ['x254','小マゼラン雲','宇宙'],
+    ['x255','オリオン大星雲','宇宙'],
+    ['x256','ラグーン風','宇宙'],
+    ['x257','馬頭星雲影','宇宙'],
+    ['x258','ヘリックス星雲','宇宙'],
+    ['x259','光子雨','粒子'],
+    ['x260','電子しぶき','粒子'],
+    ['x261','陽子軌跡','粒子'],
+    ['x262','中性子霧','粒子'],
+    ['x263','ニュートリノ透','粒子'],
+    ['x264','ミューオン線','粒子'],
+    ['x265','タウ閃','粒子'],
+    ['x266','グルーオン糸','粒子'],
+    ['x267','クォーク3色','粒子'],
+    ['x268','反粒子鏡','粒子'],
+    ['x269','チェレンコフ青','粒子'],
+    ['x270','霧箱の線','粒子'],
+    ['x271','泡箱の跡','粒子'],
+    ['x272','スパークチェンバー','粒子'],
+    ['x273','飛跡検出','粒子'],
+    ['x274','カロリメータ閃','粒子'],
+    ['x275','シリコンヒット','粒子'],
+    ['x276','ドリフトチェンバー','粒子'],
+    ['x277','TOF点','粒子'],
+    ['x278','ピクセルヒット','粒子'],
+    ['x279','クラスタ光','粒子'],
+    ['x280','ジェット円錐','粒子'],
+    ['x281','欠損エネルギー','粒子'],
+    ['x282','横運動量','粒子'],
+    ['x283','衝突頂点','粒子'],
+    ['x284','ビームハロー','粒子'],
+    ['x285','バンチ交差','粒子'],
+    ['x286','ルミノシティ','粒子'],
+    ['x287','冷却ビーム','粒子'],
+    ['x288','トラップイオン','粒子'],
+    ['x289','光格子点','粒子'],
+    ['x290','ボース凝縮霞','粒子'],
+    ['x291','超流動渦','粒子'],
+    ['x292','量子渦糸','粒子'],
+    ['x293','音波量子','粒子'],
+    ['x294','マグノン波','粒子'],
+    ['x295','ポラリトン','粒子'],
+    ['x296','プラズモン','粒子'],
+    ['x297','フォノン波','粒子'],
+    ['x298','エキシトン','粒子'],
+    ['x299','ポーラロン','粒子'],
+    ['x300','スキルミオン','粒子'],
+    ['x301','ドメイン壁粒子','粒子'],
+    ['x302','ナノ粒子金','粒子'],
+    ['x303','量子ドット虹','粒子'],
+    ['x304','コロイドゆらぎ','粒子'],
+    ['x305','ブラウン運動','粒子'],
+    ['x306','レヴィ飛行','粒子'],
+    ['x307','ランダムウォーク','粒子'],
+    ['x308','星のハープ','音'],
+    ['x309','ベガの音色','音'],
+    ['x310','シリウス鐘','音'],
+    ['x311','パルサー拍','音'],
+    ['x312','ブラックホール低音','音'],
+    ['x313','量子クリック高音','音'],
+    ['x314','干渉のうなり','音'],
+    ['x315','準位の和音','音'],
+    ['x316','光子の鈴','音'],
+    ['x317','彗星の風音','音'],
+    ['x318','オーロラコーラス','音'],
+    ['x319','磁気圏ホイッスラー','音'],
+    ['x320','流星ソニック','音'],
+    ['x321','コア水晶音B','音'],
+    ['x322','コア水晶音C','音'],
+    ['x323','5度上のキラ','音'],
+    ['x324','短調エコー','音'],
+    ['x325','長調エコー','音'],
+    ['x326','ペンタトニック星','音'],
+    ['x327','全音階宇宙','音'],
+    ['x328','和声スタック','音'],
+    ['x329','ディレイ3連','音'],
+    ['x330','リバーブ星空','音'],
+    ['x331','ノイズゲート星','音'],
+    ['x332','ビットクラッシュ星','音'],
+    ['x333','FMキラ','音'],
+    ['x334','AMゆらぎ','音'],
+    ['x335','リングモジュ','音'],
+    ['x336','ハーモナイザ','音'],
+    ['x337','オクターバー','音'],
+    ['x338','水素赤','色'],
+    ['x339','酸素緑','色'],
+    ['x340','窒素青','色'],
+    ['x341','ヘリウム黄','色'],
+    ['x342','ナトリウムD','色'],
+    ['x343','カルシウムH','色'],
+    ['x344','マグネシウムb','色'],
+    ['x345','スペクトル虹','色'],
+    ['x346','吸収線黒','色'],
+    ['x347','輝線ネオン','色'],
+    ['x348','ドップラー青','色'],
+    ['x349','ドップラー赤','色'],
+    ['x350','重力赤方偏移','色'],
+    ['x351','温度黒体','色'],
+    ['x352','3000K灯','色'],
+    ['x353','6500K昼','色'],
+    ['x354','12000K青白','色'],
+    ['x355','O型星色','色'],
+    ['x356','B型星色','色'],
+    ['x357','A型星色','色'],
+    ['x358','F型星色','色'],
+    ['x359','G型星色','色'],
+    ['x360','K型星色','色'],
+    ['x361','M型星色','色'],
+    ['x362','カーボン星','色'],
+    ['x363','ウォルフ・ライエ','色'],
+    ['x364','白色矮星青','色'],
+    ['x365','宇宙嵐','天候'],
+    ['x366','太陽嵐','天候'],
+    ['x367','磁気嵐','天候'],
+    ['x368','流星雨天気','天候'],
+    ['x369','星霜','天候'],
+    ['x370','星露','天候'],
+    ['x371','真空の雪','天候'],
+    ['x372','イオン霧','天候'],
+    ['x373','プラズマ雷','天候'],
+    ['x374','重力潮','天候'],
+    ['x375','時間時化','天候'],
+    ['x376','量子曇り','天候'],
+    ['x377','干渉晴れ','天候'],
+    ['x378','銀河曇','天候'],
+    ['x379','暗黒晴','天候'],
+    ['x380','極光天気','天候'],
+    ['x381','黄道光時','天候'],
+    ['x382','対日照時','天候'],
+    ['x383','地球影','天候'],
+    ['x384','星座クリット','クリック'],
+    ['x385','量子クリット','クリック'],
+    ['x386','銀河コンボ','クリック'],
+    ['x387','準位コンボ','クリック'],
+    ['x388','光子タップ','クリック'],
+    ['x389','軌道タップ','クリック'],
+    ['x390','もつれタップ','クリック'],
+    ['x391','観測タップ','クリック'],
+    ['x392','崩壊タップ','クリック'],
+    ['x393','トンネルタップ','クリック'],
+    ['x394','レンズタップ','クリック'],
+    ['x395','パルサータップ','クリック'],
+    ['x396','ノヴァタップ','クリック'],
+    ['x397','超新星タップ','クリック'],
+    ['x398','彗星タップ','クリック'],
+    ['x399','流星タップ','クリック'],
+    ['x400','北極星タップ','クリック'],
+    ['x401','ベガタップ','クリック'],
+    ['x402','ダブルスリットタップ','クリック'],
+    ['x403','確率タップ','クリック'],
+    ['x404','重ね合わせタップ','クリック'],
+    ['x405','スピンタップ','クリック'],
+    ['x406','準位アップタップ','クリック'],
+    ['x407','準位ダウンタップ','クリック'],
+    ['x408','星図HUD','UI'],
+    ['x409','等級HUD','UI'],
+    ['x410','赤経HUD','UI'],
+    ['x411','赤緯HUD','UI'],
+    ['x412','方位HUD','UI'],
+    ['x413','高度HUD','UI'],
+    ['x414','視線速度HUD','UI'],
+    ['x415','等級バー','UI'],
+    ['x416','スペクトルバー','UI'],
+    ['x417','等級バッジ','UI'],
+    ['x418','星座バッジ','UI'],
+    ['x419','量子バッジ','UI'],
+    ['x420','ミッション星印','UI'],
+    ['x421','ログ星屑','UI'],
+    ['x422','タブ星線','UI'],
+    ['x423','カード星枠','UI'],
+    ['x424','ツールチップ星','UI'],
+    ['x425','ミニマップ空','UI'],
+    ['x426','コンパスHUD','UI'],
+    ['x427','観測ログ','UI'],
+    ['x428','夜更かし印','UI'],
+    ['x429','ファーストライト印','UI'],
+    ['x430','ピント合わせ','UI'],
+    ['x431','露出バー','UI'],
+    ['x432','ISO風','UI'],
+    ['x433','回折スパイク','描画'],
+    ['x434','エアリーディスク','描画'],
+    ['x435','シーイング揺らぎ','描画'],
+    ['x436','色収差紫','描画'],
+    ['x437','色収差緑','描画'],
+    ['x438','コマ収差','描画'],
+    ['x439','非点収差','描画'],
+    ['x440','歪曲収差','描画'],
+    ['x441','ビネッティング円','描画'],
+    ['x442','フレアゴースト','描画'],
+    ['x443','ブルーム星','描画'],
+    ['x444','ソフトフォーカス','描画'],
+    ['x445','長時間露光','描画'],
+    ['x446','星の軌跡円','描画'],
+    ['x447','赤道儀追尾','描画'],
+    ['x448','オートガイダ','描画'],
+    ['x449','スタック合成','描画'],
+    ['x450','ダーク補正風','描画'],
+    ['x451','フラット補正風','描画'],
+    ['x452','アンシャープ星','描画'],
+    ['x453','HDR星雲','描画'],
+    ['x454','トーンマップ','描画'],
+    ['x455','フィルム粒子','描画'],
+    ['x456','ホログラム重畳','描画'],
+    ['x457','星座キャッシュ','エンジン'],
+    ['x458','シェーダ分岐削減','エンジン'],
+    ['x459','星点インスタンス','エンジン'],
+    ['x460','線分バッチ','エンジン'],
+    ['x461','ワーカー星図','エンジン'],
+    ['x462','間引き等級','エンジン'],
+    ['x463','遠方LOD','エンジン'],
+    ['x464','近傍LOD','エンジン'],
+    ['x465','オクルージョン空','エンジン'],
+    ['x466','タイル空','エンジン'],
+    ['x467','定数バッファ','エンジン'],
+    ['x468','ユニフォーム圧縮','エンジン'],
+    ['x469','半精度色','エンジン'],
+    ['x470','ディザバンディング','エンジン'],
+    ['x471','VSync任意','エンジン']
   ];
-
   const state = {
     on: Object.create(null),
-    fps: 0, frames: 0, lastFps: performance.now(),
+    fps: 0, frames: 0, lastFps: 0,
     quality: 1, mobile: false, hidden: false,
     combo: 0, lastTap: 0, taps: 0,
-    hue: 172, pan: 0, workerOk: false, gpuOk: false,
-    reduced: false, dirtyFx: false
+    hue: 176, pan: 0, workerOk: false, gpuOk: false
   };
-  FEATURES.forEach(([k]) => { state.on[k] = true; });
-  const heavy = ["supernova","blackhole","spaceFold","fractal","glitch","screenShake","scanlines"];
-  function isMobile(){
-    return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent||"") ||
-      Math.min(screen.width||999, screen.height||999) <= 820;
-  }
-  state.mobile = isMobile();
-  state.reduced = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
-  if (state.mobile || state.reduced) {
-    heavy.forEach(k => state.on[k] = false);
-    state.on.hiDpr = true; state.on.mobileTune = true; state.on.autoQuality = true;
-    state.on.fpsCap = true; state.on.batterySaver = true;
-    state.quality = state.mobile ? 0.7 : 0.85;
-  }
+
+  const LIGHT_ON = {
+    gpuNebula:1, gpuStars:1, gpuAurora:1, gpuVignette:1, constellation:1,
+    bloom:1, halo:1, sparks:1, rings:1, orbit:1,
+    autoQuality:1, mobileTune:1, hiDpr:1, pauseHidden:1, fpsCap:0,
+    workerSim:1, workerStats:1, softLimiter:1, shimmer:1, subKick:1,
+    toastPop:1, additiveBlend:1, starBurst:1, sparkleText:1
+  };
+  FEATURES.forEach(function(f){ state.on[f[0]] = !!LIGHT_ON[f[0]]; });
 
   const NE = window.NeonEngine = {
-    state, features: FEATURES,
+    state: state,
+    features: FEATURES,
     playCoreTone: null,
-    toast(msg){
-      const el = document.getElementById("neonToast");
+    toast: function(msg){
+      var el = document.getElementById("neonToast");
       if (!el) return;
       el.textContent = msg;
       el.classList.add("show");
       clearTimeout(NE._tt);
-      NE._tt = setTimeout(() => el.classList.remove("show"), 800);
+      NE._tt = setTimeout(function(){ el.classList.remove("show"); }, 700);
     }
   };
 
-  /* Worker: physics only, low frequency */
-  let worker = null;
+  var ua = navigator.userAgent||"";
+  state.mobile = /Android|iPhone|iPad|iPod|Mobile/i.test(ua);
+  if (state.mobile) state.quality = 0.6;
+
+  var worker = null;
   try {
-    const src = `
-      let stars=[], orbit=[], t=0;
-      function seed(n){
-        stars=new Array(n);
-        for(let i=0;i<n;i++) stars[i]=[Math.random(),Math.random(),Math.random(),0.2+Math.random()*0.8,(Math.random()-0.5)*0.00035,(Math.random()-0.5)*0.00035];
-        orbit=new Array(36);
-        for(let i=0;i<36;i++) orbit[i]=[Math.random()*6.283,0.12+Math.random()*0.26,0.004+Math.random()*0.01];
-      }
-      seed(160);
-      onmessage=function(e){
-        const d=e.data||{};
-        if(d.cmd==="seed") seed(d.n||160);
-        if(d.cmd==="tick"){
-          const dt=d.dt||0.033, q=d.quality||1;
-          t+=dt;
-          const n=Math.max(20, Math.floor(stars.length*q));
-          const outS=new Float32Array(n*3);
-          for(let i=0;i<n;i++){
-            const s=stars[i];
-            s[0]+=s[4]; s[1]+=s[5];
-            if(s[0]<0||s[0]>1)s[4]*=-1;
-            if(s[1]<0||s[1]>1)s[5]*=-1;
-            outS[i*3]=s[0]; outS[i*3+1]=s[1]; outS[i*3+2]=s[3];
-          }
-          const outO=new Float32Array(orbit.length*2);
-          for(let i=0;i<orbit.length;i++){
-            const o=orbit[i]; o[0]+=o[2]*dt*60;
-            outO[i*2]=0.5+Math.cos(o[0])*o[1];
-            outO[i*2+1]=0.5+Math.sin(o[0])*o[1];
-          }
-          postMessage({s:outS,o:outO,pulse:Math.sin(t*2.1)*0.5+0.5},[outS.buffer,outO.buffer]);
-        }
-      };
-    `;
+    var src = "onmessage=function(e){var d=e.data||{};if(d.cmd==='tick'){var t=d.t||0;postMessage({pulse:Math.sin(t*2.0)*0.5+0.5});}};";
     worker = new Worker(URL.createObjectURL(new Blob([src],{type:"text/javascript"})));
     state.workerOk = true;
-    worker.postMessage({cmd:"seed", n: state.mobile ? 90 : 180});
-  } catch(e){ worker=null; }
-
-  let pack = {s:null,o:null,pulse:0.5};
-  if (worker) worker.onmessage = function(e){ if(e.data) pack = e.data; };
+  } catch (e) { worker = null; }
+  var pack = {pulse:0.5};
+  if (worker) worker.onmessage = function(e){ if (e.data) pack = e.data; };
 
   NE.playCoreTone = function(ctx){
     if (!ctx) return;
-    const now = ctx.currentTime;
-    const combo = Math.min(24, state.combo);
-    const pitch = 1 + combo * 0.016;
-    const master = ctx.createGain();
-    master.gain.value = state.on.softLimiter ? 0.62 : 0.8;
-    let dest = master;
-    if (ctx.createStereoPanner) {
-      const pan = ctx.createStereoPanner();
-      state.pan = state.pan*0.65 + (Math.random()*2-1)*0.28;
-      pan.pan.setValueAtTime(state.on.stereoPan ? state.pan : 0, now);
-      master.connect(pan); pan.connect(ctx.destination);
-    } else master.connect(ctx.destination);
-    function voice(type,f0,f1,dur,vol,delay){
-      const o=ctx.createOscillator(), g=ctx.createGain(), f=ctx.createBiquadFilter();
+    var now = ctx.currentTime;
+    var pitch = 1 + Math.min(20, state.combo) * 0.014;
+    var master = ctx.createGain();
+    master.gain.value = 0.62;
+    master.connect(ctx.destination);
+    function voice(type,f0,f1,dur,vol){
+      var o=ctx.createOscillator(), g=ctx.createGain();
       o.type=type;
-      const t0=now+(delay||0);
-      o.frequency.setValueAtTime(f0*pitch,t0);
-      o.frequency.exponentialRampToValueAtTime(Math.max(28,f1*pitch),t0+dur);
-      f.type="lowpass"; f.frequency.value=3800+combo*60;
-      g.gain.setValueAtTime(vol,t0);
-      g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
-      o.connect(f); f.connect(g); g.connect(dest);
-      o.start(t0); o.stop(t0+dur+0.02);
+      o.frequency.setValueAtTime(f0*pitch, now);
+      o.frequency.exponentialRampToValueAtTime(Math.max(30,f1*pitch), now+dur);
+      g.gain.setValueAtTime(vol, now);
+      g.gain.exponentialRampToValueAtTime(0.0001, now+dur);
+      o.connect(g); g.connect(master);
+      o.start(now); o.stop(now+dur+0.02);
     }
-    voice("sine",988,392,0.1,0.07,0);
-    voice("triangle",1560,620,0.13,0.03,0.006);
-    if (state.on.shimmer) voice("sine",2480,1100,0.08,0.016,0.01);
-    if (state.on.subKick) voice("sine",128,38,0.08,0.05,0);
-    if (state.on.echoClick) voice("sine",760,240,0.14,0.016,0.068);
+    voice("sine",988,392,0.09,0.07);
+    voice("triangle",1480,620,0.11,0.025);
+    if (state.on.shimmer) voice("sine",2200,900,0.07,0.012);
+    if (state.on.subKick) voice("sine",120,36,0.07,0.045);
   };
 
-  /* GPU: one program, one quad, resize only when needed */
-  const bg = document.getElementById("neonGpuBg");
-  const gl = bg && (bg.getContext("webgl",{alpha:false,antialias:false,depth:false,stencil:false,premultipliedAlpha:false,powerPreference:"high-performance"}) || bg.getContext("experimental-webgl"));
-  state.gpuOk = !!gl;
-  let gpu = null, lastW=0,lastH=0;
-  if (gl) {
-    const vs = "attribute vec2 a;void main(){gl_Position=vec4(a,0.0,1.0);}";
-    const fs = [
-      "precision mediump float;",
-      "uniform vec2 uRes;uniform float uT,uHue,uPulse;uniform vec4 uF;",
-      "float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}",
-      "float n2(vec2 p){vec2 i=floor(p),f=fract(p);float a=hash(i),b=hash(i+vec2(1.,0.)),c=hash(i+vec2(0.,1.)),d=hash(i+vec2(1.,1.));vec2 u=f*f*(3.-2.*f);return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);}",
-      "float fbm(vec2 p){float v=0.0,a=0.5;for(int i=0;i<4;i++){v+=a*n2(p);p=p*2.03+vec2(1.7,9.2);a*=0.5;}return v;}",
-      "vec3 hsv(float h,float s,float v){vec3 c=clamp(abs(mod(h*6.0+vec3(0.0,4.0,2.0),6.0)-3.0)-1.0,0.0,1.0);return v*mix(vec3(1.0),c,s);}",
-      "void main(){",
-      "vec2 uv=gl_FragCoord.xy/uRes.xy;",
-      "vec2 p=uv*2.0-1.0; p.x*=uRes.x/max(uRes.y,1.0);",
-      "float t=uT;",
-      "float r=length(p);",
-      "float ang=atan(p.y,p.x);",
-      /* deep space */
-      "vec3 col=vec3(0.012,0.016,0.045);",
-      "col+=vec3(0.04,0.01,0.07)*smoothstep(1.4,0.15,r);",
-      /* cosmic dust / nebula */
-      "float neb=fbm(p*1.15+vec2(t*0.018,-t*0.012));",
-      "float neb2=fbm(p*2.4+vec2(-t*0.03,t*0.02)+neb);",
-      "float cloud=smoothstep(0.28,0.92,neb*0.62+neb2*0.48);",
-      "vec3 nebA=hsv(uHue/360.0+0.02,0.62,0.38);",
-      "vec3 nebB=hsv(uHue/360.0+0.18,0.78,0.32);",
-      "vec3 nebC=hsv(0.78+0.04*sin(t*0.2),0.55,0.22);",
-      "col+=mix(nebA,nebB,neb2)*cloud*0.85;",
-      "col+=nebC*(1.0-cloud)*0.18;",
-      /* galaxy spiral arms */
-      "float arm=0.5+0.5*cos(ang*2.0 - log(max(r,0.08))*3.2 + t*0.22);",
-      "col+=hsv(uHue/360.0+0.08,0.55,0.22)*pow(arm,3.0)*smoothstep(1.15,0.12,r);",
-      /* quantum interference / wave function */
-      "float k1=sin(p.x*14.0 - t*1.1)+sin(p.y*11.0 + t*0.8);",
-      "float k2=sin(dot(p,vec2(9.0,6.5)) - t*1.4)+sin(dot(p,vec2(-7.5,10.0)) + t*0.9);",
-      "float psi=0.5+0.5*sin((k1+k2)*1.15);",
-      "float fringe=smoothstep(0.72,1.0,psi)*smoothstep(1.2,0.18,r);",
-      "col+=vec3(0.25,0.95,0.88)*fringe*(0.16+0.10*uPulse);",
-      "col+=vec3(0.72,0.28,1.0)*pow(1.0-psi,2.0)*0.07;",
-      /* probability orbital rings */
-      "float orb=abs(sin(r*9.0 - t*0.7));",
-      "float shell=smoothstep(0.18,0.0,abs(orb-0.12))*exp(-r*1.3);",
-      "col+=vec3(0.55,0.85,1.0)*shell*0.55;",
-      "float shell2=smoothstep(0.12,0.0,abs(r-0.42-0.04*sin(t*0.6+ang*3.0)));",
-      "col+=hsv(uHue/360.0,0.4,0.35)*shell2*0.35;",
-      /* quantum lattice */
-      "if(uF.x>0.5){",
-      "vec2 g=abs(fract(p*4.5+vec2(t*0.03,0.0))-0.5);",
-      "float grid=smoothstep(0.03,0.0,min(g.x,g.y));",
-      "col+=vec3(0.2,0.9,1.0)*grid*0.08*(0.6+0.4*psi);",
-      "}",
-      /* stars + distant quasars */
-      "if(uF.y>0.5){",
-      "float star=0.0;",
-      "for(int i=0;i<12;i++){",
-      "float fi=float(i);",
-      "vec2 q=uv*vec2(16.0+fi*1.1,10.0+fi)+vec2(fi*2.1,t*0.01);",
-      "float h=hash(floor(q));",
-      "vec2 f=fract(q)-0.5;",
-      "float tw=0.4+0.6*sin(t*(2.0+h*4.0)+h*40.0);",
-      "star+=step(0.974,h)*smoothstep(0.09,0.0,length(f))*tw;",
-      "}",
-      "col+=vec3(0.92,0.97,1.0)*star*0.85;",
-      "}",
-      /* aurora / ionosphere */
-      "if(uF.z>0.5){",
-      "float au=pow(max(0.0,1.0-abs(uv.y-0.18-0.08*sin(uv.x*6.0+t*0.32))),3.4);",
-      "col+=hsv(0.48+0.07*sin(t*0.7+uv.x*4.0),0.7,au*(0.38+0.12*uPulse));",
-      "float au2=pow(max(0.0,1.0-abs(uv.y-0.82+0.05*cos(uv.x*4.0-t*0.25))),4.0);",
-      "col+=hsv(0.78,0.55,au2*0.22);",
-      "}",
-      /* quantum foam sparkles */
-      "float foam=step(0.88,n2(uv*38.0+vec2(t*0.4,-t*0.22)));",
-      "col+=vec3(0.7,1.0,0.95)*foam*0.12;",
-      /* central singularity glow */
-      "float core=exp(-r*r*3.4);",
-      "col+=hsv(uHue/360.0,0.35,0.55)*core*(0.22+0.16*uPulse);",
-      "col+=vec3(1.0,0.95,0.85)*exp(-r*r*18.0)*0.18;",
-      /* vignette */
-      "if(uF.w>0.5){col*=mix(0.38,1.0,smoothstep(1.28,0.22,r));}",
-      "gl_FragColor=vec4(col,1.0);",
-      "}"
-    ].join("");
-    function mk(type,src){const sh=gl.createShader(type);gl.shaderSource(sh,src);gl.compileShader(sh);return sh;}
-    const prog=gl.createProgram();
-    gl.attachShader(prog,mk(gl.VERTEX_SHADER,vs));
-    gl.attachShader(prog,mk(gl.FRAGMENT_SHADER,fs));
-    gl.linkProgram(prog);
-    const buf=gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER,buf);
-    gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
-    gpu={
-      prog,buf,loc:gl.getAttribLocation(prog,"a"),
-      u:{
-        res:gl.getUniformLocation(prog,"uRes"),
-        t:gl.getUniformLocation(prog,"uT"),
-        hue:gl.getUniformLocation(prog,"uHue"),
-        pulse:gl.getUniformLocation(prog,"uPulse"),
-        f:gl.getUniformLocation(prog,"uF")
+  
+  /* NeonRE: lightweight WebGL render engine (2-3 draw calls) */
+  var NeonRE = window.NeonRE = null;
+  (function initNeonRE(){
+    var canvas = document.getElementById("neonThree") || document.getElementById("neonGpuBg");
+    if (!canvas) return;
+    var gl = canvas.getContext("webgl", {
+      alpha:false, antialias:false, depth:false, stencil:false,
+      preserveDrawingBuffer:false, powerPreference:"high-performance",
+      desynchronized:true
+    }) || canvas.getContext("experimental-webgl");
+    if (!gl) return;
+    function sh(type, src){
+      var s=gl.createShader(type); gl.shaderSource(s,src); gl.compileShader(s); return s;
+    }
+    function prog(vs, fs){
+      var p=gl.createProgram();
+      gl.attachShader(p, sh(gl.VERTEX_SHADER, vs));
+      gl.attachShader(p, sh(gl.FRAGMENT_SHADER, fs));
+      gl.linkProgram(p); return p;
+    }
+    var pBG = prog(
+      "attribute vec2 a;varying vec2 v;void main(){v=a*0.5+0.5;gl_Position=vec4(a,0.0,1.0);}",
+      "precision mediump float;varying vec2 v;uniform float t;void main(){vec2 p=v*2.0-1.0;float n=sin(p.x*3.2+t*0.13)*sin(p.y*2.1-t*0.09);float g=exp(-dot(p,p)*1.15);vec3 col=vec3(0.015,0.02,0.07);col+=vec3(0.10,0.04,0.20)*(0.5+0.5*n);col+=vec3(0.00,0.20,0.22)*g*0.55;col+=vec3(0.20,0.08,0.35)*exp(-pow(p.y-0.35-0.08*sin(p.x*4.0+t*0.2),2.0)*8.0)*0.25;gl_FragColor=vec4(col,1.0);}"
+    );
+    var pStar = prog(
+      "attribute vec3 p;attribute float s;uniform float t,asp;void main(){float c=cos(t*0.018),si=sin(t*0.018);vec3 q=vec3(p.x*c-p.z*si,p.y,p.x*si+p.z*c);vec2 sc=q.xy/max(q.z+88.0,8.0);sc.x/=asp;gl_Position=vec4(sc,0.0,1.0);gl_PointSize=s;}",
+      "precision mediump float;void main(){vec2 d=gl_PointCoord-0.5;float a=1.0-dot(d,d)*4.0;if(a<=0.0)discard;gl_FragColor=vec4(0.90,0.95,1.0,a);}"
+    );
+    var pLine = prog(
+      "attribute vec3 p;uniform float t,asp;void main(){float c=cos(t*0.018),si=sin(t*0.018);vec3 q=vec3(p.x*c-p.z*si,p.y,p.x*si+p.z*c);vec2 sc=q.xy/max(q.z+88.0,8.0);sc.x/=asp;gl_Position=vec4(sc,0.0,1.0);}",
+      "precision mediump float;void main(){gl_FragColor=vec4(0.70,0.86,1.0,0.55);}"
+    );
+    var pCStar = prog(
+      "attribute vec3 p;uniform float t,asp;void main(){float c=cos(t*0.018),si=sin(t*0.018);vec3 q=vec3(p.x*c-p.z*si,p.y,p.x*si+p.z*c);vec2 sc=q.xy/max(q.z+88.0,8.0);sc.x/=asp;gl_Position=vec4(sc,0.0,1.0);gl_PointSize=3.2;}",
+      "precision mediump float;void main(){vec2 d=gl_PointCoord-0.5;float a=1.0-dot(d,d)*4.2;if(a<=0.0)discard;gl_FragColor=vec4(1.0,0.95,0.75,a);}"
+    );
+    var quad = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
+
+    var mobile = !!(window.NeonEngine && NeonEngine.state && NeonEngine.state.mobile) || /Mobile|Android|iPhone/i.test(navigator.userAgent||"");
+    var nStar = mobile ? 520 : 900;
+    var star = new Float32Array(nStar*4);
+    var i,r,th,ph;
+    for(i=0;i<nStar;i++){
+      r=36+Math.random()*54; th=Math.random()*6.28318; ph=Math.acos(2*Math.random()-1);
+      star[i*4]=r*Math.sin(ph)*Math.cos(th);
+      star[i*4+1]=r*Math.cos(ph);
+      star[i*4+2]=r*Math.sin(ph)*Math.sin(th);
+      star[i*4+3]=mobile?1.4:1.8;
+    }
+    var starBuf=gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, starBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, star, gl.STATIC_DRAW);
+
+    function uv3(u,v,R){
+      var a=u*6.28318, b=(0.22+v*0.56)*3.14159;
+      return [R*Math.sin(b)*Math.cos(a), R*Math.cos(b)*0.85, R*Math.sin(b)*Math.sin(a)];
+    }
+    var CATALOG = [
+      [[0.18,0.22],[0.24,0.20],[0.30,0.21],[0.35,0.26],[0.41,0.25],[0.46,0.20],[0.52,0.18]],
+      [[0.58,0.16],[0.63,0.12],[0.68,0.16],[0.73,0.11],[0.79,0.15]],
+      [[0.62,0.48],[0.66,0.52],[0.70,0.48],[0.64,0.58],[0.69,0.60],[0.60,0.40],[0.72,0.39]],
+      [[0.28,0.38],[0.32,0.42],[0.30,0.47],[0.25,0.45],[0.28,0.38]],
+      [[0.40,0.34],[0.46,0.32],[0.52,0.34],[0.46,0.26],[0.46,0.40]],
+      [[0.78,0.62],[0.82,0.70],[0.80,0.58],[0.86,0.64]],
+      [[0.14,0.50],[0.22,0.48],[0.24,0.56],[0.16,0.58],[0.14,0.50]],
+      [[0.70,0.72],[0.74,0.70],[0.78,0.72],[0.81,0.76],[0.80,0.82],[0.76,0.86],[0.72,0.84]],
+      [[0.30,0.40],[0.46,0.32],[0.22,0.28],[0.30,0.40]],
+      [[0.66,0.52],[0.78,0.36],[0.58,0.36],[0.66,0.52]]
+    ];
+    var lines=[], bright=[];
+    CATALOG.forEach(function(pts){
+      var P=pts.map(function(p){return uv3(p[0],p[1],48);});
+      for(var k=0;k<P.length;k++){
+        bright.push(P[k][0],P[k][1],P[k][2]);
+        if(k){ var a=P[k-1],b=P[k]; lines.push(a[0],a[1],a[2],b[0],b[1],b[2]); }
+      }
+    });
+    var lineBuf=gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, lineBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(lines), gl.STATIC_DRAW);
+    var cstarBuf=gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, cstarBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(bright), gl.STATIC_DRAW);
+
+    var locA = gl.getAttribLocation(pBG,"a");
+    var uBGt = gl.getUniformLocation(pBG,"t");
+    var locSP = gl.getAttribLocation(pStar,"p");
+    var locSS = gl.getAttribLocation(pStar,"s");
+    var uSt = gl.getUniformLocation(pStar,"t");
+    var uSasp = gl.getUniformLocation(pStar,"asp");
+    var locLP = gl.getAttribLocation(pLine,"p");
+    var uLt = gl.getUniformLocation(pLine,"t");
+    var uLasp = gl.getUniformLocation(pLine,"asp");
+    var locCP = gl.getAttribLocation(pCStar,"p");
+    var uCt = gl.getUniformLocation(pCStar,"t");
+    var uCasp = gl.getUniformLocation(pCStar,"asp");
+
+    gl.disable(gl.DEPTH_TEST);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+
+    function resize(){
+      var dpr = 1;
+      var w=Math.max(1,innerWidth), h=Math.max(1,innerHeight);
+      var W=Math.floor(w*dpr), H=Math.floor(h*dpr);
+      if (canvas.width!==W || canvas.height!==H){
+        canvas.width=W; canvas.height=H;
+        canvas.style.width=w+"px"; canvas.style.height=h+"px";
+        gl.viewport(0,0,W,H);
+      }
+    }
+    resize();
+    addEventListener("resize", resize, {passive:true});
+
+    NeonRE = window.NeonRE = {
+      gl:gl, ready:true,
+      render: function(now){
+        resize();
+        var t=now*0.001, asp=canvas.width/Math.max(1,canvas.height);
+        gl.viewport(0,0,canvas.width,canvas.height);
+        gl.disable(gl.BLEND);
+        gl.useProgram(pBG);
+        gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+        gl.enableVertexAttribArray(locA);
+        gl.vertexAttribPointer(locA,2,gl.FLOAT,false,0,0);
+        gl.uniform1f(uBGt,t);
+        gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+
+        gl.enable(gl.BLEND);
+        gl.useProgram(pStar);
+        gl.bindBuffer(gl.ARRAY_BUFFER, starBuf);
+        gl.enableVertexAttribArray(locSP);
+        gl.enableVertexAttribArray(locSS);
+        gl.vertexAttribPointer(locSP,3,gl.FLOAT,false,16,0);
+        gl.vertexAttribPointer(locSS,1,gl.FLOAT,false,16,12);
+        gl.uniform1f(uSt,t); gl.uniform1f(uSasp,asp);
+        gl.drawArrays(gl.POINTS,0,nStar);
+
+        if (state.on.constellation || state.on.starBurst){
+          gl.useProgram(pLine);
+          gl.bindBuffer(gl.ARRAY_BUFFER, lineBuf);
+          gl.enableVertexAttribArray(locLP);
+          gl.vertexAttribPointer(locLP,3,gl.FLOAT,false,0,0);
+          gl.uniform1f(uLt,t); gl.uniform1f(uLasp,asp);
+          gl.drawArrays(gl.LINES,0,lines.length/3);
+          gl.useProgram(pCStar);
+          gl.bindBuffer(gl.ARRAY_BUFFER, cstarBuf);
+          gl.enableVertexAttribArray(locCP);
+          gl.vertexAttribPointer(locCP,3,gl.FLOAT,false,0,0);
+          gl.uniform1f(uCt,t); gl.uniform1f(uCasp,asp);
+          gl.drawArrays(gl.POINTS,0,bright.length/3);
+        }
       }
     };
-    gl.disable(gl.DEPTH_TEST); gl.disable(gl.BLEND);
+    state.gpuOk = true;
+    var hide=document.getElementById("neonGpuBg");
+    if (hide) hide.style.display="none";
+  })();
+  var threeSky = null;
+  var bg = document.getElementById("neonGpuBg");
+  var gl = null, gpu = null, lastW=0, lastH=0;
+var fxC=document.getElementById("neonFxOverlay");
+  var fx=fxC?fxC.getContext("2d",{alpha:true}):null;
+  var CAP = state.mobile ? 48 : 90;
+  var parts = new Array(CAP);
+  var pCount = 0;
+  function spawn(kind,x,y,n){
+    n = n || (state.mobile?3:6);
+    var i;
+    for(i=0;i<n;i++){
+      if(pCount>=CAP){ pCount=CAP-6; }
+      var a=Math.random()*6.283, sp=0.4+Math.random()*2.6;
+      parts[pCount++] = {kind:kind,x:x,y:y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,decay:0.02+Math.random()*0.02,s:1+Math.random()*2,hue:(state.hue+Math.random()*50)%360};
+    }
   }
 
-  const fxC=document.getElementById("neonFxOverlay");
-  const fx=fxC?fxC.getContext("2d",{alpha:true}):null;
-  const CAP = state.mobile ? 70 : 140;
-  const parts = new Array(CAP);
-  let pCount=0;
-  function spawn(kind,x,y,n){
-    n = n || (state.mobile?5:9);
-    for(let i=0;i<n;i++){
-      if(pCount>=CAP){ parts.copyWithin(0,8); pCount=CAP-8; }
-      const a=Math.random()*6.28318, sp=0.5+Math.random()*3.2;
-      parts[pCount++] = {kind,x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,decay:0.016+Math.random()*0.02,s:1+Math.random()*2.6,hue:(state.hue+Math.random()*60)%360};
-    }
-    state.dirtyFx = true;
-  }
+  var CONSTELS = [
+    {n:"北斗七星", pts:[[0.18,0.22],[0.24,0.20],[0.30,0.21],[0.35,0.26],[0.41,0.25],[0.46,0.20],[0.52,0.18]]},
+    {n:"カシオペヤ", pts:[[0.58,0.16],[0.63,0.12],[0.68,0.16],[0.73,0.11],[0.79,0.15]]},
+    {n:"オリオン", pts:[[0.62,0.48],[0.66,0.52],[0.70,0.48],[0.64,0.58],[0.69,0.60],[0.60,0.40],[0.72,0.39]]},
+    {n:"こと座", pts:[[0.28,0.38],[0.32,0.42],[0.30,0.47],[0.25,0.45],[0.28,0.38]]},
+    {n:"はくちょう", pts:[[0.40,0.34],[0.46,0.32],[0.52,0.34],[0.46,0.26],[0.46,0.40]]},
+    {n:"南十字", pts:[[0.78,0.62],[0.82,0.70],[0.80,0.58],[0.86,0.64]]}
+  ];
+  var skyAng = 0;
 
   function fit(){
-    const dprBase = window.devicePixelRatio||1;
-    const dpr = state.on.hiDpr ? Math.min(1.25, dprBase) : Math.min(1.75, dprBase);
-    const q = state.quality;
-    const w=Math.max(1,innerWidth), h=Math.max(1,innerHeight);
-    const gw=Math.max(1,Math.floor(w*dpr*q)), gh=Math.max(1,Math.floor(h*dpr*q));
+    var dpr = Math.min(state.on.hiDpr ? 1.1 : 1.35, window.devicePixelRatio||1);
+    var q = state.quality;
+    var w=Math.max(1,innerWidth), h=Math.max(1,innerHeight);
+    var gw=Math.max(1,Math.floor(w*dpr*q)), gh=Math.max(1,Math.floor(h*dpr*q));
     if (bg && (gw!==lastW || gh!==lastH)){
       bg.width=gw; bg.height=gh;
       bg.style.width=w+"px"; bg.style.height=h+"px";
       lastW=gw; lastH=gh;
-      if(gl) gl.viewport(0,0,gw,gh);
+      if (gl) gl.viewport(0,0,gw,gh);
     }
     if (fxC){
-      const fw=Math.max(1,Math.floor(w*Math.min(dpr,1.15)*Math.max(0.5,q)));
-      const fh=Math.max(1,Math.floor(h*Math.min(dpr,1.15)*Math.max(0.5,q)));
+      var fw=Math.max(1,Math.floor(w*Math.min(dpr,1.05)*Math.max(0.4,q*0.85)));
+      var fh=Math.max(1,Math.floor(h*Math.min(dpr,1.05)*Math.max(0.4,q*0.85)));
       if (fxC.width!==fw || fxC.height!==fh){
         fxC.width=fw; fxC.height=fh;
         fxC.style.width=w+"px"; fxC.style.height=h+"px";
       }
     }
   }
-  let resizeT=0;
-  addEventListener("resize", function(){ clearTimeout(resizeT); resizeT=setTimeout(fit,80); }, {passive:true});
+  var resizeT=0;
+  addEventListener("resize", function(){ clearTimeout(resizeT); resizeT=setTimeout(fit,120); }, {passive:true});
   fit();
   document.addEventListener("visibilitychange", function(){
     state.hidden = document.hidden && !!state.on.pauseHidden;
   });
 
-  let last=performance.now(), wkAcc=0, skip=0;
+  var last=performance.now(), skip=0, fxTick=0, wkAcc=0;
   function frame(now){
     requestAnimationFrame(frame);
     if (state.hidden) return;
-    const dt=Math.min(0.05,(now-last)/1000); last=now;
-    if (state.on.fpsCap && state.mobile){
-      skip ^= 1; if (skip) return;
-    }
+    var dt = Math.min(0.05, (now-last)/1000);
+    last = now;
     state.frames++;
-    if (now-state.lastFps>=600){
-      state.fps=Math.round(state.frames*1000/(now-state.lastFps));
-      state.frames=0; state.lastFps=now;
-      const el=document.getElementById("neonFps"); if(el) el.textContent=String(state.fps);
+    if (now - state.lastFps >= 500){
+      state.fps = Math.round(state.frames * 1000 / Math.max(1, now - state.lastFps));
+      state.frames = 0;
+      state.lastFps = now;
+      var fpsTxt = String(state.fps);
+      var el = document.getElementById("neonFps");
+      if (el) el.textContent = fpsTxt;
+      var eh = document.getElementById("eh-fps");
+      if (eh) eh.textContent = fpsTxt;
       if (state.on.autoQuality){
-        if (state.fps && state.fps<38) state.quality=Math.max(0.42,state.quality-0.06);
-        else if (state.fps>56) state.quality=Math.min(1,state.quality+0.03);
+        if (state.fps && state.fps < 42) state.quality = Math.max(0.35, state.quality - 0.08);
+        else if (state.fps > 56) state.quality = Math.min(state.mobile?0.7:0.9, state.quality + 0.03);
       }
     }
-    if (state.on.paletteCycle) state.hue=(state.hue+dt*10)%360;
-    document.documentElement.style.setProperty("--combo-hue", String(state.hue|0));
+    if (state.on.paletteCycle) state.hue = (state.hue + dt*8) % 360;
 
-    wkAcc+=dt;
-    if (worker && state.on.workerSim && wkAcc>(state.mobile?0.066:0.04)){
-      worker.postMessage({cmd:"tick",dt:wkAcc,quality:state.quality});
-      wkAcc=0;
+    wkAcc += dt;
+    if (worker && state.on.workerSim && wkAcc > 0.12){
+      worker.postMessage({cmd:"tick", t: now*0.001});
+      wkAcc = 0;
     }
 
-    if (gl && gpu && (state.on.gpuNebula||state.on.gpuStars||state.on.gpuAurora)){
-      gl.useProgram(gpu.prog);
-      gl.bindBuffer(gl.ARRAY_BUFFER,gpu.buf);
-      gl.enableVertexAttribArray(gpu.loc);
-      gl.vertexAttribPointer(gpu.loc,2,gl.FLOAT,false,0,0);
-      gl.uniform2f(gpu.u.res,bg.width,bg.height);
-      gl.uniform1f(gpu.u.t,now*0.001);
-      gl.uniform1f(gpu.u.hue,state.hue);
-      gl.uniform1f(gpu.u.pulse,pack.pulse||0.5);
-      gl.uniform4f(gpu.u.f,
-        state.on.gpuGrid?1:0,
-        state.on.gpuStars?1:0,
-        state.on.gpuAurora?1:0,
-        state.on.gpuVignette?1:0
-      );
-      gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+    if (NeonRE && NeonRE.render){
+      try { NeonRE.render(now); } catch (e) { NeonRE = null; }
     }
 
-    if (fx && fxC){
-      const w=fxC.width,h=fxC.height;
+    fxTick++;
+    if (fx && fxC && pCount>0){
+      var w=fxC.width, h=fxC.height;
       fx.clearRect(0,0,w,h);
-      if (state.on.orbit && pack.o){
-        fx.fillStyle="rgba(0,255,204,0.22)";
-        for(let i=0;i<pack.o.length;i+=2) fx.fillRect(pack.o[i]*w, pack.o[i+1]*h, 1.6, 1.6);
-      }
-      if (state.on.constellation && pack.o && pack.o.length>8){
-        fx.strokeStyle="rgba(255,234,0,0.10)";
-        fx.beginPath();
-        for(let i=0;i<Math.min(pack.o.length-4,28);i+=4){
-          fx.moveTo(pack.o[i]*w,pack.o[i+1]*h);
-          fx.lineTo(pack.o[i+2]*w,pack.o[i+3]*h);
+      if (false && state.on.constellation){
+        skyAng += 0.0007;
+        var cx=w*0.5, cy=h*0.40, ca=Math.cos(skyAng), sa=Math.sin(skyAng);
+        fx.lineWidth = 1;
+        var ci, pj, pts, x,y,u,v,px,py;
+        for (ci=0; ci<CONSTELS.length; ci++){
+          pts = CONSTELS[ci].pts;
+          fx.strokeStyle = "rgba(180,210,255,0.28)";
+          fx.beginPath();
+          for (pj=0; pj<pts.length; pj++){
+            u=pts[pj][0]-0.5; v=pts[pj][1]-0.45;
+            px = cx + (u*w)*ca - (v*h)*sa;
+            py = cy + (u*w)*sa + (v*h)*ca;
+            if (pj) fx.lineTo(px,py); else fx.moveTo(px,py);
+          }
+          fx.stroke();
+          fx.fillStyle = "rgba(255,240,190,0.85)";
+          for (pj=0; pj<pts.length; pj++){
+            u=pts[pj][0]-0.5; v=pts[pj][1]-0.45;
+            px = cx + (u*w)*ca - (v*h)*sa;
+            py = cy + (u*w)*sa + (v*h)*ca;
+            fx.fillRect(px-1.2, py-1.2, 2.4, 2.4);
+          }
         }
-        fx.stroke();
       }
-      if (state.on.additiveBlend) fx.globalCompositeOperation="lighter";
-      else fx.globalCompositeOperation="source-over";
-      let write=0;
-      for(let i=0;i<pCount;i++){
-        const p=parts[i];
-        p.x+=p.vx; p.y+=p.vy; p.vy+=0.018; p.life-=p.decay;
-        if(p.life<=0) continue;
+      var write=0, i, p;
+      for (i=0;i<pCount;i++){
+        p=parts[i];
+        p.x+=p.vx; p.y+=p.vy; p.vy+=0.02; p.life-=p.decay;
+        if (p.life<=0) continue;
         parts[write++]=p;
         fx.globalAlpha=p.life;
-        if(p.kind==="ring"){
+        if (p.kind==="ring"){
           fx.strokeStyle="hsla("+p.hue+",90%,62%,"+p.life+")";
-          fx.beginPath(); fx.arc(p.x,p.y,(1-p.life)*36+6,0,6.28); fx.stroke();
+          fx.beginPath(); fx.arc(p.x,p.y,(1-p.life)*28+5,0,6.28); fx.stroke();
         } else {
-          fx.fillStyle="hsl("+p.hue+",92%,68%)";
+          fx.fillStyle="hsl("+p.hue+",90%,68%)";
           fx.fillRect(p.x,p.y,p.s,p.s);
         }
       }
       pCount=write;
-      fx.globalAlpha=1; fx.globalCompositeOperation="source-over";
-      if (state.on.halo){
-        const core=document.getElementById("coreTrigger");
-        if(core){
-          const r=core.getBoundingClientRect();
-          const sx=fxC.width/innerWidth, sy=fxC.height/innerHeight;
-          const cx=(r.left+r.width/2)*sx, cy=(r.top+r.height/2)*sy;
-          const g=fx.createRadialGradient(cx,cy,6,cx,cy,80*sx);
-          g.addColorStop(0,"rgba(0,255,204,0.16)");
-          g.addColorStop(1,"rgba(0,255,204,0)");
-          fx.fillStyle=g; fx.beginPath(); fx.arc(cx,cy,80*sx,0,6.28); fx.fill();
-        }
-      }
-      const fxn=document.getElementById("neonFxN"); if(fxn) fxn.textContent=String(pCount);
+      fx.globalAlpha=1;
+      var fxn=document.getElementById("neonFxN"); if (fxn) fxn.textContent=String(pCount);
     }
   }
   requestAnimationFrame(frame);
 
   document.addEventListener("pointerdown", function(ev){
-    const t=ev.target;
-    if(!(t && t.closest && t.closest("#coreTrigger"))) return;
-    const now=performance.now();
+    var t=ev.target;
+    if (!(t && t.closest && t.closest("#coreTrigger"))) return;
+    var now=performance.now();
     state.combo = (now-state.lastTap<900) ? state.combo+1 : 1;
     state.lastTap=now; state.taps++;
-    const x=(ev.clientX||innerWidth/2) * (fxC?fxC.width/innerWidth:1);
-    const y=(ev.clientY||innerHeight/2) * (fxC?fxC.height/innerHeight:1);
-    if (state.on.sparks||state.on.pixelBurst) spawn("spark",x,y,state.mobile?4:8);
-    if (state.on.rings||state.on.shockwave) spawn("ring",x,y,2);
-    if (state.on.themeShift) state.hue=(state.hue+9)%360;
-    document.body.classList.toggle("neon-bloom", !!state.on.bloom);
-    document.body.classList.toggle("neon-chroma", !!state.on.chroma);
-    if (state.on.haptics && navigator.vibrate){ try{navigator.vibrate(6);}catch(e){} }
-    if (state.on.toastPop && state.combo%12===0) NE.toast("COMBO "+state.combo);
+    var x=(ev.clientX||innerWidth/2) * (fxC?fxC.width/innerWidth:1);
+    var y=(ev.clientY||innerHeight/2) * (fxC?fxC.height/innerHeight:1);
+    if (state.on.sparks) spawn("spark",x,y, state.mobile?3:6);
+    if (state.on.rings) spawn("ring",x,y,2);
+    if (state.on.haptics && navigator.vibrate){ try{navigator.vibrate(5);}catch(e){} }
+    if (state.on.toastPop && state.combo && state.combo%10===0) NE.toast("COMBO "+state.combo);
   }, {passive:true});
 
-  const grid=document.getElementById("neonFeatGrid");
+  var grid=document.getElementById("neonFeatGrid");
+  var catsBox=document.getElementById("neonFeatCats");
+  var searchBox=document.getElementById("neonFeatSearch");
+  var catFilter="星座";
   function countOn(){
-    const n=FEATURES.reduce((a,k)=>a+(state.on[k[0]]?1:0),0);
-    const el=document.getElementById("neonFeatCount"); if(el) el.textContent=n+"/"+FEATURES.length;
-    const g=document.getElementById("neonGpu"); if(g) g.textContent=state.gpuOk?"ON":"2D";
-    const w=document.getElementById("neonWk"); if(w) w.textContent=state.workerOk?"ON":"OFF";
+    var n=0, i;
+    for(i=0;i<FEATURES.length;i++) if (state.on[FEATURES[i][0]]) n++;
+    var el=document.getElementById("neonFeatCount"); if(el) el.textContent=n+"/"+FEATURES.length;
+    var g=document.getElementById("neonGpu"); if(g) g.textContent=state.gpuOk?"ON":"2D";
+    var w=document.getElementById("neonWk"); if(w) w.textContent=state.workerOk?"ON":"OFF";
   }
-  if (grid){
-    const frag=document.createDocumentFragment();
-    FEATURES.forEach(([k,label])=>{
-      const b=document.createElement("button");
+  function paintGrid(){
+    if (!grid) return;
+    var q=(searchBox && searchBox.value || "").trim().toLowerCase();
+    grid.textContent="";
+    var frag=document.createDocumentFragment();
+    var shown=0, i, k,label,cat,b;
+    for(i=0;i<FEATURES.length;i++){
+      k=FEATURES[i][0]; label=FEATURES[i][1]; cat=FEATURES[i][2]||"";
+      if (catFilter!=="すべて" && cat!==catFilter) continue;
+      if (q && label.toLowerCase().indexOf(q)<0 && cat.indexOf(q)<0) continue;
+      if (shown>80 && !q) break;
+      b=document.createElement("button");
       b.type="button"; b.className="nd"+(state.on[k]?" on":"");
       b.textContent=label;
-      b.addEventListener("click",function(ev){
-        ev.stopPropagation();
-        state.on[k]=!state.on[k];
-        b.classList.toggle("on",state.on[k]);
-        countOn();
-      });
+      b.addEventListener("click", (function(key,btn){
+        return function(ev){ ev.stopPropagation(); state.on[key]=!state.on[key]; btn.classList.toggle("on", state.on[key]); countOn(); };
+      })(k,b));
       frag.appendChild(b);
-    });
+      shown++;
+    }
     grid.appendChild(frag);
   }
-  countOn();
-  const dock=document.getElementById("neonDock");
-  const head=document.getElementById("neonDockHead");
+  if (catsBox){
+    var names=["星座","宇宙","量子","粒子","音","色","クリック","UI","描画","エンジン","すべて"];
+    names.forEach(function(name){
+      var b=document.createElement("button");
+      b.type="button"; b.textContent=name; if(name===catFilter) b.className="on";
+      b.addEventListener("click", function(ev){
+        ev.stopPropagation();
+        catFilter=name;
+        var ch=catsBox.children, i;
+        for(i=0;i<ch.length;i++) ch[i].classList.toggle("on", ch[i]===b);
+        paintGrid();
+      });
+      catsBox.appendChild(b);
+    });
+  }
+  if (searchBox){
+    searchBox.addEventListener("input", paintGrid);
+    searchBox.addEventListener("click", function(ev){ ev.stopPropagation(); });
+  }
+  var dock=document.getElementById("neonDock");
+  var head=document.getElementById("neonDockHead");
+  var painted=false;
   if (head && dock){
     head.addEventListener("click", function(){
       dock.classList.toggle("collapsed");
+      if (!dock.classList.contains("collapsed") && !painted){ paintGrid(); painted=true; }
     });
   }
+  countOn();
 
   function hookSM(){
     if (!window.SoundManager || !SoundManager.playClick) return;
-    const orig=SoundManager.playClick.bind(SoundManager);
+    var orig=SoundManager.playClick.bind(SoundManager);
     SoundManager.playClick=function(){
       try{
-        SoundManager.init&&SoundManager.init();
+        SoundManager.init && SoundManager.init();
         if (SoundManager.ctx){ NE.playCoreTone(SoundManager.ctx); return; }
       }catch(e){}
       orig();
@@ -12648,6 +13256,458 @@ html.wx-meteor body{box-shadow:inset 0 0 90px rgba(58,134,255,.2)}
   }
   if (document.readyState==="complete") hookSM();
   else addEventListener("load", hookSM);
+})();
+</script>
+
+
+<script id="dopaArcadePack">
+(function(){
+  "use strict";
+  function tuneGraph(){
+    var G=window.OmegaSyncRecord;
+    if(!G||!G.cfg) return;
+    G.cfg.intervalMs=1000;
+    G.cfg.maxPoints=1200;
+    G.cfg.showDots=false;
+    G.cfg.quality="low";
+    G.cfg.exactRaw=true;
+    if(typeof G.setIntervalMs==="function") try{ G.setIntervalMs(1000); }catch(e){}
+  }
+  setTimeout(tuneGraph, 400);
+  setTimeout(tuneGraph, 2000);
+
+  /* perfect-enough ring log (log10 energy), light */
+  var REC = window.NeonRecord = {
+    n:0, cap:2400,
+    t:new Float64Array(2400),
+    e:new Float64Array(2400),
+    c:new Float64Array(2400),
+    last:0,
+    push:function(){
+      var now=performance.now();
+      if(now-this.last<1000) return;
+      this.last=now;
+      var e=0,c=0;
+      try{
+        if(window.game){
+          var E=game.energy;
+          if(E && E.ln) e=Number(E.ln())/Math.LN10;
+          else e=Math.log10(Math.max(1e-12, Number(E)||0));
+          if(typeof getTotalCps==="function"){
+            var C=getTotalCps();
+            if(C && C.ln) c=Number(C.ln())/Math.LN10;
+            else c=Math.log10(Math.max(1e-12, Number(C)||0));
+          }
+        }
+      }catch(err){}
+      var i=this.n%this.cap;
+      this.t[i]=Date.now(); this.e[i]=e; this.c[i]=c; this.n++;
+    },
+    snapshot:function(){
+      var len=Math.min(this.n,this.cap), out=new Array(len), i, idx;
+      var start=Math.max(0,this.n-this.cap);
+      for(i=0;i<len;i++){
+        idx=(start+i)%this.cap;
+        out[i]={t:this.t[idx], energyLog10:this.e[idx], cpsLog10:this.c[idx]};
+      }
+      return out;
+    }
+  };
+  setInterval(function(){ if(!document.hidden) REC.push(); }, 1000);
+
+  var GAMES=[
+    ["星タップ","targets"],["タイミングバー","timing"],["記憶フラッシュ","memory"],["落ち星キャッチ","catch"],
+    ["長押しチャージ","hold"],["連打チャレンジ","mash"],["流れ星よけ","dodge"],["いろ合わせ","color"],
+    ["サイモン星","simon"],["バーを止める","stop"],["星を数える","count"],["スワイプカット","swipe"],
+    ["コンボキープ","combo"],["スピード星","speed"],["静かなタップ","calm"],["リズム3拍","rhythm"],
+    ["左右タッチ","lr"],["拡大コア","grow"],["縮小コア","shrink"],["色チェンジ","hue"],
+    ["二重円","ring"],["点つなぎ","dots"],["反射神経","react"],["ストップウォッチ","watch"],
+    ["宝箱あけ","box"],["雲ぬけ","cloud"],["月ジャンプ","jump"],["惑星キャッチ","planet"],
+    ["彗星タッチ","comet"],["北斗なぞり","dipper"],["カシオペヤ","cass"],["オリオンベルト","orion"],
+    ["こと座ピン","lyra"],["南十字","crux"],["ペガスス","peg"],["さそり尾","sco"],
+    ["量子ピンポン","qping"],["干渉タッチ","wave"],["軌道一周","orbit"],["光子集め","photon"],
+    ["泡わり","bubble"],["雪キャッチ","snow"],["花びら","petal"],["ホタル","fly"],
+    ["パルス合わせ","pulse"],["ゲージぴったり","gauge"],["3択クイズ星","quiz"],["音なし神経","silent"],
+    ["ペア探し","pair"],["おぼえ星","memo"]
+  ];
+
+  var overlay, grid, play, cv, ctx, stat, running=false, raf=0, mode=null, st=null;
+
+  function reward(score){
+    var add=Math.max(1, score|0);
+    try{
+      if(window.game && window.D){ game.energy=D(game.energy).add(D(add)); }
+      else if(window.game){ game.energy=(Number(game.energy)||0)+add; }
+    }catch(e){}
+    if(window.NeonEngine && NeonEngine.toast) NeonEngine.toast("+"+add+" ENERGY");
+    if(typeof formatValue==="function"){
+      var el=document.getElementById("v-energy");
+      try{ if(el) el.textContent=formatValue(game.energy); }catch(e){}
+    }
+  }
+
+  function openList(){
+    overlay.classList.add("show");
+    play.classList.remove("show");
+    grid.style.display="grid";
+    running=false;
+  }
+  function closeAll(){
+    overlay.classList.remove("show");
+    running=false;
+    if(raf){ cancelAnimationFrame(raf); raf=0; }
+  }
+
+  function start(id, type){
+    grid.style.display="none";
+    play.classList.add("show");
+    mode=type;
+    st={t0:performance.now(), score:0, hits:0, lives:3, x:240, y:110, items:[], seq:[], step:0, phase:0, need:8};
+    if(type==="memory"||type==="simon"||type==="memo"){
+      st.seq=[1,2,3,1]; st.step=0; st.phase="show";
+    }
+    running=true;
+    loop();
+  }
+
+  function loop(){
+    if(!running) return;
+    raf=requestAnimationFrame(loop);
+    var w=cv.width, h=cv.height, now=performance.now(), t=(now-st.t0)/1000;
+    ctx.fillStyle="#050814"; ctx.fillRect(0,0,w,h);
+    ctx.fillStyle="#00ffcc"; ctx.font="12px system-ui";
+
+    if(mode==="targets"||mode==="speed"||mode==="photon"||mode==="fly"||mode==="petal"||mode==="snow"){
+      if(st.items.length<4 && Math.random()<0.04){
+        st.items.push({x:20+Math.random()*(w-40), y:20+Math.random()*(h-40), r:14, life:1});
+      }
+      st.items.forEach(function(p){
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,6.28); ctx.fill();
+      });
+      ctx.fillStyle="#ffea00"; ctx.fillText("星をタップ  "+st.hits+"/"+st.need, 10, 16);
+      if(st.hits>=st.need){ running=false; stat.textContent="クリア!"; reward(20+st.hits); }
+    } else if(mode==="timing"||mode==="stop"||mode==="gauge"||mode==="pulse"){
+      var pos=(Math.sin(now/220)+1)*0.5;
+      st.pos=pos;
+      ctx.fillStyle="#133"; ctx.fillRect(20,h/2-10,w-40,20);
+      ctx.fillStyle="#00ffcc"; ctx.fillRect(20+(w-40)*0.42,h/2-10,(w-40)*0.16,20);
+      ctx.fillStyle="#ffea00"; ctx.fillRect(20+(w-40)*pos-3,h/2-14,6,28);
+      ctx.fillText("黄色い線が緑の帯でタップ", 10, 16);
+    } else if(mode==="catch"||mode==="comet"||mode==="planet"){
+      if(Math.random()<0.03) st.items.push({x:Math.random()*w,y:-10,vy:1.4+Math.random()});
+      st.items.forEach(function(p){ p.y+=p.vy; ctx.beginPath(); ctx.arc(p.x,p.y,8,0,6.28); ctx.fill(); });
+      ctx.fillStyle="#ffea00"; ctx.fillRect(st.x-18,h-16,36,10);
+      ctx.fillText("下で受け止める  "+st.hits, 10, 16);
+      st.items=st.items.filter(function(p){
+        if(p.y>h-18 && Math.abs(p.x-st.x)<24){ st.hits++; return false; }
+        return p.y<h+10;
+      });
+      if(st.hits>=10){ running=false; stat.textContent="クリア!"; reward(25); }
+    } else if(mode==="mash"||mode==="combo"){
+      ctx.font="28px system-ui"; ctx.fillText(String(st.hits), w/2-10, h/2);
+      ctx.font="12px system-ui"; ctx.fillText("連打! 残り "+Math.max(0,(5-t)).toFixed(1)+"秒", 10, 16);
+      if(t>=5){ running=false; stat.textContent="スコア "+st.hits; reward(st.hits); }
+    } else if(mode==="hold"||mode==="grow"){
+      st.hold=(st.hold||0)*0.98;
+      ctx.fillStyle="#133"; ctx.fillRect(20,h-24,w-40,12);
+      ctx.fillStyle="#00ffcc"; ctx.fillRect(20,h-24,(w-40)*Math.min(1,st.hold),12);
+      ctx.fillText("押しっぱなしでチャージ", 10, 16);
+      if(st.hold>=1){ running=false; stat.textContent="満タン!"; reward(18); }
+    } else if(mode==="dodge"||mode==="cloud"){
+      if(Math.random()<0.04) st.items.push({x:Math.random()*w,y:-8,vy:2});
+      st.items.forEach(function(p){ p.y+=p.vy; ctx.fillStyle="#ff5577"; ctx.fillRect(p.x,p.y,12,12); });
+      ctx.fillStyle="#00ffcc"; ctx.beginPath(); ctx.arc(st.x,h-20,10,0,6.28); ctx.fill();
+      var hit=st.items.some(function(p){ return Math.abs(p.x-st.x)<16 && Math.abs(p.y-(h-20))<16; });
+      if(hit){ running=false; stat.textContent="ぶつかった スコア"+st.hits; reward(st.hits); }
+      else { st.hits=Math.floor(t); ctx.fillStyle="#ffea00"; ctx.fillText("避け続けて "+st.hits, 10, 16); }
+    } else if(mode==="count"){
+      if(!st.ready){
+        st.n=3+((Math.random()*4)|0);
+        for(var i=0;i<st.n;i++) st.items.push({x:30+Math.random()*(w-60),y:40+Math.random()*(h-80)});
+        st.ready=1; st.tshow=now;
+      }
+      if(now-st.tshow<1200){
+        st.items.forEach(function(p){ ctx.beginPath(); ctx.arc(p.x,p.y,7,0,6.28); ctx.fill(); });
+        ctx.fillText("いくつ？",10,16);
+      } else {
+        ctx.fillText("画面タップで回答: いま "+(st.guess||0)+" （もう一度タップで+1、長めに待って確定）",10,16);
+        if(now-st.tshow>5000){
+          running=false;
+          var ok=(st.guess||0)===st.n;
+          stat.textContent=ok?"正解 "+st.n:"正解は "+st.n;
+          reward(ok?30:5);
+        }
+      }
+    } else {
+      ctx.fillText(mode+" : 画面をタップ!", 10, 16);
+      ctx.beginPath(); ctx.arc(w/2,h/2,20+Math.sin(now/150)*6,0,6.28); ctx.fill();
+      if(st.hits>=8){ running=false; stat.textContent="クリア!"; reward(16+st.hits); }
+    }
+  }
+
+  function onTap(ev){
+    if(!running) return;
+    var r=cv.getBoundingClientRect();
+    var x=(ev.clientX-r.left)*cv.width/r.width;
+    var y=(ev.clientY-r.top)*cv.height/r.height;
+    if(mode==="targets"||mode==="speed"||mode==="photon"||mode==="fly"||mode==="petal"||mode==="snow"){
+      st.items=st.items.filter(function(p){
+        var dx=p.x-x, dy=p.y-y;
+        if(dx*dx+dy*dy<p.r*p.r*4){ st.hits++; return false; }
+        return true;
+      });
+    } else if(mode==="timing"||mode==="stop"||mode==="gauge"||mode==="pulse"){
+      var ok=st.pos>0.42 && st.pos<0.58;
+      running=false; stat.textContent=ok?"ぴったり!":"もう少し"; reward(ok?28:6);
+    } else if(mode==="mash"||mode==="combo"){ st.hits++; }
+    else if(mode==="hold"||mode==="grow"){ st.hold=(st.hold||0)+0.08; }
+    else if(mode==="dodge"||mode==="cloud"||mode==="catch"||mode==="comet"||mode==="planet"){ st.x=x; }
+    else if(mode==="count"){ st.guess=(st.guess||0)+1; }
+    else { st.hits++; }
+  }
+
+  function boot(){
+    overlay=document.getElementById("dopaArcade");
+    grid=document.getElementById("dopaGrid");
+    play=document.getElementById("dopaPlay");
+    cv=document.getElementById("dopaCV");
+    stat=document.getElementById("dopaStat");
+    if(!overlay||!grid||!cv) return;
+    ctx=cv.getContext("2d",{alpha:false});
+    GAMES.forEach(function(g,i){
+      var b=document.createElement("button");
+      b.type="button"; b.textContent=(i+1)+". "+g[0];
+      b.addEventListener("click", function(){ start(g[0], g[1]); });
+      grid.appendChild(b);
+    });
+    document.getElementById("dopaArcadeBtn").addEventListener("click", openList);
+    document.getElementById("dopaClose").addEventListener("click", closeAll);
+    document.getElementById("dopaBack").addEventListener("click", function(){ running=false; openList(); });
+    overlay.addEventListener("click", function(e){ if(e.target===overlay) closeAll(); });
+    cv.addEventListener("pointerdown", onTap);
+    cv.addEventListener("pointermove", function(e){
+      if(!running) return;
+      if(mode==="dodge"||mode==="cloud"||mode==="catch"||mode==="comet"||mode==="planet"){
+        var r=cv.getBoundingClientRect();
+        st.x=(e.clientX-r.left)*cv.width/r.width;
+      }
+    });
+  }
+  if(document.readyState==="complete") boot();
+  else addEventListener("load", boot);
+})();
+</script>
+
+
+<script id="miniArcadeAndGraphFix">
+(function(){
+  "use strict";
+  /* graph: exact reset + lighter default interval */
+  function resetGraphStorage(){
+    try {
+      localStorage.removeItem("omega_record_v1");
+      localStorage.removeItem("omega_record_cfg_v1");
+      localStorage.removeItem("omega_record_view_v1");
+    } catch(e){}
+    try {
+      if (window.OmegaSyncRecord) {
+        if (typeof OmegaSyncRecord.resetData === "function") OmegaSyncRecord.resetData();
+        else if (OmegaSyncRecord.cfg) {
+          OmegaSyncRecord.cfg.paused = false;
+        }
+      }
+    } catch(e){}
+  }
+  window.resetGraphStorage = resetGraphStorage;
+  function patchRecord(){
+    var R = window.OmegaSyncRecord;
+    if (!R) return;
+    if (!R.resetData) {
+      R.resetData = function(){
+        try { localStorage.removeItem("omega_record_v1"); } catch(e){}
+        try { localStorage.removeItem("omega_record_view_v1"); } catch(e){}
+        if (R.view) { R.view.metric = R.view.metric || "energy"; }
+        if (typeof R.ensurePlayviewMount === "function") R.ensurePlayviewMount();
+      };
+    }
+    try {
+      if (R.cfg && (R.cfg.intervalMs === 0 || R.cfg.intervalMs == null)) {
+        if (typeof R.setIntervalMs === "function") R.setIntervalMs(250);
+        else R.cfg.intervalMs = 250;
+      }
+    } catch(e){}
+  }
+  if (document.readyState === "complete") patchRecord();
+  else addEventListener("load", patchRecord);
+
+  /* 50 family-friendly minigames */
+  var GAMES = [
+    ["星タップ","限時間内に星をタップ"],["流れ星","流れる星をキャッチ"],["タイミング","バーが中央で止める"],
+    ["連打10秒","10秒間タップ"],["色合わせ","同じ色を選ぶ"],["記憶カード","2枚そろえる"],
+    ["星座つなぎ","星を順に結ぶ"],["数字順","1から順に"],["ストップ寄せ","目標値で止める"],
+    ["バブル割","泡を割る"],["リズム4","4拍でタップ"],["左右交互","左右を交互に"],
+    ["円ジャンプ","円が重なったら"],["小さい星","小さい星を探す"],["カウント撃ち","0でタップ"],
+    ["ペア探し","ペアを見つける"],["色じゃなくて","色の名前に従う"],["レーン3","3レーンを拾う"],
+    ["まばたき星","点滅した星をタップ"],["拡大狙い","大きくなったらタップ"],["コイン集め","コインを集める"],
+    ["シールド","赤い球をはじく"],["3個同時","3つ tap"],["一筆星","線を切らずに"],
+    ["北極星","一番明るい星"],["オリオン","3つ並びをタップ"],["カシオペヤ","Wをなぞる"],
+    ["こと座","琴の形を作る"],["はくちょう","十字をタップ"],["南十字","4星を順に"],
+    ["量子タップ","2つ同時風"],["干渉","波が重なったら"],["光子集め","光の粒"],
+    ["軌道乗り","円軌道をタップ"],["準位ジャンプ","段が揃ったら"],["霧箱","軌跡をなぞる"],
+    ["パルサー","点滅に合わせる"],["彗星尾","尾をなぞる"],["流星群","連続キャッチ"],
+    ["銀河核","中心をキープ"],["衛星周回","一周でタップ"],["重力井戸","端から中心へ"],
+    ["ノヴァ","膨らんだら離す"],["星図合わせ","形を選ぶ"],["等級比べ","明るい方"],
+    ["赤経合わせ","目盛を合わせる"],["スペクトル","色を並べる"],["ファインダー","円の中に星"],
+    ["露出","明るさバー"],["ファーストライト","最初の星を探す"]
+  ];
+  while (GAMES.length < 50) GAMES.push(["星遊び"+(GAMES.length+1),"短時間タップ"]);
+
+  var root, canvas, ctx, ui, state = {
+    id:0, t:0, score:0, live:false, need:0, hits:0, mark:0.5, seq:[], step:0, orbs:[]
+  };
+  var raf=0, last=0;
+
+  function reward(n){
+    n = Math.max(1, n|0);
+    try {
+      if (window.game && typeof D === "function") {
+        var bonus = D(2).pow(Math.min(12, Math.floor(Math.log10(Math.max(1, Number(game.totalClicks||1))))));
+        game.energy = D(game.energy).add(bonus.mul(n));
+      }
+    } catch(e){}
+    try {
+      var el=document.getElementById("starPts");
+      if (el) el.textContent = String((parseInt(el.textContent,10)||0)+n);
+    } catch(e){}
+    try { if (window.NeonEngine && NeonEngine.toast) NeonEngine.toast("+" + n + " 星"); } catch(e){}
+  }
+
+  function start(id){
+    state.id=id; state.t=0; state.score=0; state.live=true; state.hits=0; state.step=0;
+    state.need = 8 + (id%7);
+    state.mark = 0.35 + (id%5)*0.08;
+    state.seq = [1,2,3,4,5,6,7,8].slice(0, 4+(id%5));
+    state.orbs = [];
+    for (var i=0;i<6;i++) state.orbs.push({x:40+Math.random()*220,y:30+Math.random()*120,r:8+id%6,vx:(Math.random()*2-1)*1.2,vy:(Math.random()*2-1)*1.2,on:1});
+    last=performance.now();
+    if (!raf) loop(last);
+    paintList();
+  }
+  function end(win){
+    state.live=false;
+    if (win) reward(3 + (state.id%5) + Math.min(8, state.score));
+    else reward(1);
+  }
+  function loop(now){
+    raf=requestAnimationFrame(loop);
+    if (!state.live){ raf=0; return; }
+    var pane=document.getElementById("tab-mini");
+    if (pane && !pane.classList.contains("active")) { raf=0; return; }
+    var dt=Math.min(0.05,(now-last)/1000); last=now; state.t+=dt;
+    var g=GAMES[state.id]||GAMES[0];
+    var mode=state.id%8;
+    if (mode===1 || mode===5){
+      state.orbs.forEach(function(o){
+        o.x+=o.vx; o.y+=o.vy;
+        if(o.x<10||o.x>290)o.vx*=-1;
+        if(o.y<10||o.y>170)o.vy*=-1;
+      });
+    }
+    if (state.t>12){ end(state.hits>=state.need); draw(); return; }
+    draw();
+  }
+  function draw(){
+    if (!ctx || !canvas) return;
+    var w=canvas.width, h=canvas.height;
+    ctx.fillStyle="#070714"; ctx.fillRect(0,0,w,h);
+    ctx.strokeStyle="rgba(0,255,204,.25)"; ctx.strokeRect(1,1,w-2,h-2);
+    ctx.fillStyle="#00ffcc"; ctx.font="12px sans-serif";
+    var g=GAMES[state.id];
+    ctx.fillText((g?g[0]:"")+"  "+state.hits+"/"+state.need+"  "+(12-state.t).toFixed(1)+"s", 8, 16);
+    var mode=state.id%8;
+    if (mode===2){
+      var x=20+(w-40)*Math.abs(Math.sin(state.t*2.2));
+      ctx.fillStyle="#334"; ctx.fillRect(20,h*0.55,w-40,10);
+      ctx.fillStyle="#ffea00"; ctx.fillRect(w*state.mark-6,h*0.52,12,16);
+      ctx.fillStyle="#00ffcc"; ctx.fillRect(x-3,h*0.54,6,12);
+    } else {
+      state.orbs.forEach(function(o,i){
+        if(!o.on) return;
+        ctx.beginPath(); ctx.fillStyle = i===0?"#ffea00":"#7dd3fc";
+        ctx.arc(o.x,o.y,o.r,0,6.28); ctx.fill();
+        if (mode===7){ ctx.fillStyle="#fff"; ctx.font="10px sans-serif"; ctx.fillText(String(i+1), o.x-3, o.y+3); }
+      });
+    }
+  }
+  function tap(ev){
+    if (!state.live || !canvas) return;
+    var r=canvas.getBoundingClientRect();
+    var x=(ev.clientX-r.left)*canvas.width/r.width;
+    var y=(ev.clientY-r.top)*canvas.height/r.height;
+    var mode=state.id%8;
+    if (mode===2){
+      var bar=20+(canvas.width-40)*Math.abs(Math.sin(state.t*2.2));
+      if (Math.abs(bar - canvas.width*state.mark)<16){ state.hits++; state.score++; }
+      if (state.hits>=state.need) end(true);
+      return;
+    }
+    for (var i=0;i<state.orbs.length;i++){
+      var o=state.orbs[i]; if(!o.on) continue;
+      var dx=x-o.x, dy=y-o.y;
+      if (dx*dx+dy*dy <= (o.r+8)*(o.r+8)){
+        if (mode===7 && i!==state.step) break;
+        o.on=0; state.hits++; state.score++; state.step++;
+        o.x=30+Math.random()*240; o.y=30+Math.random()*120; o.on=1;
+        if (state.hits>=state.need) end(true);
+        break;
+      }
+    }
+  }
+
+  function paintList(){
+    if (!ui) return;
+    var html="<div style='display:flex;gap:8px;align-items:center;margin:0 0 8px;flex-wrap:wrap'>";
+    html+="<b style='color:#ffea00'>MINI 50</b>";
+    html+="<button type='button' id='miniGraphReset' class='btn-utility'>グラフをリセット</button>";
+    html+="</div>";
+    html+="<canvas id='miniCanvas' width='320' height='180' style='width:min(100%,360px);height:auto;border:1px solid rgba(0,255,204,.3);border-radius:8px;background:#070714;touch-action:manipulation'></canvas>";
+    html+="<div id='miniGrid' style='display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;margin-top:10px'>";
+    GAMES.forEach(function(g,i){
+      html+="<button type='button' data-mg='"+i+"' style='text-align:left;padding:6px;border-radius:8px;border:1px solid rgba(255,234,0,.25);background:rgba(255,234,0,.06);color:#fff;font-size:11px;font-weight:700'>"+g[0]+"<br><span style='color:#9ca3af;font-weight:600;font-size:10px'>"+g[1]+"</span></button>";
+    });
+    html+="</div>";
+    ui.innerHTML=html;
+    canvas=ui.querySelector("#miniCanvas");
+    ctx=canvas.getContext("2d",{alpha:false});
+    canvas.addEventListener("pointerdown", tap);
+    ui.querySelectorAll("[data-mg]").forEach(function(b){
+      b.addEventListener("click", function(){ start(+b.getAttribute("data-mg")); });
+    });
+    var gr=ui.querySelector("#miniGraphReset");
+    if (gr) gr.addEventListener("click", function(){
+      if (confirm("グラフ記録だけ消しますか？（ゲーム本体は残ります）")) {
+        resetGraphStorage();
+        location.reload();
+      }
+    });
+    draw();
+  }
+
+  window.MiniArcade = {
+    show: function(){
+      root=document.getElementById("miniArcadeRoot");
+      if (!root) return;
+      if (!ui){ ui=document.createElement("div"); root.appendChild(ui); paintList(); }
+    }
+  };
+
+  /* light fun events — only toast, no extra rAF */
+  setInterval(function(){
+    if (document.hidden) return;
+    if (Math.random()>0.18) return;
+    var ev=["流れ星","量子ゆらぎ","星座が輝いた","光子バースト","北極星ウインク","銀河の潮"];
+    try { if (window.NeonEngine && NeonEngine.toast) NeonEngine.toast(ev[(Math.random()*ev.length)|0]); } catch(e){}
+  }, 20000);
 })();
 </script>
 
