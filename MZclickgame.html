@@ -1,0 +1,2469 @@
+:<!doctype html>
+<html lang="ja" translate="no">
+<head>
+    <link rel="icon" type="image/png" href="icon.png">
+<meta charset="utf-8" />
+<meta name="offline-capable" content="yes">
+<script src="decimal.min.js"></script>
+<script>
+if (typeof Decimal === "undefined" && typeof navigator!=="undefined" && navigator.onLine && /^https?:/i.test(location.protocol||"")) {
+  document.write('<script src="https://cdn.jsdelivr.net/npm/decimal.js@10.4.3/decimal.min.js"><\/script>');
+}
+</script>
+<script>
+  if (typeof navigator!=="undefined" && navigator.onLine && /^https?:/i.test(location.protocol||"")) {
+    try {
+      var translateScript = document.createElement('script');
+      translateScript.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+      translateScript.onerror = function(){};
+      document.head.appendChild(translateScript);
+    } catch (e) {}
+  }
+</script>
+<script>
+(function(){
+  try {
+    if (window.__lsWrap) return;
+    window.__lsWrap = true;
+    var rawSet = localStorage.setItem.bind(localStorage);
+    var rawGet = localStorage.getItem.bind(localStorage);
+    var q = Object.create(null);
+    var t = 0;
+    function flush(){
+      t = 0;
+      var ks = Object.keys(q);
+      for (var i=0;i<ks.length;i++){
+        try { rawSet(ks[i], q[ks[i]]); } catch(e){}
+      }
+      q = Object.create(null);
+    }
+    localStorage.setItem = function(k,v){
+      q[k]=String(v);
+      if (!t) t = setTimeout(flush, 500);
+    };
+    localStorage.getItem = function(k){
+      if (q[k]!=null) return q[k];
+      return rawGet(k);
+    };
+    addEventListener("pagehide", flush);
+    addEventListener("beforeunload", flush);
+  } catch(e){}
+})();
+</script>
+<script>
+  // ホーム画面を経由しているか（登録フラグがあるか）チェック
+  // スタンドアロン再生時はフラグを自動セット（元のホーム誘導は index.html があるときだけ）
+  if (!localStorage.getItem('infinity_game_registered')) {
+    try {
+      if (typeof location !== 'undefined' && /index\.html$/i.test(location.pathname)) {
+        /* stay */
+      }
+      localStorage.setItem('infinity_game_registered', 'standalone-pack');
+    } catch (e) {}
+  }
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="google" content="notranslate">
+<title>インクリメンタル絶対神 — INFINITY MATRIX OMEGA — EXACT GRAPH + DOPA PACK —</title>
+  <script>
+  // 他のサイトにiframeで埋め込まれているかを判定
+  if (window.self !== window.top) {
+    // ページ読み込み完了時に警告画面に書き換える
+    document.addEventListener("DOMContentLoaded", () => {
+      document.body.innerHTML = `
+        <div style="
+          position: fixed;
+          inset: 0;
+          background: #020106;
+          color: #f4f4f5;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          font-family: 'Consolas', 'Fira Code', 'Courier New', monospace, system-ui;
+          z-index: 999999;
+          padding: 20px;
+          text-align: center;
+        ">
+          <div style="
+            background: rgba(20, 14, 38, 0.8);
+            border: 1px solid rgba(255, 0, 85, 0.35);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 0 30px rgba(255, 0, 85, 0.15);
+          ">
+            <h2 style="
+              font-size: 1rem;
+              font-weight: 900;
+              margin: 0 0 16px 0;
+              background: linear-gradient(90deg, #fff, #ff0055);
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+              letter-spacing: 1px;
+            ">ACCESS BLOCKED</h2>
+            
+            <p style="
+              font-size: 0.8rem;
+              color: #bbb;
+              margin: 0 0 20px 0;
+              line-height: 1.5;
+            ">あなたはこのゲームを読み込むことができません</p>
+            
+            <a href="${window.self.location.href}" target="_top" style="
+              display: inline-block;
+              width: 100%;
+              padding: 12px;
+              background: linear-gradient(90deg, #1b0a33, #2f1057);
+              border: 1px solid rgba(157, 78, 221, 0.5);
+              border-radius: 6px;
+              color: #fff;
+              font-size: 0.8rem;
+              font-weight: 900;
+              text-decoration: none;
+              letter-spacing: 1px;
+              box-shadow: 0 0 12px rgba(157, 78, 221, 0.25);
+              transition: all 0.15s;
+              box-sizing: border-box;
+            ">ゲームに飛ぶ</a>
+          </div>
+        </div>
+      `;
+    });
+  }
+</script>
+<style>
+ 
+:root {
+  --bg-main: #020106;
+  --bg-panel: rgba(10, 6, 20, 0.9);
+  --bg-card: rgba(20, 14, 38, 0.6);
+  --border-weak: rgba(255, 255, 255, 0.04);
+  --border-strong: rgba(255, 255, 255, 0.12);
+  
+  --color-energy: #00ffcc;
+  --color-upgrade: #ffea00;
+  --color-antimatter: #ff0055;
+  --color-timeline: #9d4edd;
+  --color-galaxy: #3a86ff;
+  --color-godhead: #ffffff;
+  
+  --text-main: #f4f4f5;
+  --text-muted: #6b7280;
+  --text-dark: #1f2937;
+}
+/* 右クリック時の長押しメニューやテキスト選択の青いハイライトを防止する */
+body, button, input, textarea {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+* {
+  box-sizing: border-box;
+  font-family: 'Consolas', 'Fira Code', 'Courier New', monospace, system-ui;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-main);
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(157, 78, 221, 0.16) 0%, transparent 42%),
+    radial-gradient(circle at 88% 78%, rgba(0, 255, 204, 0.14) 0%, transparent 44%),
+    radial-gradient(circle at 50% 110%, rgba(58, 134, 255, 0.10) 0%, transparent 50%),
+    radial-gradient(circle at 50% 0%, rgba(255, 234, 0, 0.04) 0%, transparent 36%);
+  background-attachment: fixed;
+  color: var(--text-main);
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  display: flex;
+  user-select: none;
+}
+/* Webkit (Edge, Chrome) 用スクロールバー設定 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.4);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-energy);
+}
+  /* Firefox (Floorp) 用スクロールバー設定（@supportsでFirefoxのみに限定） */
+@supports (-moz-appearance: none) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-energy) rgba(0, 0, 0, 0.4);
+  }
+}
+.column-left {
+  flex: 1;
+  min-width: 320px;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 16px;
+  border-right: 1px solid var(--border-weak);
+  background: rgba(3, 2, 8, 0.6);
+  overflow-y: auto;
+}
+
+.column-center {
+  flex: 2;
+  min-width: 400px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border-weak);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.column-right {
+  flex: 1.1;
+  min-width: 340px;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  background: rgba(2, 1, 4, 0.85);
+}
+
+.game-title {
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-align: center;
+  margin: 0 0 16px 0;
+  background: linear-gradient(90deg, #fff, var(--color-energy), var(--color-timeline), var(--color-antimatter));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  width: 100%;
+  border-bottom: 1px solid var(--border-weak);
+  padding-bottom: 8px;
+}
+
+.display-group {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 12px;
+}
+.resource-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.resource-value {
+  font-size: 2.2rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  word-break: break-all;
+}
+.value-energy { color: var(--color-energy); text-shadow: 0 0 25px rgba(0, 255, 204, 0.25); }
+.value-antimatter { color: var(--color-antimatter); text-shadow: 0 0 25px rgba(255, 0, 85, 0.25); }
+.value-timelines { color: var(--color-timeline); text-shadow: 0 0 25px rgba(157, 78, 221, 0.25); }
+
+.resource-ps {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.click-core-container {
+  margin: 15px 0;
+  position: relative;
+}
+/* タップコアボタン本体：指5本が同時に置ける超巨大サイズ */
+.click-core-btn {
+  width: clamp(260px, 80vw, 360px);   /* スマホの横幅に合わせて大きく変形 */
+  height: clamp(180px, 35vw, 240px);  /* 高さは指を置きやすいように適度なボリュームに */
+  border-radius: 999px;               /* 丸みを帯びたカプセル型にしてマルチタッチしやすくする */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  box-sizing: border-box;
+  font-size: 1.5rem;                  /* 文字も大きくして見やすく */
+}
+.click-core-btn:active {
+  transform: scale(0.96);
+  border-color: var(--color-antimatter);
+  box-shadow: 0 0 50px rgba(255, 0, 85, 0.25);
+}
+.click-core-btn::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 1px dashed rgba(0, 255, 204, 0.15);
+  animation: rotation-clockwise 50s linear infinite;
+}
+.click-core-btn::after {
+  content: '';
+  position: absolute;
+  inset: -15px;
+  border-radius: 50%;
+  border: 1px dotted rgba(255, 0, 85, 0.08);
+  animation: rotation-counter 30s linear infinite;
+}
+@keyframes rotation-clockwise { 100% { transform: rotate(360deg); } }
+@keyframes rotation-counter { 100% { transform: rotate(-360deg); } }
+
+.core-text-main { font-size: 1rem; font-weight: 900; color: #fff; letter-spacing: 1px; }
+.core-text-sub { font-size: 0.7rem; color: var(--color-energy); margin-top: 2px; }
+
+.prestige-wrapper {
+  width: 100%;
+  background: rgba(8, 4, 18, 0.5);
+  border: 1px solid var(--border-weak);
+  border-radius: 12px;
+  padding: 10px;
+  margin-top: auto;
+}
+.prestige-title-bar {
+  font-size: 0.65rem;
+  font-weight: 900;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  text-align: center;
+  letter-spacing: 1px;
+}
+.prestige-node {
+  margin-bottom: 8px;
+}
+.prestige-node:last-child { margin-bottom: 0; }
+
+.btn-action-prestige {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.btn-action-prestige:disabled {
+  opacity: 0.12;
+  cursor: not-allowed;
+  background: #111113 !important;
+  border-color: var(--border-weak) !important;
+  color: var(--text-muted) !important;
+}
+.p-antimatter { background: linear-gradient(90deg, #2b0413, #4a021d); border-color: rgba(255, 0, 85, 0.35); }
+.p-antimatter:not(:disabled):hover { background: linear-gradient(90deg, #42061e, #630327); box-shadow: 0 0 12px rgba(255, 0, 85, 0.25); }
+.p-timeline { background: linear-gradient(90deg, #1b0a33, #2f1057); border-color: rgba(157, 78, 221, 0.35); }
+.p-timeline:not(:disabled):hover { background: linear-gradient(90deg, #280f4c, #42167a); box-shadow: 0 0 12px rgba(157, 78, 221, 0.25); }
+.p-galaxy { background: linear-gradient(90deg, #0a1b36, #112d57); border-color: rgba(58, 134, 255, 0.35); }
+.p-galaxy:not(:disabled):hover { background: linear-gradient(90deg, #122f5c, #1b4382); box-shadow: 0 0 12px rgba(58, 134, 255, 0.25); }
+
+.prestige-req {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  padding-left: 2px;
+}
+
+.tab-navigation-bar {
+  display: flex;
+  background: rgba(0, 0, 0, 0.4);
+  border-bottom: 1px solid var(--border-weak);
+  overflow-x: auto;
+}
+.tab-trigger-button {
+  padding: 10px 12px;
+  background: transparent;
+  border: 0;
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.1s;
+  position: relative;
+}
+.tab-trigger-button:hover { color: #fff; }
+.tab-trigger-button.active {
+  color: #fff;
+  background: var(--bg-panel);
+}
+.tab-trigger-button.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--color-energy);
+}
+.tab-trigger-button.tab-color-am.active::after { background: var(--color-antimatter); }
+.tab-trigger-button.tab-color-tl.active::after { background: var(--color-timeline); }
+.tab-trigger-button.tab-color-gx.active::after { background: var(--color-galaxy); }
+
+.center-content-viewport {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  background: var(--bg-panel);
+}
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+.pane-heading {
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: #fff;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-left: 3px solid var(--color-energy);
+  padding-left: 10px;
+  letter-spacing: 1px;
+}
+.pane-heading.heading-am { border-left-color: var(--color-antimatter); }
+.pane-heading.heading-tl { border-left-color: var(--color-timeline); }
+.pane-heading.heading-gx { border-left-color: var(--color-galaxy); }
+
+.upgrade-matrix-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.card-upgrade-node {
+  background: var(--bg-card);
+  border: 1px solid var(--border-weak);
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100px;
+  transition: all 0.1s;
+}
+.card-upgrade-node:hover:not(.state-disabled):not(.state-maxed) {
+  border-color: var(--color-upgrade);
+  background: rgba(255, 234, 0, 0.02);
+}
+.card-upgrade-node.state-disabled { opacity: 0.22; cursor: not-allowed; }
+.card-upgrade-node.state-maxed {
+  border-color: var(--color-timeline);
+  background: rgba(157, 78, 221, 0.05);
+  cursor: default;
+}
+
+.upg-meta-title { font-size: 0.78rem; font-weight: 900; color: #fff; line-height: 1.2; }
+.upg-meta-desc { font-size: 0.65rem; color: #bbb; margin-top: 4px; line-height: 1.3; flex-grow: 1; }
+.upg-meta-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+  font-size: 0.68rem;
+}
+.upg-meta-cost { color: var(--color-upgrade); font-weight: 700; }
+.upg-meta-lv { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+.factory-linear-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-weak);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.1s;
+}
+.factory-linear-card:hover:not(.state-disabled) {
+  border-color: var(--color-energy);
+  background: rgba(0, 255, 204, 0.01);
+}
+.factory-linear-card.state-disabled { opacity: 0.22; cursor: not-allowed; }
+
+.fac-profile-left { display: flex; flex-direction: column; flex: 1; padding-right: 8px; }
+.fac-name-text { font-size: 0.82rem; font-weight: 900; color: #fff; }
+.fac-desc-text { font-size: 0.65rem; color: #aaa; margin-top: 2px; }
+.fac-cost-text { font-size: 0.72rem; color: var(--color-upgrade); font-weight: 700; margin-top: 4px; }
+
+.fac-profile-right { text-align: right; min-width: 70px; }
+.fac-qty-counter { font-size: 1.4rem; font-weight: 900; color: rgba(255, 255, 255, 0.12); font-variant-numeric: tabular-nums; line-height: 1; }
+.fac-impact-rate { font-size: 0.68rem; color: var(--color-energy); margin-top: 2px; font-variant-numeric: tabular-nums; }
+
+.automation-control-row {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border-weak);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.auto-info-block { display: flex; flex-direction: column; }
+.auto-name { font-size: 0.78rem; font-weight: 900; }
+.auto-state-descr { font-size: 0.65rem; color: var(--text-muted); }
+
+.switch-input-hidden { display: none; }
+.switch-label-track {
+  width: 38px; height: 18px; background: #222; border-radius: 999px;
+  position: relative; cursor: pointer; transition: background 0.2s; display: block;
+}
+.switch-label-track::after {
+  content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px;
+  background: #fff; border-radius: 50%; transition: transform 0.2s;
+}
+.switch-input-hidden:checked + .switch-label-track { background: var(--color-energy); }
+.switch-input-hidden:checked + .switch-label-track::after { transform: translateX(20px); }
+
+.right-header {
+  padding: 10px 12px;
+  font-size: 0.72rem;
+  font-weight: 900;
+  color: var(--color-upgrade);
+  border-bottom: 1px solid var(--border-weak);
+  letter-spacing: 1px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.btn-utility {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border-strong);
+  color: #fff;
+  font-size: 0.6rem;
+  padding: 3px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.btn-utility:hover { background: rgba(255,255,255,0.15); }
+.btn-danger { color: var(--color-antimatter); border-color: rgba(255,0,85,0.3); }
+.btn-danger:hover { background: rgba(255,0,85,0.15); }
+
+.stat-scroller-box {
+  padding: 10px 12px;
+  overflow-y: auto;
+  flex: 1;
+}
+.stat-item-line {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.01);
+  font-size: 0.68rem;
+}
+.stat-item-line span:first-child { color: var(--text-muted); }
+.stat-item-line span:last-child { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.mod-loader-container {
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid var(--border-weak);
+}
+.mod-input-area {
+  width: 100%;
+  height: 60px;
+  background: #090611;
+  border: 1px solid var(--border-strong);
+  color: var(--color-energy);
+  font-size: 0.65rem;
+  padding: 4px;
+  border-radius: 4px;
+  resize: none;
+  font-family: monospace;
+}
+.mod-control-bar {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.log-stream-box {
+  height: 130px;
+  border-top: 1px solid var(--border-strong);
+  background: rgba(0,0,0,0.4);
+  padding: 8px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column-reverse;
+}
+.log-message-unit {
+  font-size: 0.65rem;
+  line-height: 1.3;
+  margin-bottom: 3px;
+  border-left: 2px solid var(--text-muted);
+  padding-left: 6px;
+  color: #d4d4d8;
+}
+
+.notification-center-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 99999;
+  pointer-events: none;
+}
+.toast-notification {
+  background: rgba(8, 4, 20, 0.96);
+  border: 1px solid var(--color-upgrade);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 15px rgba(255, 234, 0, 0.15);
+  padding: 12px 18px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  width: 310px;
+  pointer-events: auto;
+  animation: slide-in-toast 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+@keyframes slide-in-toast {
+  0% { transform: translateX(120%); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+.toast-title { font-size: 0.78rem; font-weight: 900; color: var(--color-upgrade); }
+.toast-body { font-size: 0.68rem; color: #e4e4e7; margin-top: 2px; }
+
+.pop-float-number {
+  position: fixed;
+  pointer-events: none;
+  font-weight: 900;
+  font-size: 16px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+  animation: core-float-upwards 0.4s ease-out forwards;
+  z-index: 9999;
+}
+@keyframes core-float-upwards {
+  0% { transform: translate(-50%, -50%) scale(0.7); opacity: 1; }
+  100% { transform: translate(-50%, -150%) scale(1.1); opacity: 0; }
+}
+
+.guide-text-block {
+  font-size: 0.68rem;
+  line-height: 1.4;
+  color: #9ca3af;
+  background: rgba(0,0,0,0.25);
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px dashed var(--border-weak);
+  margin-bottom: 10px;
+}
+/* 単位（/ワット）のスタイル：数字の半分の大きさに設定 */
+.display-group .unit {
+  font-size: 0.25em; /* 親要素（数字）のフォントサイズに対する50%（半分）にする */
+  margin-left: 4px;  /* 必要に応じて数字と単位の間隔を調整 */
+  vertical-align: baseline; /* 表示位置の微調整 */
+}
+.display-group .unitdown {
+  font-size: 0.8em; /* 親要素（数字）のフォントサイズに対する50%（半分）にする */
+  margin-left: 4px;  /* 必要に応じて数字と単位の間隔を調整 */
+  vertical-align: baseline; /* 表示位置の微調整 */
+}
+/* ==========================================
+   スマートフォン・タブレット向けレスポンシブ対応
+   ================================---------- */
+@media screen and (max-width: 1024px) {
+  body {
+    flex-direction: column; /* 3カラムを縦並びに変更 */
+    height: auto;
+    min-height: 100vh;
+    overflow: auto; /* 画面全体のスクロールを許可 */
+  }
+
+  .column-left, 
+  .column-center, 
+  .column-right {
+    max-width: 100% !important;
+    min-width: 100% !important;
+    flex: none;
+    border-right: none;
+    border-bottom: 1px solid var(--border-weak);
+    height: auto;
+  }
+
+  /* 中央コンテンツの高さをスマホ向けに調整 */
+  .center-content-viewport {
+    max-height: 500px;
+  }
+
+  /* タップコアのサイズを少しコンパクトに、押しやすく */
+  .click-core-btn {
+    width: min(78vw, 280px);
+    height: min(78vw, 280px);
+    margin: 0 auto;
+  }
+  
+  .click-core-container {
+    display: flex;
+    justify-content: center;
+  }
+
+  /* ログボックスの高さ調整 */
+  .log-stream-box {
+    height: 100px;
+  }
+}
+button, .btn-action-prestige, .click-core-btn, .card-upgrade-node, .factory-linear-card {
+  -webkit-tap-highlight-color: transparent; /* タップ時の青い光を消す */
+  -webkit-user-select: none;
+  user-select: none; /* 文字選択を防ぐ */
+  touch-action: manipulation; /* ダブルタップズームを無効化し、反応速度を上げる */
+}
+  /* =========================================================================
+   🔧 ボタン・タップコアのレスポンシブ崩れ防止・可変対応
+   ========================================================================= */
+
+/* 右上ヘッダー内のボタン群：スマホなどで自然に折り返し、幅に合わせて縮小 */
+.column-right .right-header {
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.column-right .right-header > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+/* ユーティリティボタンが画面幅に応じて縮小・柔軟に配置されるようにする */
+.column-right .right-header .btn-utility {
+  font-size: 0.55rem;
+  padding: 4px 6px;
+  white-space: nowrap; /* 文字が不自然に縦に折れるのを防ぐ */
+  flex: 1 1 auto;      /* 空きスペースに応じて伸び縮みする */
+  min-width: fit-content;
+}
+
+/* タップコアコンテナ：画面幅が狭くなってもはみ出さず中央に収まるようにする */
+.click-core-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 8px 0 4px;
+  box-sizing: border-box;
+  gap: 8px;
+}
+
+/* タップコアボタン本体：画面が小さい時は自動で少しコンパクトになる可変サイズ */
+.click-core-btn {
+  width: clamp(220px, 42vw, 340px);
+  height: clamp(220px, 42vw, 340px);
+  max-width: 96%;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* さらに画面が狭いスマホ縦向きなどのメディアクエリ追加調整 */
+@media screen and (max-width: 480px) {
+  .column-right .right-header .btn-utility {
+    font-size: 0.52rem;
+    padding: 3px 5px;
+  }
+}
+  /* 右側UI全体のコンテナ崩れ防止 */
+.column-right, .right-header, .settings-group {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+/* 4等分・複数並びのUIグリッド/フレックスの修復 */
+.ui-four-split, .settings-buttons-row, .btn-container-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+
+/* ボタンが縦に潰れて「┆」になる現象の防止 */
+.column-right button, 
+.right-header button, 
+.btn-utility, 
+.product-btn {
+  white-space: nowrap; /* テキストを強制的に改行させない */
+  flex: 1 1 auto;      /* 画面幅に合わせて伸縮させる */
+  min-width: 70px;     /* 潰れすぎを防ぐ最小幅 */
+  box-sizing: border-box;
+}
+
+/* 4等分したいエリアがある場合のグリッド定義 */
+.grid-4-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+  gap: 6px;
+  width: 100%;
+}
+  /* =========================================================================
+ * 🖱️ カスタムマウスカーソル効果（ボタン・UI対応版）
+ * ========================================================================= */
+
+/* 1. サイト全体のベース（基本はこれに継承される） */
+body {
+    cursor: default;
+}
+
+/* 2. クリックできるボタンや、独自でカーソルが変わりやすいUI要素に強制適用 */
+button, 
+a, 
+input[type="button"], 
+input[type="submit"], 
+input[type="image"],
+label,
+[role="button"],
+.factory-linear-card, 
+.card-upgrade-node, 
+.click-core-btn,
+.tab-trigger-button,
+[onclick] {
+    cursor: pointer !important;
+}
+
+/* 3. 入力フィールドなど、テキストを選択させたい部分だけ標準に戻す */
+input[type="text"], 
+input[type="email"], 
+input[type="password"], 
+textarea {
+    cursor: text;
+}
+/* =========================================================================
+ * ⚡ 超軽量・高速フォント定義（パフォーマンス改善版）
+ * ========================================================================= */
+body, button, input, select, textarea, [class*="game-"] {
+    font-family: 
+        system-ui, 
+        -apple-system, 
+        "Segoe UI", 
+        Roboto, 
+        "Helvetica Neue", 
+        Arial, 
+        "Hiragino Sans", 
+        "Meiryo", 
+        sans-serif;
+    /* !important を外し、無駄なフォント列挙を削ることで再描画を爆速化します */
+}
+
+[dir="rtl"] {
+    direction: rtl;
+    text-align: right;
+}
+  /* =========================================================================
+   ⚙️ 既存CSSに統合する中央モーダル & ボタン崩れ完全防止パッチ
+   ========================================================================= */
+
+/* 1. モーダル本体の確実に中央固定・背景の安全確保 */
+#settingsModalOverlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 99999;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 15px;
+}
+
+/* 2. モーダルコンテナがPC/スマホ共通で絶対に破綻しない指定 */
+#settingsModalOverlay > div {
+  background: rgba(15, 10, 25, 0.98);
+  border: 1px solid var(--border-strong, #444);
+  border-radius: 8px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* 3. モーダル内部のボタン群が縦に潰れて「┆」になるのを完全に阻止 */
+#settingsModalOverlay button,
+#settingsModalOverlay .btn-utility,
+#settingsModalOverlay .product-btn {
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+  white-space: nowrap !important;
+  word-break: normal !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  box-sizing: border-box !important;
+  flex: 1 1 120px !important;
+  min-width: 0 !important;
+}
+
+/* 4. 右上のシステムヘッダーのボタンが暴発しないための整理 */
+.column-right .right-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: rgba(10, 6, 20, 0.9);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+   #bootLoader {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(157,78,221,.18), transparent 42%),
+    radial-gradient(circle at 80% 75%, rgba(0,255,204,.12), transparent 45%),
+    #020106;
+  color: #f4f4f5;
+  font-family: Consolas, "Fira Code", monospace, system-ui;
+  transition: opacity .35s ease, visibility .35s ease;
+}
+#bootLoader.boot-done {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+#bootLoader .boot-title {
+  font-size: 0.85rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  margin-bottom: 18px;
+  background: linear-gradient(90deg, #fff, #00ffcc, #9d4edd, #ff0055);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+#bootLoader .boot-bar-wrap {
+  width: min(320px, 78vw);
+  height: 8px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 99px;
+  overflow: hidden;
+}
+#bootLoader .boot-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #00ffcc, #3a86ff, #9d4edd);
+  box-shadow: 0 0 12px rgba(0,255,204,.45);
+  transition: width .12s linear;
+}
+#bootLoader .boot-pct {
+  margin-top: 12px;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #00ffcc;
+  text-shadow: 0 0 16px rgba(0,255,204,.35);
+}
+#bootLoader .boot-sub {
+  margin-top: 8px;
+  font-size: 0.68rem;
+  letter-spacing: 1px;
+  color: #6b7280;
+}
+  /* ページネーションの見た目・レイアウト修復 */
+.pagination-container, [id^="pagination-"] {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin: 15px 0;
+    width: 100%;
+}
+
+[id^="pagination-"] button, .pagination-btn {
+    background: var(--bg-card, rgba(20, 14, 38, 0.6));
+    border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.12));
+    color: var(--text-main, #f4f4f5);
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+[id^="pagination-"] button:hover:not(:disabled) {
+    border-color: var(--color-energy, #00ffcc);
+    background: rgba(0, 255, 204, 0.1);
+}
+
+[id^="pagination-"] button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+  /* ⚡ 限界軽量化モード発動時のスタイル上書き */
+body.force-lightweight-all,
+body.force-lightweight-all * {
+    animation: none !important;
+    transition: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+/* 背景の重いグラデーションやエフェクトも簡易化して描画速度を上げる */
+body.force-lightweight-all {
+    background-image: none !important;
+    background-color: var(--bg-main) !important;
+}
+/* 軽量化モード発動時は、重い回転アニメーションの要素自体を非表示（またはアニメーション停止）にする */
+body.force-lightweight-all .click-core-btn::before,
+body.force-lightweight-all .click-core-btn::after {
+    display: none !important;
+}
+
+/* ===== RANDOM COSMIC EVENTS (CANVAS + LOW-DOM) ===== */
+#eventFxCanvas { display: none !important; }
+.event-shock { display: none !important; }
+#eventOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200000;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  contain: layout style paint;
+  transform: translateZ(0);
+}
+#eventOverlay.show { animation: eventOverlayHold 3.6s ease-out forwards; }
+#eventOverlay.v2 .event-stamp { top: 16%; letter-spacing: .14em; }
+#eventOverlay.v3 .event-card { border-radius: 28px 8px 28px 8px; }
+#eventOverlay.v4 .event-stamp { transform-origin: 40% 60%; }
+#eventOverlay.show.v2 { animation-timing-function: cubic-bezier(.2,.8,.2,1); }
+#eventFxCanvas { contain: strict; touch-action: none; }
+@keyframes eventOverlayHold {
+  0% { opacity: 0; }
+  4% { opacity: 1; }
+  88% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.event-white-slam {
+  position: absolute;
+  inset: 0;
+  background: #fff8c8;
+  opacity: 0;
+}
+#eventOverlay.show .event-white-slam { animation: eventWhiteSlam 0.32s ease-out forwards; }
+#eventOverlay.show.unlucky .event-white-slam { background: #ffd0dc; }
+#eventOverlay.show.mixed .event-white-slam { background: #e6d4ff; }
+@keyframes eventWhiteSlam {
+  0% { opacity: 0.82; }
+  100% { opacity: 0; }
+}
+.event-flash-ring { position: absolute; inset: 0; }
+.event-flash-ring.lucky {
+  background: radial-gradient(circle at 50% 46%, rgba(255,234,0,.42) 0%, transparent 58%);
+}
+.event-flash-ring.unlucky {
+  background: radial-gradient(circle at 50% 46%, rgba(255,0,85,.42) 0%, transparent 58%);
+}
+.event-flash-ring.mixed {
+  background: radial-gradient(circle at 50% 46%, rgba(157,78,221,.42) 0%, transparent 58%);
+}
+.event-shock {
+  position: absolute;
+  left: 50%; top: 48%;
+  width: 36px; height: 36px;
+  margin: -18px 0 0 -18px;
+  border-radius: 50%;
+  border: 3px solid #ffea00;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+#eventOverlay.show .event-shock.s1 { animation: eventShock 0.62s ease-out forwards; }
+#eventOverlay.show .event-shock.s2 { animation: eventShock 0.78s ease-out .08s forwards; }
+#eventOverlay.show.unlucky .event-shock { border-color: #ff0055; }
+#eventOverlay.show.mixed .event-shock { border-color: #c77dff; }
+@keyframes eventShock {
+  0% { transform: scale(.25); opacity: .9; }
+  100% { transform: scale(22); opacity: 0; }
+}
+.event-stamp {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(2.2rem, 9vw, 5.4rem);
+  font-weight: 900;
+  letter-spacing: .06em;
+  line-height: .9;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  z-index: 3;
+  white-space: nowrap;
+  text-shadow: 0 6px 0 rgba(0,0,0,.35), 0 0 22px currentColor;
+  pointer-events: none;
+}
+#eventOverlay.show .event-stamp { visibility: visible; }
+#eventOverlay.show .event-stamp { animation: eventStampSlam 3.6s cubic-bezier(.12,1.35,.2,1) forwards; }
+#eventOverlay.show.lucky .event-stamp { color: #ffea00; }
+#eventOverlay.show.unlucky .event-stamp { color: #ff2d6a; }
+#eventOverlay.show.mixed .event-stamp { color: #d0a2ff; }
+@keyframes eventStampSlam {
+  0% { transform: translateX(-50%) scale(2.6) rotate(-14deg); opacity: 0; }
+  6% { transform: translateX(-50%) scale(.96) rotate(-7deg); opacity: 1; }
+  10% { transform: translateX(-50%) scale(1.08) rotate(-6deg); opacity: 1; }
+  88% { transform: translateX(-50%) scale(1) rotate(-6deg); opacity: 1; }
+  100% { transform: translateX(-50%) scale(1.05) rotate(-4deg); opacity: 0; }
+}
+.event-card {
+  position: relative;
+  z-index: 4;
+  width: min(92vw, 480px);
+  padding: 20px 18px 16px;
+  border-radius: 16px;
+  background: rgba(6,3,16,.94);
+  border: 3px solid #ffea00;
+  box-shadow: 0 0 40px rgba(255,234,0,.45);
+  text-align: center;
+}
+#eventOverlay.show .event-card { animation: eventCardPop 3.6s cubic-bezier(.12,1.3,.2,1) forwards; }
+.event-card.unlucky { border-color: #ff0055; box-shadow: 0 0 40px rgba(255,0,85,.45); }
+.event-card.mixed { border-color: #9d4edd; box-shadow: 0 0 40px rgba(157,78,221,.45); }
+@keyframes eventCardPop {
+  0% { transform: scale(.35); opacity: 0; }
+  8% { transform: scale(1.08); opacity: 1; }
+  12% { transform: scale(1); opacity: 1; }
+  88% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.03); opacity: 0; }
+}
+.event-kicker {
+  font-size: .72rem;
+  letter-spacing: .26em;
+  color: #ffea00;
+  margin-bottom: 6px;
+  font-weight: 900;
+}
+.event-card.unlucky .event-kicker { color: #ff6b9a; }
+.event-card.mixed .event-kicker { color: #c77dff; }
+.event-title-main {
+  font-size: clamp(1.4rem, 5vw, 2.3rem);
+  font-weight: 900;
+  line-height: 1.12;
+  margin: 0 0 8px;
+  color: #fff;
+  text-shadow: 0 0 16px currentColor;
+}
+.event-desc-main { font-size: .84rem; color: #e4e4e7; line-height: 1.4; }
+.event-result-big {
+  margin-top: 10px;
+  font-size: clamp(1.1rem, 3.6vw, 1.7rem);
+  font-weight: 900;
+  color: #ffea00;
+}
+.event-card.unlucky .event-result-big { color: #ff6b9a; }
+.event-card.mixed .event-result-big { color: #d0a2ff; }
+#eventBuffBar {
+  position: relative;
+  left: auto;
+  bottom: auto;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  pointer-events: none;
+  width: min(100%, 360px);
+  max-width: 100%;
+  margin: 4px auto 0;
+}
+.event-buff-chip {
+  background: rgba(8,4,20,.88);
+  border: 1px solid rgba(255,234,0,.4);
+  color: #fff;
+  font-size: .64rem;
+  padding: 5px 8px;
+  border-radius: 8px;
+}
+.event-buff-chip.unlucky { border-color: rgba(255,0,85,.5); }
+.pop-float-number {
+  will-change: transform, opacity;
+  contain: layout style;
+}
+#coreTrigger.event-core-boom { animation: eventCoreBoom .55s ease-out; }
+@keyframes eventCoreBoom {
+  0% { transform: scale(1); }
+  20% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+@media (max-width: 820px) {
+  .event-shock.s2 { display: none; }
+  .notification-center-container { top: 8px; right: 8px; }
+  .toast-notification { width: min(86vw, 280px); padding: 10px 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #eventOverlay.show,
+  #eventOverlay.show .event-card,
+  #eventOverlay.show .event-stamp,
+  #eventOverlay.show .event-shock,
+  #eventOverlay.show .event-white-slam { animation-duration: .6s !important; }
+}
+
+#effectHUD {
+  position: relative;
+  right: auto;
+  bottom: auto;
+  z-index: 3;
+  width: min(100%, 360px);
+  background: rgba(8,4,20,.88);
+  border: 1px solid rgba(0,255,204,.28);
+  border-radius: 10px;
+  padding: 8px 9px 7px;
+  font-size: .62rem;
+  color: #d4d4d8;
+  pointer-events: auto;
+  contain: layout style;
+}
+#effectHUD .eh-title {
+  font-weight: 900;
+  letter-spacing: .12em;
+  color: #00ffcc;
+  margin-bottom: 5px;
+}
+#effectHUD .eh-row { display: flex; justify-content: space-between; gap: 8px; margin: 2px 0; }
+#effectHUD .eh-val { color: #ffea00; font-weight: 700; }
+#effectHUD button {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.14);
+  color: #fff;
+  font-size: .6rem;
+  border-radius: 6px;
+  padding: 3px 6px;
+  cursor: pointer;
+}
+#effectHUD .eh-hist {
+  margin-top: 5px;
+  max-height: 72px;
+  overflow: hidden;
+  color: #9ca3af;
+  line-height: 1.35;
+}
+#comboBanner {
+  position: fixed;
+  left: 50%;
+  top: 22%;
+  transform: translateX(-50%);
+  z-index: 199990;
+  pointer-events: none;
+  font-size: clamp(1.2rem, 4vw, 2rem);
+  font-weight: 900;
+  color: #00ffcc;
+  text-shadow: 0 0 16px #00ffcc;
+  opacity: 0;
+}
+
+#coreTrigger {
+  --combo-hue: 170;
+  box-shadow: 0 0 22px hsla(var(--combo-hue), 90%, 55%, .35), 0 0 0 2px hsla(var(--combo-hue), 90%, 60%, .35);
+  transition: box-shadow .15s linear, border-color .15s linear, filter .12s ease;
+}
+#coreTrigger.combo-hot {
+  animation: comboHueShift 1.2s linear infinite;
+}
+@keyframes comboHueShift {
+  0% { filter: hue-rotate(0deg) saturate(1.15); }
+  50% { filter: hue-rotate(40deg) saturate(1.35); }
+  100% { filter: hue-rotate(0deg) saturate(1.15); }
+}
+#eh-combo { color: hsl(var(--combo-hue, 50), 95%, 62%) !important; text-shadow: 0 0 8px hsla(var(--combo-hue, 50), 90%, 50%, .8); }
+#v-energy.fx-pop { animation: energyPop .22s ease-out; }
+@keyframes energyPop {
+  0% { transform: scale(1.08); filter: brightness(1.5); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+.resource-value { display: inline-block; }
+#comboBanner { display: none !important; }
+
+@keyframes comboPop {
+  0% { opacity: 0; transform: translateX(-50%) scale(.6); }
+  25% { opacity: 1; transform: translateX(-50%) scale(1.08); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-12px) scale(1); }
+}
+
+
+button, .btn-action-prestige, .tab-trigger-button, .btn-utility, #skillBar button, .omega-btn {
+  transition: transform .1s ease, box-shadow .1s ease, filter .1s ease;
+  transform: perspective(480px) rotateX(7deg);
+  box-shadow: 0 4px 0 rgba(0,40,36,.8), 0 8px 12px rgba(0,0,0,.3);
+}
+button:hover, .tab-trigger-button:hover, .btn-action-prestige:hover {
+  transform: perspective(480px) rotateX(3deg) translateY(-1px);
+}
+button:active, .btn-action-prestige:active, .tab-trigger-button:active, .click-core-btn:active {
+  transform: perspective(480px) rotateX(12deg) translateY(3px);
+  box-shadow: 0 1px 0 rgba(0,40,36,.8);
+  filter: brightness(1.2);
+}
+.click-core-btn {
+  transform: perspective(640px) rotateX(9deg);
+  box-shadow: 0 12px 0 rgba(0,255,204,.16), 0 18px 24px rgba(0,0,0,.4), inset 0 2px 0 rgba(255,255,255,.18);
+}
+.click-core-btn:active {
+  transform: perspective(640px) rotateX(14deg) translateY(5px) scale(.98);
+}
+body.force-lightweight-all button,
+body.force-lightweight-all .click-core-btn,
+body.force-lightweight-all .tab-trigger-button {
+  transform: none !important;
+  box-shadow: none !important;
+}
+.fx-hit { animation: fxHitA .2s ease-out; }
+.fx-hit2 { animation: fxHitB .22s ease-out; }
+.fx-hit3 { animation: fxHitC .18s ease-out; }
+@keyframes fxHitA {
+  0% { transform: scale(.92); filter: brightness(1.6); }
+  55% { transform: scale(1.05); filter: brightness(1.2); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+@keyframes fxHitB {
+  0% { transform: scale(.95) rotate(-1.2deg); box-shadow: 0 0 0 0 rgba(0,255,204,.0); }
+  40% { transform: scale(1.06) rotate(.6deg); box-shadow: 0 0 18px rgba(0,255,204,.45); }
+  100% { transform: scale(1) rotate(0); }
+}
+@keyframes fxHitC {
+  0% { filter: brightness(1.8) saturate(1.3); transform: scale(.9); }
+  100% { filter: brightness(1); transform: scale(1); }
+}
+.click-core-btn.fx-hit, .click-core-btn.fx-hit2, .click-core-btn.fx-hit3 {
+  animation-duration: .16s;
+}
+.tab-trigger-button.active {
+  box-shadow: 0 0 12px rgba(255,234,0,.25);
+}
+
+/* extra fun motion (transform/opacity only) */
+.core-text-main { animation: coreTitlePulse 2.2s ease-in-out infinite; }
+@keyframes coreTitlePulse {
+  0%,100% { letter-spacing: 1px; text-shadow: 0 0 0 transparent; }
+  50% { letter-spacing: 3px; text-shadow: 0 0 12px rgba(0,255,204,.45); }
+}
+.click-core-btn::before { animation-duration: 18s; border-color: hsla(var(--combo-hue, 170), 80%, 60%, .4); }
+.click-core-btn::after { animation-duration: 12s; border-color: hsla(var(--combo-hue, 170), 80%, 55%, .28); }
+.factory-linear-card:hover:not(.state-disabled),
+.card-upgrade-node:hover:not(.state-disabled):not(.state-maxed) {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 8px 18px rgba(0,255,204,.12);
+}
+.tab-trigger-button { transition: transform .14s ease, box-shadow .14s ease, color .14s ease; }
+.tab-trigger-button:hover { transform: translateY(-1px); }
+.btn-action-prestige { animation: prestigeIdle 3.4s ease-in-out infinite; }
+@keyframes prestigeIdle {
+  0%,100% { filter: brightness(1); }
+  50% { filter: brightness(1.18); }
+}
+#eventOverlay.show .event-card {
+  animation: eventCardPop 3.6s cubic-bezier(.12,1.3,.2,1) forwards, eventCardGlow 0.8s ease-in-out infinite alternate;
+}
+@keyframes eventCardGlow {
+  from { filter: brightness(1); }
+  to { filter: brightness(1.18) saturate(1.15); }
+}
+.event-result-big { animation: resultBlink 0.45s ease-in-out infinite alternate; }
+@keyframes resultBlink {
+  from { transform: scale(1); }
+  to { transform: scale(1.06); }
+}
+body.force-lightweight-all .core-text-main,
+body.force-lightweight-all .btn-action-prestige,
+body.force-lightweight-all #eventOverlay.show .event-card {
+  animation: none !important;
+}
+
+
+
+.click-core-btn { position: relative; overflow: visible; }
+#tapPing {
+  position: absolute;
+  left: 50%;
+  top: 14%;
+  transform: translateX(-50%);
+  font-weight: 900;
+  font-size: clamp(1rem, 3.6vw, 1.4rem);
+  color: #00ffcc;
+  opacity: 0;
+  pointer-events: none;
+  text-shadow: 0 0 12px #00ffcc;
+  z-index: 5;
+}
+#tapPing.show { animation: tapPingUp .4s ease-out forwards; }
+@keyframes tapPingUp {
+  0% { opacity: 1; transform: translateX(-50%) translateY(10px) scale(.85); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-28px) scale(1.2); }
+}
+#coreTrigger.tap-ack {
+  animation: tapAckPop .18s ease-out;
+}
+@keyframes tapAckPop {
+  0% { transform: scale(.88); filter: brightness(2) saturate(1.4); }
+  55% { transform: scale(1.06); filter: brightness(1.3); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+@keyframes tapAck {
+  0% { transform: scale(.92); filter: brightness(1.8) saturate(1.25); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+@-moz-document url-prefix() {
+  #eventFxCanvas { image-rendering: auto; }
+  .click-core-btn::before, .click-core-btn::after { will-change: auto; }
+}
+
+
+#skillBar {
+  width: min(100%, 360px);
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+  margin: 8px auto 10px;
+}
+#skillBar button {
+  background: rgba(0,255,204,.08);
+  border: 1px solid rgba(0,255,204,.35);
+  color: #fff;
+  border-radius: 10px;
+  padding: 8px 4px 6px;
+  font-size: .68rem;
+  font-weight: 800;
+  cursor: pointer;
+  line-height: 1.25;
+}
+#skillBar button:disabled { opacity: .4; cursor: not-allowed; }
+#skillBar .sk-cd { display: block; font-size: .58rem; color: #ffea00; font-weight: 700; }
+#missionBox {
+  width: 100%;
+  margin: 0 0 8px;
+  padding: 7px 8px;
+  border: 1px solid rgba(255,234,0,.22);
+  border-radius: 8px;
+  font-size: .65rem;
+  color: #d4d4d8;
+}
+#missionBox b { color: #ffea00; }
+
+
+.click-core-container { flex-direction: column !important; align-items: center !important; }
+.click-core-btn {
+  width: clamp(225px, 58vw, 285px) !important;
+  height: clamp(225px, 58vw, 285px) !important;
+  max-width: 86vw !important;
+  border-radius: 50% !important;
+}
+.core-text-main { font-size: clamp(.85rem, 3.2vw, 1.05rem) !important; }
+.core-text-sub { font-size: clamp(.7rem, 2.5vw, .9rem) !important; }
+#skillBar { order: 2; width: min(100%, 360px); }
+#missionBox {
+  order: 3;
+  width: min(100%, 360px);
+  text-align: center;
+  background: rgba(255,234,0,.06);
+}
+#coreRank {
+  font-size: .62rem;
+  letter-spacing: .14em;
+  color: #a5f3fc;
+  margin-top: 4px;
+}
+
+
+@media (min-width: 1024px) {
+  .click-core-btn {
+    width: 165px !important;
+    height: 165px !important;
+  }
+  .core-text-main { font-size: .78rem !important; letter-spacing: .04em !important; }
+  .core-text-sub { font-size: .7rem !important; }
+  #coreRank { font-size: .55rem !important; }
+}
+#missionBox.done-flash { animation: missionFlash .45s ease-out; }
+@keyframes missionFlash {
+  0% { filter: brightness(2); transform: scale(1.03); }
+  100% { filter: brightness(1); transform: scale(1); }
+}
+#bindList button { width:100%; text-align:left; margin:3px 0; padding:7px 8px; }
+
+
+#funBar {
+  width: min(100%, 360px);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  font-size: .62rem;
+  color: #cbd5e1;
+  margin-top: 4px;
+}
+#funBar b { color: #ffea00; }
+#funBar button {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(0,255,204,.3);
+  color: #fff;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: .62rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+
+.pad-focus {
+  outline: 3px solid #22c55e !important;
+  outline-offset: 3px;
+  box-shadow: 0 0 14px rgba(34,197,94,.45) !important;
+}
+.btn-fullscreen {
+  background: rgba(0, 255, 204, 0.1);
+  border: 1px solid rgba(0, 255, 204, 0.5);
+  color: #00ffcc;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 900;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);
+}
+
+.btn-fullscreen:hover {
+  background: #00ffcc;
+  color: #000;
+  box-shadow: 0 0 20px rgba(0, 255, 204, 0.6);
+}
+  .copyright {
+  position: fixed;   /* 画面に対して固定する */
+  left: 10px;        /* 左からの距離 */
+  bottom: 10px;      /* 下からの距離 */
+  font-size: 11px;   /* 小さめの文字サイズ */
+  color: #666;       /* 文字色（グレーなど） */
+  z-index: 9999;     /* 他の要素の下に隠れないように手前に表示 */
+}
+</style>
+</head>
+<body>
+
+<style id="neonEngineCss">
+html,body{background:#010108;}
+#neonGpuBg,#neonFxOverlay,#neonThree{
+  position:fixed;inset:0;width:100%;height:100%;
+  pointer-events:none!important;z-index:0;border:0;display:block;
+}
+#neonThree{z-index:0;}
+#neonFxOverlay{z-index:0;}
+.column-left,.column-center,.column-right{
+  position:relative;z-index:2;
+}
+#neonComboRing,#neonToast{pointer-events:none;}
+#neonToast{
+  position:fixed;left:50%;top:12%;transform:translateX(-50%);
+  z-index:90;color:#fff;background:rgba(0,0,0,.6);border:1px solid rgba(0,255,204,.4);
+  padding:6px 12px;border-radius:999px;font:700 12px/1 system-ui;opacity:0;transition:opacity .18s;
+}
+#neonToast.show{opacity:1;}
+#neonComboRing{position:fixed;z-index:1;display:none;}
+#neonDock{
+  position:fixed;left:8px;bottom:28px;top:auto;right:auto;z-index:30;
+  width:auto;max-width:min(280px,46vw);
+  margin:0;
+  background:rgba(8,10,24,.94);
+  border:1px solid rgba(0,255,204,.35);border-radius:12px;
+  color:#e5e7eb;font:11px/1.3 system-ui,sans-serif;
+  box-shadow:0 8px 24px rgba(0,0,0,.4);
+}
+#neonDock.collapsed{max-width:none;width:auto;}
+#neonDock.collapsed .nd-body{display:none !important;}
+#neonDock header{display:flex;align-items:center;gap:8px;padding:6px 9px;cursor:pointer;user-select:none;}
+#neonDock header b{color:#00ffcc;letter-spacing:.06em;font-size:11px;}
+#neonDock header .nd-fps{color:#00ffcc;font-weight:800;font-style:normal;}
+#neonDock header span{margin-left:auto;color:#ffea00;font-weight:800;}
+#neonDock .nd-body{display:block;padding:8px 9px 9px;overflow:auto;max-height:min(42vh,320px);}
+#neonDock .nd-search{width:100%;box-sizing:border-box;margin:0 0 6px;padding:5px 7px;border-radius:8px;
+  border:1px solid rgba(0,255,204,.28);background:rgba(0,0,0,.35);color:#e5e7eb;font-size:11px;}
+#neonDock .nd-cats{display:flex;flex-wrap:wrap;gap:3px;margin:0 0 6px;}
+#neonDock .nd-cats button{appearance:none;border:1px solid rgba(0,255,204,.22);background:rgba(255,255,255,.04);
+  color:#9ca3af;border-radius:999px;padding:2px 6px;font-size:10px;cursor:pointer;}
+#neonDock .nd-cats button.on{border-color:#ffea00;color:#ffea00;}
+#neonDock .nd-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;}
+#neonDock button.nd{appearance:none;border:1px solid rgba(0,255,204,.25);background:rgba(0,255,204,.07);
+  color:#dff;border-radius:6px;padding:4px 5px;font-size:10px;font-weight:700;cursor:pointer;}
+#neonDock button.nd.on{border-color:#ffea00;color:#ffea00;}
+#neonDock .nd-stats{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 6px;color:#9ca3af;}
+#neonDock .nd-stats b{color:#00ffcc;}
+@media (max-width:1024px){
+  #neonDock{left:8px;right:auto;bottom:56px;max-width:min(300px,70vw);}
+}
+</style>
+<canvas id="neonGpuBg" aria-hidden="true"></canvas>
+<canvas id="neonThree" aria-hidden="true"></canvas>
+<canvas id="neonFxOverlay" aria-hidden="true"></canvas>
+<div id="neonComboRing"></div>
+<div id="neonToast"></div>
+
+<style id="dopaArcadeCss">
+#dopaArcadeBtn{position:fixed;left:8px;bottom:64px;z-index:31;border:1px solid rgba(0,255,204,.4);
+  background:rgba(8,10,24,.94);color:#00ffcc;border-radius:10px;padding:6px 10px;font:700 11px system-ui;cursor:pointer;}
+#dopaArcade{display:none;position:fixed;inset:0;z-index:120;background:rgba(2,2,12,.72);align-items:center;justify-content:center;}
+#dopaArcade.show{display:flex;}
+#dopaArcade .box{width:min(520px,94vw);max-height:86vh;overflow:auto;background:#0b1020;border:1px solid rgba(0,255,204,.35);
+  border-radius:14px;padding:12px;color:#e5e7eb;font:12px/1.4 system-ui;}
+#dopaArcade h2{margin:0 0 8px;color:#00ffcc;font-size:14px;}
+#dopaArcade .grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+#dopaArcade .grid button{appearance:none;border:1px solid rgba(0,255,204,.28);background:rgba(0,255,204,.08);
+  color:#dff;border-radius:8px;padding:8px 6px;font-size:11px;font-weight:700;cursor:pointer;text-align:left;}
+#dopaPlay{display:none;margin-top:8px;}
+#dopaPlay.show{display:block;}
+#dopaCV{width:100%;height:220px;background:#050814;border-radius:10px;border:1px solid rgba(0,255,204,.25);}
+#dopaStat{margin-top:6px;color:#ffea00;font-weight:800;}
+</style>
+<button type="button" id="dopaArcadeBtn">ミニゲーム 50</button>
+<div id="dopaArcade" aria-hidden="true">
+  <div class="box">
+    <h2>ドパミニゲーム（おまけ） <button type="button" id="dopaClose">閉じる</button></h2>
+    <div class="grid" id="dopaGrid"></div>
+    <div id="dopaPlay">
+      <canvas id="dopaCV" width="480" height="220"></canvas>
+      <div id="dopaStat">スタート</div>
+      <button type="button" id="dopaBack">一覧へ</button>
+    </div>
+  </div>
+</div>
+<div id="neonDock" class="collapsed">
+  <header id="neonDockHead"><b>NEON ENGINE</b><i class="nd-fps">FPS <b id="neonFps">--</b></i><span id="neonFeatCount">0</span></header>
+  <div class="nd-body" id="neonDockBody">
+    <div class="nd-stats">
+      <span>GPU <b id="neonGpu">--</b></span>
+      <span>WORKER <b id="neonWk">--</b></span>
+      <span>FX <b id="neonFxN">0</b></span>
+    </div>
+    <input id="neonFeatSearch" class="nd-search" type="search" placeholder="機能を検索" />
+    <div class="nd-cats" id="neonFeatCats"></div>
+    <div class="nd-grid" id="neonFeatGrid"></div>
+  </div>
+</div>
+<div class="copyright">&copy; 2026 HTsatoweb</div>
+<!-- ★ ここから読み込み画面 -->
+<div id="bootLoader" aria-live="polite">
+  <div class="boot-title">INFINITY MATRIX BOOT</div>
+  <div class="boot-bar-wrap"><div class="boot-bar" id="bootBar"></div></div>
+  <div class="boot-pct" id="bootPct">0%</div>
+  <div class="boot-sub" id="bootSub">HTML を読み込み中...</div>
+</div>
+<script>
+(function () {
+  const bar = document.getElementById("bootBar");
+  const pctEl = document.getElementById("bootPct");
+  const sub = document.getElementById("bootSub");
+  const overlay = document.getElementById("bootLoader");
+  if (!overlay) return;
+
+  let shown = 0;
+  let finished = false;
+  let target = 3;
+  const STEPS = [
+    [8, "フォルダの decimal.min.js を確認"],
+    [16, "計算ライブラリを接続"],
+    [24, "画面の骨組み"],
+    [32, "コアボタン"],
+    [40, "施設データ"],
+    [48, "アップグレード"],
+    [56, "記録グラフ"],
+    [64, "演出レイヤー"],
+    [72, "独自歳時記"],
+    [80, "クエスト"],
+    [88, "分割ロード"],
+    [96, "最終点検"],
+    [100, "起動完了"]
+  ];
+  let stepI = 0;
+
+  function paint(n, label) {
+    if (finished && n < 100) return;
+    target = Math.max(target, Math.min(100, Math.floor(n)));
+    if (label && sub) sub.textContent = label;
+  }
+
+  const tick = setInterval(function () {
+    if (shown < target) {
+      var jump = target - shown;
+      shown += (jump > 8 ? 4 : 1);
+      if (shown > target) shown = target;
+      if (bar) bar.style.width = shown + "%";
+      if (pctEl) pctEl.textContent = shown + "%";
+    }
+    if (stepI < STEPS.length && shown >= STEPS[stepI][0] - 1) {
+      if (sub) sub.textContent = STEPS[stepI][1] + "  " + shown + "%";
+      stepI++;
+    }
+    if (finished && shown >= 100) {
+      clearInterval(tick);
+      overlay.classList.add("boot-done");
+      setTimeout(function () {
+        if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      }, 80);
+    }
+  }, 10);
+
+  var waitTries = 0;
+  function finish() {
+    if (typeof Decimal === "undefined" && waitTries < 8) {
+      waitTries++;
+      paint(96, "計算ライブラリ待ち");
+      setTimeout(finish, 40);
+      return;
+    }
+    if (finished) return;
+    finished = true;
+    paint(100, "起動完了");
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    paint(54, "DOM 構築");
+    if (typeof Decimal !== "undefined") paint(62, "decimal.min.js OK");
+  });
+
+  window.addEventListener("load", function () {
+    paint(92, "本体完了。追加は裏で起動");
+    finish();
+  });
+
+  setTimeout(function () {
+    if (!finished) finish();
+  }, 2500);
+})();
+</script>
+<!-- ★ ここまで読み込み画面 -->
+
+<div class="notification-center-container" id="toastHub"></div>
+
+<canvas id="eventFxCanvas" width="1" height="1"></canvas>
+<div id="eventOverlay" aria-hidden="true">
+  <div class="event-white-slam"></div>
+  <div class="event-flash-ring lucky" id="eventFlashRing"></div>
+  <div class="event-shock s1"></div>
+  <div class="event-shock s2"></div>
+  <div class="event-stamp" id="eventStamp"></div>
+  <div class="event-card lucky" id="eventCard">
+    <div class="event-kicker" id="eventKicker">RANDOM EVENT</div>
+    <div class="event-title-main" id="eventTitle">—</div>
+    <div class="event-desc-main" id="eventDesc">—</div>
+    <div class="event-result-big" id="eventResult">—</div>
+  </div>
+</div>
+
+
+<div id="comboBanner"></div>
+
+
+
+<div class="column-left">
+<div class="game-title">INFINITY MATRIX — OMEGA MULTI-LAYER OVERDRIVE API 65 —</div>
+<div class="god-display" id="displayGodName" style="font-size: 0.8rem; color: #00ffcc; letter-spacing: 2px; margin-top: 8px; margin-bottom: 15px; text-shadow: 0 0 8px rgba(0, 255, 204, 0.3); text-align: center;">GOD: <span id="playerNameSpan">名無しの神</span></div>
+ <div class="display-group">
+  <div class="resource-label">ENERGY [物質エネルギー]</div>
+  <div class="resource-value value-energy"><span id="v-energy">0.0</span><span class="unit">/ワット</span></div>
+  <div class="resource-ps">毎秒生成: +<span id="v-total-cps">0.0</span><span class="unitdown">/ワット</span></div>
+</div>
+
+  <div class="display-group" id="group-am" style="display:none;">
+    <div class="resource-label">ANTIMATTER [反物質]</div>
+    <div class="resource-value value-antimatter" id="v-antimatter">0</div>
+  </div>
+
+  <div class="display-group" id="group-tl" style="display:none;">
+    <div class="resource-label">TIME SHARDS [時間律の破片]</div>
+    <div class="resource-value value-timelines" id="v-timeshards">0</div>
+  </div>
+
+  <div class="click-core-container">
+    <button class="click-core-btn" id="coreTrigger">
+      <span id="tapPing" aria-hidden="true"></span>
+      <span class="core-text-main">TAP CORE</span>
+      <span class="core-text-sub" id="v-click-power">+1.0</span>
+      <span id="coreRank">RANK 見習いコア</span>
+    </button>
+    <div id="skillBar">
+      <button type="button" id="sk-fever">フィーバー<span class="sk-cd" id="sk-fever-cd">準備OK</span></button>
+      <button type="button" id="sk-shield">シールド<span class="sk-cd" id="sk-shield-cd">準備OK</span></button>
+      <button type="button" id="sk-call">イベント召喚<span class="sk-cd" id="sk-call-cd">準備OK</span></button>
+    </div>
+    <div id="missionBox">ミッション: <b id="missionText">コアを 30 回タップ</b></div>
+    <div id="funBar">
+      <span>SESSION <b id="sessTaps">0</b></span>
+      <span>STAR <b id="starPts">0</b></span>
+      <button type="button" id="sk-theme">色替え</button>
+      <button type="button" id="sk-burst">バースト</button>
+      <button type="button" id="sk-starshop">★交換</button>
+      <button type="button" id="sk-rumble">振動ON</button>
+    </div>
+    <div id="eventBuffBar"></div>
+    <div id="effectHUD" aria-label="effect system">
+  <div class="eh-title">EFFECT SYSTEM</div>
+  <div class="eh-row"><span>QUALITY</span><span class="eh-val" id="eh-quality">AUTO</span></div>
+  <div class="eh-row"><span>FPS</span><span class="eh-val" id="eh-fps">--</span></div>
+  <div class="eh-row"><span>COMBO</span><span class="eh-val" id="eh-combo">0</span></div>
+  <div class="eh-row"><span>EVENTS</span><span class="eh-val" id="eh-events">0</span></div>
+  <div class="eh-row"><span>CRIT</span><span class="eh-val" id="eh-crit">0</span></div>
+  <div class="eh-row"><span>MISSION</span><span class="eh-val" id="eh-mission">0</span></div>
+  <div class="eh-row" style="margin-top:6px;gap:4px;">
+    <button type="button" id="eh-qbtn">画質切替</button>
+    <button type="button" id="eh-hudbtn">HUD隠す</button>
+  </div>
+  <div class="eh-hist" id="eh-hist">まだイベントなし</div>
+</div>
+  </div>
+
+  <div class="prestige-wrapper">
+    <div class="prestige-title-bar">DIMENSIONAL PRESTIGE (多層宇宙リセット転生系)</div>
+    
+    <div class="prestige-node">
+      <button class="btn-action-prestige p-antimatter" id="btnResetAm" disabled>
+        <span>転生: 反物質化</span>
+        <span id="v-gain-am">+0 AM</span>
+      </button>
+      <div class="prestige-req">要求: 1.00e6 E (進行度に応じて獲得量増)</div>
+    </div>
+
+    <div class="prestige-node">
+      <button class="btn-action-prestige p-timeline" id="btnResetTl" disabled>
+        <span>跳躍: 時間軸の切断</span>
+        <span id="v-gain-tl">+0 TS</span>
+      </button>
+      <div class="prestige-req">要求: 1.00e12 E かつ 100 AM</div>
+    </div>
+
+    <div class="prestige-node">
+      <button class="btn-action-prestige p-galaxy" id="btnResetGx" disabled>
+        <span>収束: 銀河系の統合</span>
+        <span id="v-gain-gx">+0 GN</span>
+      </button>
+      <div class="prestige-req">要求: 1.00e24 E かつ 50 TS</div>
+    </div>
+  </div>
+</div>
+
+<div class="column-center">
+  <div class="tab-navigation-bar">
+    <button class="tab-trigger-button active" onclick="switchMainTab('tab-fac')">MATERIAL (施設)</button>
+    <button class="tab-trigger-button" onclick="switchMainTab('tab-upg')">CONCEPT (改良)</button>
+    <button class="tab-trigger-button tab-color-am" onclick="switchMainTab('tab-am-layer')">ANTIMATTER (反物質)</button>
+    <button class="tab-trigger-button tab-color-tl" onclick="switchMainTab('tab-tl-layer')">TIME (時間律)</button>
+    <button class="tab-trigger-button" onclick="switchMainTab('tab-auto')">AUTOMATION (自動化)</button>
+    <button class="tab-trigger-button" onclick="switchMainTab('tab-ach'); renderAchievementsList();" style="color: var(--color-upgrade); border-color: var(--color-upgrade);">ACHIEVEMENTS (実績)</button>
+    <button class="tab-trigger-button" id="tabBtnPlayview" onclick="switchMainTab('tab-playview'); if(window.renderPlayViewTab) renderPlayViewTab();" style="color: var(--color-energy);">PLAY VIEW (やりこみ)</button>
+    <button class="tab-trigger-button" id="tabBtnMini" onclick="switchMainTab('tab-mini'); if(window.MiniArcade) MiniArcade.show();" style="color:#ffea00;">MINI (ミニゲーム)</button>
+    <button class="tab-trigger-button" id="tabBtnElem" onclick="switchMainTab('tab-elements'); if(window.ElementCodex) ElementCodex.show();" style="color:#a78bfa;">MOMENTS (変化)</button>
+  </div>
+
+  <div class="center-content-viewport">
+    
+    <!-- 施設 -->
+    <div class="tab-pane active" id="tab-fac">
+      <div class="pane-heading">AUTOMATION INDUSTRIAL (自動製造ライン)</div>
+      <div class="guide-text-block">エネルギーを自動生成するインフラ。数が多くなるほどインフレコストが跳ね上がる。</div>
+      <div id="containerFactories"></div>
+      <div class="pagination-area" id="pagination-fac" style="text-align: center; margin: 15px 0;"></div>
+    </div>
+
+    <!-- 改良 -->
+    <div class="tab-pane" id="tab-upg">
+      <div class="pane-heading">CONCEPT SYSTEM UPGRADES (システム改変)</div>
+      <div class="upgrade-matrix-grid" id="containerUpgrades"></div>
+      <div class="pagination-area" id="pagination-upg" style="text-align: center; margin: 15px 0;"></div>
+    </div>
+
+    <!-- 反物質 -->
+    <div class="tab-pane" id="tab-am-layer">
+      <div class="pane-heading heading-am">ANTIMATTER REACTION (反物質パラメータ)</div>
+      <div class="guide-text-block">保有する反物質 1 AM ごとに、全CPSに <b>+100%</b> の複利増幅がかかります（永続）。</div>
+      <div class="upgrade-matrix-grid" id="containerAmUpgrades"></div>
+      <div class="pagination-area" id="pagination-am" style="text-align: center; margin: 15px 0;"></div>
+    </div>
+
+    <!-- 時間律 -->
+    <div class="tab-pane" id="tab-tl-layer">
+      <div class="pane-heading heading-tl">CHRONO-MATRIX UPGRADES (時間歪曲フィールド)</div>
+      <div class="guide-text-block">時間律の破片(Time Shards)は世界の時間軸そのものを加速します。1 TS ごとに<b>ゲーム全体の進行が +2% 加速</b>。</div>
+      <div class="upgrade-matrix-grid" id="containerTlUpgrades"></div>
+      <div class="pagination-area" id="pagination-tl" style="text-align: center; margin: 15px 0;"></div>
+    </div>
+
+    <!-- 自動化 -->
+    <div class="tab-pane" id="tab-auto">
+      <div class="pane-heading heading-gx">AUTOMATION ENGINE (全自動化思考コア)</div>
+      <div class="guide-text-block">完全自動化の領域。「CONCEPT」タブ最下層の【マトリクスの深淵】の購入で全稼働します。</div>
+      <div id="containerAutomation"></div>
+      <div class="pagination-area" id="pagination-auto" style="text-align: center; margin: 15px 0;"></div>
+    </div>
+
+    <!-- 実績（そのまま） -->
+    <div class="tab-pane" id="tab-ach">
+      <div class="pane-heading" style="color: var(--color-upgrade);">ACHIEVEMENTS MATRIX (実績データベース)</div>
+      <div class="guide-text-block">宇宙の因果を紐解き、数々の条件を達成して称号を手に入れろ。<br>達成率: <span id="ach-progress-text">0 / 0</span> (<span id="ach-progress-percent">0%</span>)</div>
+      <div class="upgrade-matrix-grid" id="containerAchievements" style="display: flex; flex-direction: column; gap: 6px;"></div>
+    </div>
+
+    <div class="tab-pane" id="tab-playview">
+      <div class="pane-heading" style="color: var(--color-energy);">PLAY VIEW / LONG PLAY / RECORD</div>
+      <div class="guide-text-block">やりこみと正確グラフです。値は丸めず生のまま記録します。0秒＝こまめに記録。点数0＝間引きなし。スマホでも同じ操作です。</div>
+      <div id="playviewTabBody"></div>
+      <div id="omegaRecordMount"></div>
+    </div>
+
+    <div class="tab-pane" id="tab-mini">
+      <div class="pane-heading" style="color:#ffea00;">MINI ARCADE（サブ戦力ミニゲーム）</div>
+      <div class="guide-text-block">短いミニゲームで星とエネルギーを少し増やせます。本体の工場や転生はそのままです。</div>
+      <div id="miniArcadeRoot"></div>
+    </div>
+    <div class="tab-pane" id="tab-elements">
+      <div class="pane-heading" style="color:#a78bfa;">MOMENTS（変化する要素）</div>
+      <div class="guide-text-block">同じ図鑑の繰り返しではなく、タップのたびに音・色・星座イベントが入れ替わります。</div>
+      <div id="elementCodexRoot"></div>
+    </div>
+
+  </div>
+</div>
+  </div>
+</div>
+<div class="column-right">
+  <div class="right-header" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(10,6,20,0.9); flex-wrap: wrap; gap: 8px;">
+    <span style="font-size: 0.72rem; color: var(--color-upgrade);">SYSTEM DATA (システム)</span>
+    <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+      <button class="btn-utility" onclick="saveGameManual()" style="white-space: nowrap;">手動セーブ</button>
+      <button class="btn-utility" id="settingsMenuBtn" onclick="toggleSettingsMenu()" style="color: var(--color-upgrade); border-color: var(--color-upgrade); white-space: nowrap; font-weight: bold;">⚙️ 設定</button>
+      <button class="btn-fullscreen" id="fullscreenToggleBtn">⛶ 全画面切替</button>
+    </div>
+  </div>
+
+  <div class="settings-group" style="padding: 8px 12px; border-bottom: 1px solid var(--border-weak); background: rgba(0,0,0,0.2);">
+    <div style="display: flex; gap: 4px; margin-bottom: 4px;">
+      <button class="btn-utility" onclick="exportSaveData()" style="flex:1; white-space: nowrap;">データ書出</button>
+      <button class="btn-utility" onclick="importSaveData(document.getElementById('importDataInput').value)" style="flex:1; white-space: nowrap;">データ読込</button>
+    </div>
+    <textarea id="importDataInput" placeholder="ここにセーブ文字列を貼り付け" style="width:100%; height:36px; background:#090611; color:#fff; border:1px solid var(--border-strong); font-size: 0.62rem; padding: 4px; border-radius: 4px; resize: none;"></textarea>
+  </div>
+  
+  <div class="stat-scroller-box">
+    <div class="stat-item-line"><span>この世界線の経過時間</span><span id="s-run-time">0.0s</span></div>
+    <div class="stat-item-line"><span>全期間の総稼働時間</span><span id="s-total-time">0.0s</span></div>
+    <div class="stat-item-line"><span>総コアクリック回数</span><span id="s-clicks">0</span></div>
+    <div class="stat-item-line"><span>反物質転生回数</span><span id="s-p-am">0</span></div>
+    <div class="stat-item-line"><span>時間軸切断回数</span><span id="s-p-tl">0</span></div>
+    <div class="stat-item-line"><span>統合銀河数</span><span id="s-galaxy-nodes">0</span></div>
+    <div class="stat-item-line"><span>反物質による純増幅倍率</span><span id="s-mult-am" style="color:var(--color-antimatter)">100%</span></div>
+    <div class="stat-item-line"><span>時間加速フィールド</span><span id="s-mult-time" style="color:var(--color-timeline)">+0%</span></div>
+    <div class="stat-item-line"><span>銀河共鳴パッシブ効果</span><span id="s-mult-galaxy" style="color:var(--color-galaxy)">1.00x</span></div>
+    <div class="stat-item-line" style="margin-top:8px; border-top:1px solid rgba(255,255,255,0.05)">
+      <span style="color:var(--color-upgrade)">オートセーブ状況</span><span id="s-save-status" style="color:var(--color-energy)">稼働中</span>
+    </div>
+  </div>
+
+  <div class="right-header" style="border-top:1px solid var(--border-weak)">MOD SYSTEM LOADER (拡張モジュール)</div>
+  <div class="mod-loader-container">
+    <textarea class="mod-input-area" id="modCodeInput" placeholder="// ここにMODのJavaScriptコードを貼り付け"></textarea>
+    <div class="mod-control-bar">
+      <input type="file" id="modFileSelector" accept=".js" style="display:none;" onchange="loadModFromFile(event)">
+      <button class="btn-utility" onclick="document.getElementById('modFileSelector').click()">JSファイル選択</button>
+      <button class="btn-utility" style="color:var(--color-energy); border-color:var(--color-energy);" onclick="loadModFromTextarea()">MODを適用</button>
+    </div>
+  </div>
+
+  <div class="right-header">SYSTEM LOG (宇宙の因果履歴)</div>
+  <div class="log-stream-box" id="logBox"></div>
+
+<!-- ① 専用のブラウザ警告モーダル（ページ読み込み時に自動で出る） -->
+<div id="browserWarningModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:999999; align-items:center; justify-content:center;">
+  <div style="background:var(--bg-panel, #1a1a1a); border:2px solid #ff4444; padding:25px; border-radius:10px; width:340px; text-align:center; box-shadow: 0 0 20px rgba(255,68,68,0.4);">
+    <div style="font-size:1rem; font-weight:900; color:#ff4444; margin-bottom:12px;">⚠️ 推奨ブラウザのお知らせ</div>
+    <div style="font-size:0.75rem; color:var(--text-muted, #ccc); margin-bottom:20px; line-height:1.5;">
+      現在ご利用のブラウザ（Firefox / Floorp系）では、動作が重く感じられるか、正常に動作しない場合があります。<br><br>快適に遊ぶためには <b>Google Chrome</b> などのChrome系ブラウザをおすすめします。
+    </div>
+    <button class="btn-utility" onclick="closeBrowserWarning()" style="width:100%; padding:10px; font-weight:bold; background:#ff4444; color:#fff; border:none; border-radius:5px; cursor:pointer;">理解して閉じる</button>
+  </div>
+</div>
+
+<!-- ② 言語設定モーダル（設定画面の「🌐 言語」ボタンから開く） -->
+<div id="langModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:99999; align-items:center; justify-content:center;">
+  <div style="background:var(--bg-panel, #1a1a1a); border:1px solid var(--border-strong, #444); padding:20px; border-radius:8px; width:320px; text-align:center; display:flex; flex-direction:column; max-height:80vh;">
+    
+    <div style="font-size:0.85rem; font-weight:900; color:#fff; margin-bottom:4px;">LANGUAGES / 言語設定</div>
+    <div style="font-size:0.68rem; color:var(--text-muted, #ccc); margin-bottom:12px;">表示言語を選択してください</div>
+    
+    <!-- 🔍 検索バー -->
+    <input type="text" id="langSearch" placeholder="Search language..." onkeyup="filterLanguages()" style="padding: 8px 10px; margin-bottom: 12px; border-radius: 4px; border: 1px solid var(--border-strong, #444); background: #222; color: white; font-size: 0.8rem; outline: none;">
+
+    <!-- 🌐 言語ボタンが入るリスト（スクロール可能） -->
+    <div id="langList" style="display:flex; flex-direction:column; gap:6px; margin-bottom:15px; overflow-y:auto; max-height:250px; padding-right:2px;">
+      <!-- JavaScriptで自動生成されます -->
+    </div>
+    
+    <button class="btn-utility" onclick="toggleLangMenu()" style="width:100%; padding:6px;">閉じる</button>
+  </div>
+</div>
+
+<!-- ③ 🎛️ 設定モーダルウィンドウ（中央ポップアップ） -->
+
+<div id="controlsModalOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.75); z-index:100000; justify-content:center; align-items:center; padding:15px; box-sizing:border-box;">
+  <div style="background:rgba(15,10,25,.98); border:1px solid #444; border-radius:8px; width:100%; max-width:460px; overflow:hidden;">
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px solid #333;">
+      <span style="font-size:.85rem; font-weight:bold; color:#00ffcc;">🎮 操作設定</span>
+      <button type="button" onclick="toggleControlsMenu()" style="background:none;border:none;color:#aaa;font-size:1.1rem;cursor:pointer;">✕</button>
+    </div>
+    <div style="padding:14px; display:flex; flex-direction:column; gap:8px; font-size:.72rem; color:#ddd; max-height:78vh; overflow:auto;">
+      <div>キーボードと Xbox / Switch Pro などに対応。図の色と同じボタンです。項目を押すと割り当てを変えられます。</div>
+      <div id="padStatus" style="color:#ffea00;">コントローラー: 未接続</div>
+      <div id="padProfileRow" style="display:flex;flex-wrap:wrap;gap:4px;">
+        <button type="button" class="btn-utility pad-prof" data-prof="auto">自動</button>
+        <button type="button" class="btn-utility pad-prof" data-prof="xbox">Xbox</button>
+        <button type="button" class="btn-utility pad-prof" data-prof="switch">Switch Pro</button>
+        <button type="button" class="btn-utility pad-prof" data-prof="joyl">Joy-Con L</button>
+        <button type="button" class="btn-utility pad-prof" data-prof="joyr">Joy-Con R</button>
+        <button type="button" class="btn-utility pad-prof" data-prof="joypair">Joy-Con 両方</button>
+      </div>
+      <div style="color:#94a3b8;font-size:.65rem;">Joy-Conは左右1本でも両方でも使えます。左スティックで移動、右のAで決定、Bで戻る。スティックは画面のその方向へ移動します。押し始め0.1秒は連打しません。</div>
+      <svg viewBox="0 0 260 150" width="100%" height="120" aria-label="controller diagram">
+        <rect x="40" y="38" width="180" height="78" rx="28" fill="#1a1228" stroke="#445"/>
+        <circle cx="86" cy="78" r="16" fill="#222" stroke="#666"/>
+        <rect x="80" y="62" width="12" height="8" fill="#e5e7eb"/>
+        <rect x="80" y="86" width="12" height="8" fill="#e5e7eb"/>
+        <rect x="70" y="74" width="8" height="12" fill="#e5e7eb"/>
+        <rect x="94" y="74" width="8" height="12" fill="#e5e7eb"/>
+        <circle cx="188" cy="92" r="9" fill="#22c55e"/><text x="188" y="95" text-anchor="middle" font-size="8" fill="#041">A</text>
+        <circle cx="206" cy="76" r="9" fill="#ef4444"/><text x="206" y="79" text-anchor="middle" font-size="8" fill="#fff">B</text>
+        <circle cx="170" cy="76" r="9" fill="#60a5fa"/><text x="170" y="79" text-anchor="middle" font-size="8" fill="#021">X</text>
+        <circle cx="188" cy="60" r="9" fill="#facc15"/><text x="188" y="63" text-anchor="middle" font-size="8" fill="#321">Y</text>
+        <rect x="70" y="28" width="28" height="8" rx="3" fill="#a78bfa"/>
+        <rect x="162" y="28" width="28" height="8" rx="3" fill="#fb7185"/>
+        <text x="84" y="24" text-anchor="middle" font-size="7" fill="#c4b5fd">L</text>
+        <text x="176" y="24" text-anchor="middle" font-size="7" fill="#fda4af">R</text>
+        <text x="130" y="136" text-anchor="middle" font-size="8" fill="#94a3b8">緑=決定 赤=戻る 紫=左タブ 桃=右タブ</text>
+      </svg>
+      <div style="line-height:1.5;">
+        十字 / スティック … UI移動<br>
+        <span style="color:#22c55e;">A 緑</span> … 決定 / フォーカス中のボタン<br>
+        <span style="color:#ef4444;">B 赤</span> … 戻る / メニューを閉じる<br>
+        <span style="color:#a78bfa;">L</span> / <span style="color:#fb7185;">R</span> … タブ切替<br>
+        START … 操作メニュー
+      </div>
+      <div id="bindList"></div>
+      <div style="display:flex; gap:6px; margin-top:6px;">
+        <button type="button" class="btn-utility" id="bindResetBtn">初期設定に戻す</button>
+        <button type="button" class="btn-utility" onclick="toggleControlsMenu()">閉じる</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="settingsModalOverlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 99999; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;">
+  <div style="background: rgba(15,10,25,0.98); border: 1px solid var(--border-strong, #444); border-radius: 8px; width: 100%; max-width: 440px; box-shadow: 0 8px 25px rgba(0,0,0,0.6); overflow: hidden; font-family: sans-serif; box-sizing: border-box;">
+    
+    <!-- モーダルヘッダー -->
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(10,6,20,0.9); border-bottom: 1px solid var(--border-weak, #333);">
+      <span style="font-size: 0.85rem; font-weight: bold; color: var(--color-upgrade, #4caf50);">⚙️ GAME SETTINGS (設定)</span>
+      <button onclick="toggleSettingsMenu()" style="background: none; border: none; color: #aaa; font-size: 1.1rem; cursor: pointer; padding: 0 4px;">✕</button>
+    </div>
+
+    <!-- モーダルコンテンツ -->
+    <div style="padding: 16px; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box; max-height: 78vh; overflow: auto;">
+      <div style="display: flex; width: 100%;">
+        <button class="btn-utility" onclick="location.href='index.html'" style="width: 100%; white-space: nowrap; color: var(--color-energy); border-color: var(--color-energy); cursor: pointer;">🏠 ホームに戻る</button>
+      </div>
+      <div style="display: flex; width: 100%;">
+        <button class="btn-utility" type="button" onclick="toggleAboutGame()" style="width: 100%; white-space: nowrap; color: var(--color-upgrade); border-color: var(--color-upgrade); cursor: pointer; font-weight: bold;">📘 ゲームについて</button>
+      </div>
+      <!-- ボタン行 1 -->
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; width: 100%;">
+        <button class="btn-utility" id="bgmBtn" onclick="toggleBGM()" style="color: var(--color-energy); border-color: var(--color-energy); font-weight: bold;">BGM: OFF</button>
+        <button class="btn-utility" onclick="saveAndReloadGame()" style="flex: 1 1 150px; min-width: 0; color: var(--color-timeline); border-color: var(--color-timeline); white-space: nowrap;">保存して再読込</button>
+      </div>
+
+      <!-- ボタン行 2 -->
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; width: 100%;">
+        <button class="btn-utility" onclick="toggleLangMenu(); toggleSettingsMenu();" style="flex: 1 1 130px; min-width: 0; color: var(--color-upgrade); border-color: var(--color-upgrade); white-space: nowrap;">🌐 言語</button>
+       <button id="lightweightToggleBtn" onclick="toggleLightweightMode()" class="product-btn" style="padding: 8px 10px; background: #333; color: white; border: 1px solid #444; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">
+  ⚡ 軽量化切替
+</button>
+      </div>
+
+      <div id="omegaSettingsHost" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-weak, #333); border-radius: 6px; padding: 10px; box-sizing: border-box;"></div>
+      <!-- ボタン行 3: リセット -->
+      <div style="display: flex; width: 100%;">
+        <button class="btn-utility btn-danger" onclick="hardResetGame()" style="width: 100%; white-space: nowrap;">⚠️ リセット</button>
+      </div>
+      <!-- 🌟 描画・パフォーマンス設定セクション（5段階対応） -->
+      <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-weak, #333); border-radius: 6px; padding: 10px; margin-top: 4px; box-sizing: border-box;">
+        <div style="font-size: 0.7rem; font-weight: bold; color: var(--text-muted, #aaa); margin-bottom: 6px; letter-spacing: 1px;">📺 描画品質（ウルトラ〜獄低）</div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; width: 100%;">
+          <button id="renderModeBtn" onclick="cycleRenderQuality()" class="btn-utility" style="flex: 1 1 100%; min-width: 0; color: #00ffcc; border-color: rgba(0,255,204,0.4); white-space: nowrap; font-weight: bold; text-align: center;">
+            描画品質: 高 (60fps)
+          </button>
+        </div>
+      </div>
+　　　<button class="btn-utility" id="controlsMenuBtn" onclick="toggleControlsMenu()" style="color: var(--color-energy); border-color: var(--color-energy); white-space: nowrap; font-weight: bold;">🎮 操作</button>
+    </div>
+  </div>
+</div>
+
+</div>
+<div id="google_translate_element" style="display:none;"></div>
+
+
+  <script src="js/mz-part-07.js"></script>
+
+<script src="js/mz-part-08.js"></script>
+
+
+<!-- ===== OMEGA FEATURE PACK (append-only / original layout colors kept) ===== -->
+<style id="omegaFeaturePackCss">
+  #playView{
+    width:min(100%,360px);
+    margin:8px auto 0;
+    background:rgba(8,4,20,.88);
+    border:1px solid rgba(0,255,204,.28);
+    border-radius:10px;
+    padding:8px 9px 8px;
+    font-size:.62rem;
+    color:#d4d4d8;
+    contain:layout style;
+    position:relative;
+    z-index:3;
+  }
+  #playView .pv-title{
+    font-weight:900;letter-spacing:.12em;color:#00ffcc;margin-bottom:6px;
+    display:flex;justify-content:space-between;align-items:center;gap:8px;
+  }
+  #playView .pv-title b{color:#ffea00;font-weight:900;letter-spacing:.08em}
+  #playView .pv-row{display:flex;justify-content:space-between;gap:8px;margin:2px 0}
+  #playView .pv-val{color:#ffea00;font-weight:700}
+  #playView .pv-bar{
+    height:8px;border-radius:99px;background:rgba(255,255,255,.08);
+    border:1px solid rgba(0,255,204,.2);overflow:hidden;margin:4px 0 6px;
+  }
+  #playView .pv-bar > i{
+    display:block;height:100%;width:0%;
+    background:linear-gradient(90deg,#00ffcc,#ffea00,#3a86ff);
+    box-shadow:0 0 10px rgba(0,255,204,.45);
+  }
+  #playView .pv-dop{
+    height:8px;border-radius:99px;background:rgba(255,234,0,.08);
+    border:1px solid rgba(255,234,0,.28);overflow:hidden;margin:2px 0 6px;
+  }
+  #playView .pv-dop > i{
+    display:block;height:100%;width:0%;
+    background:linear-gradient(90deg,#ffea00,#00ffcc);
+  }
+  #playView .pv-chipwrap{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+  #playView .pv-chip{
+    border:1px solid rgba(0,255,204,.28);background:rgba(0,0,0,.28);
+    color:#f4f4f5;border-radius:8px;padding:3px 6px;font-size:.58rem;
+  }
+  #playView .pv-chip.bad{border-color:rgba(255,0,85,.45)}
+  #playView .pv-log{
+    margin-top:5px;max-height:64px;overflow:hidden;color:#9ca3af;line-height:1.35;
+  }
+  #pvOrbs{
+    position:fixed;inset:0;pointer-events:none;z-index:40;
+  }
+  #pvOrbs .pv-orb{
+    position:absolute;width:22px;height:22px;border-radius:50%;
+    pointer-events:auto;cursor:pointer;
+    box-shadow:0 0 12px currentColor;
+    border:1px solid rgba(255,255,255,.35);
+    transform:translate(-50%,-50%);
+  }
+  #pvOrbs .pv-orb.lucky{background:radial-gradient(circle at 30% 30%,#fff,#00ffcc 45%,#003 80%);color:#00ffcc}
+  #pvOrbs .pv-orb.unlucky{background:radial-gradient(circle at 30% 30%,#fff,#ff0055 45%,#200 80%);color:#ff0055}
+  #pvToast{
+    position:fixed;left:12px;bottom:12px;z-index:60;width:min(280px,46vw);
+    pointer-events:none;display:flex;flex-direction:column;gap:4px;
+  }
+  #pvToast .pvt{
+    background:rgba(8,4,20,.92);border:1px solid rgba(0,255,204,.3);
+    color:#f4f4f5;border-radius:8px;padding:6px 8px;font-size:.62rem;
+    animation:pvIn .18s ease-out;
+  }
+  #pvToast .pvt.bad{border-color:rgba(255,0,85,.45)}
+  @keyframes pvIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @media (max-width:820px){
+    #pvToast{left:8px;right:8px;width:auto;bottom:8px}
+    #playView{width:min(100%,360px)}
+  }
+  #playView .pv-bar > i, #playView .pv-dop > i{
+    transition:width .35s ease;
+  }
+  #playView.pv-flash{
+    animation:pvFlash .45s ease;
+  }
+  @keyframes pvFlash{
+    0%{box-shadow:0 0 0 0 rgba(0,255,204,.0)}
+    35%{box-shadow:0 0 18px 2px rgba(0,255,204,.35)}
+    100%{box-shadow:0 0 0 0 rgba(0,255,204,.0)}
+  }
+  #playView.pv-flash-bad{
+    animation:pvFlashBad .45s ease;
+  }
+  @keyframes pvFlashBad{
+    0%{box-shadow:0 0 0 0 rgba(255,0,85,.0)}
+    35%{box-shadow:0 0 18px 2px rgba(255,0,85,.35)}
+    100%{box-shadow:0 0 0 0 rgba(255,0,85,.0)}
+  }
+  .pv-ripple{
+    position:fixed;border-radius:50%;pointer-events:none;z-index:45;
+    border:2px solid rgba(0,255,204,.65);
+    animation:pvRipple .55s ease-out forwards;
+  }
+  .pv-ripple.bad{border-color:rgba(255,0,85,.7)}
+  @keyframes pvRipple{
+    0%{transform:translate(-50%,-50%) scale(.2);opacity:.9}
+    100%{transform:translate(-50%,-50%) scale(2.4);opacity:0}
+  }
+  .pv-float{
+    position:fixed;pointer-events:none;z-index:46;font-weight:900;
+    font-size:.72rem;color:#00ffcc;text-shadow:0 0 8px #00ffcc;
+    animation:pvFloat .7s ease-out forwards;
+  }
+  .pv-float.bad{color:#ff0055;text-shadow:0 0 8px #ff0055}
+  @keyframes pvFloat{
+    0%{transform:translate(-50%,0);opacity:1}
+    100%{transform:translate(-50%,-28px);opacity:0}
+  }
+  #coreTrigger.pv-tap-pulse{animation:pvTapPulse .18s ease-out}
+  @keyframes pvTapPulse{
+    0%{filter:brightness(1)}
+    40%{filter:brightness(1.35)}
+    100%{filter:brightness(1)}
+  }
+</style>
+<script src="js/mz-part-09.js"></script>
+
+
+<style id="omegaQuizCss">
+#omegaQuiz{
+  position:fixed;left:50%;top:42%;transform:translate(-50%,-50%);
+  z-index:200020;width:min(340px,88vw);
+  background:rgba(8,4,20,.96);
+  border:1px solid rgba(0,255,204,.4);
+  border-radius:12px;padding:12px 12px 10px;
+  color:#f4f4f5;display:none;
+  box-shadow:0 10px 40px rgba(0,0,0,.55);
+}
+#omegaQuiz.show{display:block;animation:pvIn .18s ease-out}
+#omegaQuiz .qz-k{font-size:.58rem;letter-spacing:.14em;color:#ffea00;font-weight:800}
+#omegaQuiz .qz-q{margin:8px 0 10px;font-size:.82rem;font-weight:800;line-height:1.45;color:#00ffcc}
+#omegaQuiz button.qz-a{
+  display:block;width:100%;margin:5px 0;padding:8px 8px;
+  background:rgba(0,255,204,.08);border:1px solid rgba(0,255,204,.3);
+  color:#fff;border-radius:8px;font-size:.72rem;font-weight:700;cursor:pointer;
+}
+#omegaQuiz button.qz-a:hover{border-color:#ffea00}
+#omegaQuiz .qz-s{margin-top:6px;font-size:.62rem;color:#9ca3af}
+</style>
+<script src="js/mz-part-10.js"></script>
+
+
+<script src="js/mz-part-11.js"></script>
+
+
+<script src="js/mz-part-12.js"></script>
+
+
+<style>
+#playviewTabBody .pv-sec{margin:0 0 14px;padding:10px;border:1px solid rgba(0,255,204,.22);border-radius:10px;background:rgba(8,4,20,.45)}
+#playviewTabBody .pv-sec h3{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;color:#00ffcc}
+#playviewTabBody .pv-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#playviewTabBody .pv-item{border:1px solid rgba(255,234,0,.22);border-radius:8px;padding:8px;font-size:.68rem;color:#d4d4d8}
+#playviewTabBody .pv-item b{color:#ffea00;display:block;margin-bottom:4px}
+#playviewTabBody .pv-item.on{border-color:rgba(0,255,204,.45)}
+#playviewTabBody .pv-barx{height:7px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:6px}
+#playviewTabBody .pv-barx>i{display:block;height:100%;background:linear-gradient(90deg,#00ffcc,#ffea00)}
+@media (max-width:820px){#playviewTabBody .pv-grid{grid-template-columns:1fr}}
+</style>
+<script src="js/mz-part-13.js"></script>
+
+
+<script src="js/mz-part-14.js"></script>
+
+
+<div id="aboutGameOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.78); z-index:100050; justify-content:center; align-items:center; padding:15px; box-sizing:border-box;">
+  <div style="background:rgba(15,10,25,0.98); border:1px solid var(--border-strong,#444); border-radius:8px; width:100%; max-width:520px; max-height:min(82vh,640px); display:flex; flex-direction:column; box-shadow:0 8px 25px rgba(0,0,0,0.6); overflow:hidden;">
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:rgba(10,6,20,0.9); border-bottom:1px solid var(--border-weak,#333);">
+      <span style="font-size:0.85rem; font-weight:bold; color:var(--color-upgrade,#ffea00);">📘 ゲームについて</span>
+      <button type="button" onclick="toggleAboutGame(false)" style="background:none; border:none; color:#aaa; font-size:1.1rem; cursor:pointer; padding:0 4px;">✕</button>
+    </div>
+    <div id="aboutGameBody" style="padding:14px 16px; overflow-y:auto; font-size:0.74rem; line-height:1.7; color:#d4d4d8;">
+      <p style="margin:0 0 10px; color:#00ffcc; font-weight:800;">インクリメンタル絶対神 — INFINITY MATRIX OMEGA</p>
+      <p>コアをタップしてエネルギーを集め、施設・改良・転生を重ねてどこまでも大きくしていくクリック／放置ゲームです。ゴールの目安はエネルギー <b>1e1000</b> です。</p>
+      <p style="color:#ffea00; font-weight:800; margin:12px 0 4px;">基本操作</p>
+      <p>左の大きな <b>TAP CORE</b> を押すとエネルギーが増えます。連続で押すとコンボが伸びます。右上の設定からセーブ、BGM、画質、操作方法を変えられます。</p>
+      <p style="color:#ffea00; font-weight:800; margin:12px 0 4px;">中央のタブ</p>
+      <p><b>MATERIAL</b> … 施設を買って自動生産（毎秒のエネルギー）。<br>
+      <b>CONCEPT</b> … タップや生産を強くする改良。<br>
+      <b>ANTIMATTER</b> … 反物質で買う上級改良。転生「反物質化」でAMを得ます。<br>
+      <b>TIME</b> … 時間律の破片で買う改良。ゲームの進み方が速くなります。<br>
+      <b>AUTOMATION</b> … 条件を満たすと自動購入などが動きます。<br>
+      <b>ACHIEVEMENTS</b> … 実績と称号。<br>
+      <b>PLAY VIEW</b> … 週課題・熟練・遺物・研究などのやりこみ一覧です。</p>
+      <p style="color:#ffea00; font-weight:800; margin:12px 0 4px;">転生</p>
+      <p>左の <b>反物質化 / 時間軸の切断 / 銀河系の統合</b> で下の層をリセットし、上位の資源を残します。転生してもレガシーや遺物などのやりこみ記録は残ります。</p>
+      <p style="color:#ffea00; font-weight:800; margin:12px 0 4px;">スキルとイベント</p>
+      <p><b>フィーバー</b> はレベル制です。使うほど経験が溜まり、効果と時間が伸びます。<b>シールド</b> は次のアンラッキーを1回防ぎます。<b>イベント召喚</b> はラッキー寄りのイベントを呼びます。<br>
+      宇宙イベントは実時間で間隔が空きます。クイズイベントは正解で +100 E、ミスで -1000 E です。</p>
+      <p style="color:#ffea00; font-weight:800; margin:12px 0 4px;">PLAY VIEW（左とタブ）</p>
+      <p>左カラムの PLAY VIEW はいまの進捗の要約です。中央タブの PLAY VIEW は詳細です。<br>
+      デイリー3種、週課題（週替わり）、熟練8本、遺物、研究ポイント、レガシーレベル、図鑑、星座、章があります。研究ポイントはタブ内の理論と交換できます。</p>
+      <p style="color:#ffea00; font-weight:800; margin:12px 0 4px;">数字について</p>
+      <p>エネルギーはとても大きくなるので、decimal.js で計算しています。反物質や時間律の高い番号も同じ仕組みです。画質を下げると軽くなります。</p>
+      <p style="color:#9ca3af; margin-top:12px;">© 2026 HTsatoweb / INFINITY MATRIX OMEGA</p>
+    </div>
+  </div>
+</div>
+<script src="js/mz-part-15.js"></script>
+
+
+<div id="factoryDetailOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:100040;justify-content:center;align-items:center;padding:15px;box-sizing:border-box;">
+  <div style="background:rgba(15,10,25,.98);border:1px solid var(--border-strong,#444);border-radius:8px;width:100%;max-width:440px;max-height:min(80vh,560px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 25px rgba(0,0,0,.6);">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:rgba(10,6,20,.9);border-bottom:1px solid var(--border-weak,#333);">
+      <span id="facDetTitle" style="font-size:.85rem;font-weight:800;color:var(--color-energy);">施設</span>
+      <button type="button" onclick="closeFactoryDetail()" style="background:none;border:none;color:#aaa;font-size:1.1rem;cursor:pointer;">✕</button>
+    </div>
+    <div style="padding:14px 16px;overflow-y:auto;font-size:.74rem;line-height:1.65;color:#d4d4d8;">
+      <p id="facDetDesc" style="margin:0 0 10px;"></p>
+      <div id="facDetStats" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;"></div>
+      <div style="background:rgba(0,0,0,.28);border:1px solid rgba(0,255,204,.22);border-radius:8px;padding:8px;color:#9ca3af;font-size:.68rem;">
+        所持数の右の <b style="color:#ffea00">/s</b> はその施設全体の毎秒生産です。<br>
+        コストの <b style="color:#00ffcc">E</b> はエネルギーです。Shift+クリックで説明を飛ばして購入できます。
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;padding:10px 16px;border-top:1px solid var(--border-weak,#333);">
+      <button type="button" class="btn-utility" onclick="closeFactoryDetail()" style="flex:1;">閉じる</button>
+      <button type="button" class="btn-utility" id="facDetBuy" style="flex:1;color:var(--color-energy);border-color:var(--color-energy);font-weight:800;">購入する</button>
+    </div>
+  </div>
+</div>
+<script src="js/mz-part-16.js"></script>
+
+
+<script src="js/mz-part-17.js"></script>
+
+<style id="dopa-pack-css">
+/* extras stay inside existing columns — no corner overlays */
+#funBar{position:relative}
+#dopaFab{font-weight:800}
+#dopaPanel{
+  display:none;position:absolute;left:0;right:0;top:100%;
+  margin-top:6px;max-height:min(42vh,320px);overflow:auto;z-index:40;
+  background:rgba(8,6,18,.97);border:1px solid rgba(255,255,255,.14);
+  border-radius:10px;padding:8px;color:#f4f4f5;
+}
+#dopaPanel.open{display:block}
+#dopaPanel h3{margin:0 0 6px;font-size:12px}
+.dopa-row{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:11px}
+.dopa-chip{border:0;border-radius:999px;padding:3px 7px;font-size:10px;cursor:pointer;background:rgba(255,255,255,.1);color:#fff}
+.dopa-chip.on{background:var(--color-energy);color:#061018;font-weight:800}
+.dopa-grid{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}
+#dopaInlinePet{margin-left:6px}
+.dopa-float-num{position:fixed;pointer-events:none;z-index:30;font-weight:900;color:var(--color-energy);text-shadow:0 0 8px var(--color-energy);animation:dopaUp 650ms ease-out forwards}
+@keyframes dopaUp{to{transform:translateY(-40px);opacity:0}}
+#coreTrigger.dopa-shake{animation:dopaShake .16s linear}
+@keyframes dopaShake{0%,100%{transform:scale(1)}40%{transform:scale(.97) rotate(-1deg)}70%{transform:scale(1.02) rotate(1deg)}}
+#funBar button{min-height:34px}
+@media (max-width:820px){
+  #dopaPanel{left:0;right:0;max-height:38vh}
+  #funBar{flex-wrap:wrap}
+  .dopa-chip{min-height:32px;padding:6px 10px}
+}
+#dopaSysCard .dopa-q{margin:4px 0;font-size:12px}
+#dopaSysCard .dopa-q b{color:var(--color-energy)}
+#eh-offline{margin-left:6px}
+
+html.dopa-theme-mint{--bg-main:#02140f;--bg-panel:rgba(4,36,28,.92);--bg-card:rgba(8,48,38,.7);--color-energy:#00ffcc;--color-upgrade:#7dffd2;--color-antimatter:#ff5d8f;--color-timeline:#5eead4;--color-galaxy:#67e8f9}
+html.dopa-theme-sunset{--bg-main:#1a0802;--bg-panel:rgba(48,16,6,.94);--bg-card:rgba(72,24,8,.72);--color-energy:#ff7a18;--color-upgrade:#ffd166;--color-antimatter:#ff4d6d;--color-timeline:#fb7185;--color-galaxy:#fdba74}
+html.dopa-theme-aurora{--bg-main:#12061c;--bg-panel:rgba(28,8,48,.94);--bg-card:rgba(46,14,72,.7);--color-energy:#c084fc;--color-upgrade:#f0abfc;--color-antimatter:#fb7185;--color-timeline:#a78bfa;--color-galaxy:#67e8f9}
+html.dopa-theme-ocean{--bg-main:#03101c;--bg-panel:rgba(6,24,48,.94);--bg-card:rgba(8,36,72,.7);--color-energy:#38bdf8;--color-upgrade:#7dd3fc;--color-antimatter:#fb7185;--color-timeline:#818cf8;--color-galaxy:#22d3ee}
+html.dopa-theme-lemon{--bg-main:#141402;--bg-panel:rgba(40,40,6,.94);--bg-card:rgba(58,58,10,.7);--color-energy:#facc15;--color-upgrade:#fde047;--color-antimatter:#fb7185;--color-timeline:#f59e0b;--color-galaxy:#a3e635}
+html.dopa-theme-sakura{--bg-main:#1a0810;--bg-panel:rgba(48,10,24,.94);--bg-card:rgba(72,16,36,.7);--color-energy:#fb7185;--color-upgrade:#fecdd3;--color-antimatter:#fb7185;--color-timeline:#f472b6;--color-galaxy:#fda4af}
+html.dopa-theme-forest{--bg-main:#06140a;--bg-panel:rgba(8,36,16,.94);--bg-card:rgba(12,52,24,.7);--color-energy:#4ade80;--color-upgrade:#bbf7d0;--color-antimatter:#fb7185;--color-timeline:#34d399;--color-galaxy:#86efac}
+html.dopa-theme-ice{--bg-main:#071018;--bg-panel:rgba(10,28,40,.94);--bg-card:rgba(14,40,56,.7);--color-energy:#a5f3fc;--color-upgrade:#e0f2fe;--color-antimatter:#fb7185;--color-timeline:#7dd3fc;--color-galaxy:#bae6fd}
+html.dopa-theme-gold{--bg-main:#140e02;--bg-panel:rgba(42,30,6,.94);--bg-card:rgba(64,46,10,.7);--color-energy:#fbbf24;--color-upgrade:#fde68a;--color-antimatter:#fb7185;--color-timeline:#f59e0b;--color-galaxy:#fcd34d}
+html.dopa-theme-night{--bg-main:#020206;--bg-panel:rgba(10,10,24,.94);--bg-card:rgba(18,18,40,.7);--color-energy:#a5b4fc;--color-upgrade:#c7d2fe;--color-antimatter:#fb7185;--color-timeline:#818cf8;--color-galaxy:#93c5fd}
+html[class*="dopa-theme-"] body{
+  background-color:var(--bg-main);
+  background-image:
+    radial-gradient(circle at 15% 25%, color-mix(in srgb, var(--color-energy) 16%, transparent) 0%, transparent 46%),
+    radial-gradient(circle at 85% 75%, color-mix(in srgb, var(--color-timeline) 14%, transparent) 0%, transparent 46%);
+}
+html[class*="dopa-theme-"] .value-energy,
+html[class*="dopa-theme-"] .core-text-sub,
+html[class*="dopa-theme-"] #displayGodName{color:var(--color-energy)!important;text-shadow:0 0 10px color-mix(in srgb, var(--color-energy) 45%, transparent)}
+html[class*="dopa-theme-"] .click-core-btn{box-shadow:0 0 24px color-mix(in srgb, var(--color-energy) 28%, transparent);border:2px solid color-mix(in srgb, var(--color-energy) 55%, #fff3)}
+html[class*="dopa-theme-"] .game-title{background:linear-gradient(90deg,#fff,var(--color-energy),var(--color-timeline));-webkit-background-clip:text;background-clip:text;color:transparent}
+</style>
+<script src="js/mz-part-18.js"></script>
+
+
+
+<script src="js/mz-part-19.js"></script>
+
+<script src="js/mz-part-20.js"></script>
+<script src="js/mz-part-21.js"></script>
+
+
+<style id="neon-relic-css">
+#coreTrigger.relic-pulse{animation:relicPulse .45s ease}
+@keyframes relicPulse{0%{filter:brightness(1)}40%{filter:brightness(1.45) saturate(1.25)}100%{filter:brightness(1)}}
+#coreTrigger.relic-legend{animation:relicLegend .8s ease}
+@keyframes relicLegend{0%{box-shadow:0 0 0 0 rgba(255,234,0,.0)}40%{box-shadow:0 0 28px 6px rgba(255,234,0,.45)}100%{box-shadow:0 0 0 0 rgba(255,234,0,.0)}}
+#missionBox #relicWeather{opacity:.85;margin-left:6px}
+#relicMailBtn{min-height:34px}
+.relic-letter{white-space:pre-wrap;line-height:1.45;font-size:12px;color:#e5e7eb}
+html.wx-aurora body{box-shadow:inset 0 0 80px rgba(157,78,221,.18)}
+html.wx-solar body{box-shadow:inset 0 0 80px rgba(255,122,24,.16)}
+html.wx-quiet body{box-shadow:inset 0 0 60px rgba(0,255,204,.08)}
+html.wx-meteor body{box-shadow:inset 0 0 90px rgba(58,134,255,.2)}
+</style>
+
+<script src="js/mz-part-22.js"></script>
+
+
+<script src="js/neonEnginePack.js"></script>
+
+
+<script src="js/dopaArcadePack.js"></script>
+
+
+<script src="js/miniArcadeAndGraphFix.js"></script>
+
+<script src="js/mz-graph-engine.js"></script>
+<script src="js/mz-elements-1000.js"></script>
+<script src="js/mz-feel.js"></script>
+<script src="js/mz-variety.js"></script>
+<script src="js/mz-playloop.js"></script>
+</body>
+</html>
