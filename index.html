@@ -751,6 +751,53 @@ body.warping {
   color: #666;
   z-index: 9999;
 }
+
+/* ゲーム終了ボタン：既存UIへの最小追加 */
+.btn-exit-game {
+  background: rgba(255, 0, 85, 0.06);
+  border: 1px solid rgba(255, 0, 85, 0.65);
+  color: #ff6688;
+  font-size: 0.82rem;
+  padding: 12px;
+}
+.btn-exit-game:hover {
+  background: rgba(255, 0, 85, 0.18);
+  border-color: var(--color-antimatter);
+  color: #fff;
+  box-shadow: 0 0 22px rgba(255, 0, 85, 0.3);
+}
+.exit-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 20000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(2, 1, 6, 0.97);
+  color: var(--text-main);
+  text-align: center;
+}
+.exit-screen.active { display: flex; }
+.exit-box {
+  width: 100%;
+  max-width: 440px;
+  padding: 28px;
+  border: 1px solid var(--color-antimatter);
+  border-radius: 12px;
+  background: rgba(15, 5, 15, 0.98);
+  box-shadow: 0 0 35px rgba(255, 0, 85, 0.2);
+}
+.exit-box h2 { color: var(--color-antimatter); font-size: 1rem; letter-spacing: 2px; }
+.exit-box p { color: #d1d5db; font-size: 0.8rem; line-height: 1.7; }
+.exit-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+.exit-actions button {
+  width: 100%; padding: 12px; border-radius: 6px; cursor: pointer;
+  color: var(--text-main); background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.25); font-weight: 800;
+}
+.exit-actions button:hover { border-color: var(--color-energy); }
+
 </style>
 </head>
 <body>
@@ -820,9 +867,23 @@ body.warping {
     <a href="download.html" class="btn-menu" style="display: flex; align-items: center; justify-content: center; text-decoration: none; border-color: var(--color-galaxy); color: var(--color-galaxy); background: rgba(58, 134, 255, 0.05);">
         📥 ダウンロードターミナル
     </a>
+    <button class="btn-menu btn-exit-game" id="exitGameBtn" type="button">■ ゲームを終了する</button>
   </div>
 
   <div class="version-tag">home v6.2</div>
+</div>
+
+<div class="exit-screen" id="exitScreen" role="dialog" aria-modal="true" aria-labelledby="exitTitle">
+  <div class="exit-box">
+    <h2 id="exitTitle">GAME SESSION ENDED</h2>
+    <p>ゲームの音声と演出を停止しました。<br>
+    ブラウザーの安全機能により、このページからタブを自動で閉じられない場合があります。</p>
+    <p><strong>タブを閉じる：</strong> Windowsでは <kbd>Ctrl</kbd> + <kbd>W</kbd>、またはタブの「×」を押してください。</p>
+    <div class="exit-actions">
+      <button type="button" id="tryCloseWindowBtn">もう一度ウィンドウを閉じる</button>
+      <button type="button" id="returnFromExitBtn">ゲームメニューに戻る</button>
+    </div>
+  </div>
 </div>
 
 <div class="reset-modal" id="resetModal">
@@ -1230,6 +1291,62 @@ document.querySelectorAll('.checkbox-label').forEach(label => {
     checkbox.checked = !checkbox.checked;
   });
 });
+
+// ゲーム終了：可能な環境ではタブ/ウィンドウを閉じ、禁止された場合は終了案内を表示
+(() => {
+  const exitBtn = document.getElementById('exitGameBtn');
+  const exitScreen = document.getElementById('exitScreen');
+  const tryCloseBtn = document.getElementById('tryCloseWindowBtn');
+  const returnBtn = document.getElementById('returnFromExitBtn');
+  let ended = false;
+
+  function stopGameSession() {
+    ended = true;
+    try {
+      if (typeof KimoSoundManager !== 'undefined') {
+        KimoSoundManager.bgmPlaying = false;
+        if (KimoSoundManager.audioCtx && KimoSoundManager.audioCtx.state !== 'closed') {
+          KimoSoundManager.audioCtx.close().catch(() => {});
+        }
+      }
+    } catch (_) {}
+    try { document.body.classList.remove('warping'); } catch (_) {}
+    try { document.body.classList.remove('activated'); } catch (_) {}
+    try { document.exitFullscreen?.().catch(() => {}); } catch (_) {}
+  }
+
+  function tryCloseWindow() {
+    // window.close() はブラウザーが許可したスクリプト起動タブ等でのみ成功します。
+    try { window.open('', '_self'); } catch (_) {}
+    try { window.close(); } catch (_) {}
+    // 閉じられなかった場合はブラウザーの制限なので、終了案内を表示します。
+    window.setTimeout(() => {
+      if (!window.closed) {
+        exitScreen.classList.add('active');
+        exitScreen.style.display = 'flex';
+      }
+    }, 150);
+  }
+
+  exitBtn?.addEventListener('click', () => {
+    if (ended) return;
+    stopGameSession();
+    tryCloseWindow();
+  });
+
+  tryCloseBtn?.addEventListener('click', () => {
+    stopGameSession();
+    tryCloseWindow();
+  });
+
+  returnBtn?.addEventListener('click', () => {
+    exitScreen.classList.remove('active');
+    exitScreen.style.display = 'none';
+    document.body.classList.add('activated');
+    ended = false;
+    // AudioContext は終了時に閉じているため、BGMは自動再開しません。
+  });
+})();
 </script>
 </body>
 </html>
