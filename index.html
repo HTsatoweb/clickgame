@@ -1315,11 +1315,21 @@ document.querySelectorAll('.checkbox-label').forEach(label => {
     try { document.exitFullscreen?.().catch(() => {}); } catch (_) {}
   }
 
-  function tryCloseWindow() {
-    // window.close() はブラウザーが許可したスクリプト起動タブ等でのみ成功します。
+  async function tryCloseWindow() {
+    // pywebview で実行中なら、Python 側の終了APIを呼び出してアプリ本体を閉じます。
+    try {
+      if (window.pywebview && window.pywebview.api &&
+          typeof window.pywebview.api.close_app === 'function') {
+        await window.pywebview.api.close_app();
+        return;
+      }
+    } catch (err) {
+      console.warn('アプリ終了APIを呼び出せませんでした:', err);
+    }
+
+    // 通常のブラウザーでは、許可されたタブ以外は window.close() が拒否される場合があります。
     try { window.open('', '_self'); } catch (_) {}
     try { window.close(); } catch (_) {}
-    // 閉じられなかった場合はブラウザーの制限なので、終了案内を表示します。
     window.setTimeout(() => {
       if (!window.closed) {
         exitScreen.classList.add('active');
