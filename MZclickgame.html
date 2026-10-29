@@ -1,24 +1,26 @@
-:<!doctype html>
+<!doctype html>
 <html lang="ja" translate="no">
 <head>
     <link rel="icon" type="image/png" href="icon.png">
 <meta charset="utf-8" />
+<meta name="description" content="INFINITY MATRIX - OMEGA: a cosmic incremental clicker and automation game." />
+<meta name="theme-color" content="#020106" />
+<script id="omega-storage-compat">
+/* Persistent localStorage where available; session-only fallback for opaque sandboxed origins. */
+(function(){
+  try { var test=window.localStorage, k="__omega_storage_probe__"; test.setItem(k,"1"); test.removeItem(k); return; } catch(e) {}
+  var mem=Object.create(null);
+  var shim={get length(){return Object.keys(mem).length;},key:function(i){return Object.keys(mem)[i]||null;},getItem:function(k){k=String(k);return Object.prototype.hasOwnProperty.call(mem,k)?mem[k]:null;},setItem:function(k,v){mem[String(k)]=String(v);},removeItem:function(k){delete mem[String(k)];},clear:function(){Object.keys(mem).forEach(function(k){delete mem[k];});}};
+  try { Object.defineProperty(window,"localStorage",{configurable:true,value:shim}); } catch(e) {}
+})();
+</script>
+
 <meta name="offline-capable" content="yes">
 <script src="decimal.min.js"></script>
 <script>
 if (typeof Decimal === "undefined" && typeof navigator!=="undefined" && navigator.onLine && /^https?:/i.test(location.protocol||"")) {
   document.write('<script src="https://cdn.jsdelivr.net/npm/decimal.js@10.4.3/decimal.min.js"><\/script>');
 }
-</script>
-<script>
-  if (typeof navigator!=="undefined" && navigator.onLine && /^https?:/i.test(location.protocol||"")) {
-    try {
-      var translateScript = document.createElement('script');
-      translateScript.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-      translateScript.onerror = function(){};
-      document.head.appendChild(translateScript);
-    } catch (e) {}
-  }
 </script>
 <script>
 (function(){
@@ -66,74 +68,7 @@ if (typeof Decimal === "undefined" && typeof navigator!=="undefined" && navigato
 <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="google" content="notranslate">
 <title>インクリメンタル絶対神 — INFINITY MATRIX OMEGA — EXACT GRAPH + DOPA PACK —</title>
-  <script>
-  // 他のサイトにiframeで埋め込まれているかを判定
-  if (window.self !== window.top) {
-    // ページ読み込み完了時に警告画面に書き換える
-    document.addEventListener("DOMContentLoaded", () => {
-      document.body.innerHTML = `
-        <div style="
-          position: fixed;
-          inset: 0;
-          background: #020106;
-          color: #f4f4f5;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          font-family: 'Consolas', 'Fira Code', 'Courier New', monospace, system-ui;
-          z-index: 999999;
-          padding: 20px;
-          text-align: center;
-        ">
-          <div style="
-            background: rgba(20, 14, 38, 0.8);
-            border: 1px solid rgba(255, 0, 85, 0.35);
-            border-radius: 12px;
-            padding: 30px;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 0 30px rgba(255, 0, 85, 0.15);
-          ">
-            <h2 style="
-              font-size: 1rem;
-              font-weight: 900;
-              margin: 0 0 16px 0;
-              background: linear-gradient(90deg, #fff, #ff0055);
-              -webkit-background-clip: text;
-              -webkit-text-fill-color: transparent;
-              letter-spacing: 1px;
-            ">ACCESS BLOCKED</h2>
-            
-            <p style="
-              font-size: 0.8rem;
-              color: #bbb;
-              margin: 0 0 20px 0;
-              line-height: 1.5;
-            ">あなたはこのゲームを読み込むことができません</p>
-            
-            <a href="${window.self.location.href}" target="_top" style="
-              display: inline-block;
-              width: 100%;
-              padding: 12px;
-              background: linear-gradient(90deg, #1b0a33, #2f1057);
-              border: 1px solid rgba(157, 78, 221, 0.5);
-              border-radius: 6px;
-              color: #fff;
-              font-size: 0.8rem;
-              font-weight: 900;
-              text-decoration: none;
-              letter-spacing: 1px;
-              box-shadow: 0 0 12px rgba(157, 78, 221, 0.25);
-              transition: all 0.15s;
-              box-sizing: border-box;
-            ">ゲームに飛ぶ</a>
-          </div>
-        </div>
-      `;
-    });
-  }
-</script>
+  
 <style>
  
 :root {
@@ -2468,5 +2403,77 @@ html.wx-meteor body{box-shadow:inset 0 0 90px rgba(58,134,255,.2)}
 <script src="js/mz-core-chara.js"></script>
 <script src="js/mz-corechar.js"></script>
 <script src="js/mz-core-char.js"></script>
+<script src="js/omega-expansion.js"></script>
+<script src="js/ultimateUpdate.js"></script>
+
+<style id="arcade-2d-overhaul">
+/* 2D ARCADE RESKIN — visual-only; game systems, items and values remain intact */
+:root{
+ --bg-main:#090f1c!important;--bg-panel:#101b2c!important;--bg-card:#17283b!important;
+ --color-energy:#5eead4!important;--color-upgrade:#facc15!important;
+ --color-antimatter:#fb7185!important;--color-timeline:#a78bfa!important;
+ --color-galaxy:#60a5fa!important;--color-godhead:#f8fafc!important;
+}
+html,body{background:#080d18!important;color:#e5f0ff!important;font-family:system-ui,"Yu Gothic UI",sans-serif!important}
+body{background-image:linear-gradient(rgba(75,120,170,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(75,120,170,.055) 1px,transparent 1px)!important;background-size:24px 24px!important}
+#neonGpuBg,#neonThree,#neonFxOverlay{opacity:.12!important;filter:saturate(.45)!important}
+.column-left,.column-center,.column-right{background:rgba(12,22,38,.96)!important;border:2px solid #304b68!important;border-radius:8px!important;box-shadow:0 5px 0 #050914,0 0 0 1px #0b1524!important;backdrop-filter:none!important}
+.game-title,.pane-heading,.prestige-title-bar,.right-header{font-weight:900!important;letter-spacing:.035em!important;text-shadow:2px 2px 0 #050914!important}
+.game-title{color:#f8fafc!important}
+.pane-heading{border-bottom:2px solid #36536f!important;background:#1a2d44!important;border-radius:5px 5px 0 0!important}
+.display-group,.stat-scroller-box,.log-stream-box,.settings-group,.prestige-wrapper,.upgrade-matrix-grid,.notification-center-container,.tab-pane,.eh-hist,.guide-text-block{background:rgba(19,34,53,.95)!important;border-color:#2e4864!important;border-radius:6px!important;box-shadow:none!important}
+.resource-label,.resource-ps,.unit,.unitdown,.core-text-sub{color:#a8bdd4!important}
+.resource-value,.eh-val,.event-result-big{font-variant-numeric:tabular-nums!important;font-weight:900!important;text-shadow:1px 2px 0 #050914!important}
+.click-core-container{filter:none!important}
+.click-core-btn{border:3px solid #8be9fd!important;border-radius:12px!important;background:linear-gradient(180deg,#2563a6,#17416e)!important;box-shadow:0 6px 0 #0a2542, inset 0 2px 0 rgba(255,255,255,.25)!important;transition:transform .08s,filter .08s!important}
+.click-core-btn:hover{filter:brightness(1.18)!important;transform:translateY(-2px)!important}
+.click-core-btn:active{transform:translateY(4px)!important;box-shadow:0 2px 0 #0a2542!important}
+button,.product-btn,.btn-action-prestige,.btn-utility,.tab-trigger-button,.btn-fullscreen{
+ border-radius:5px!important;box-shadow:0 3px 0 rgba(0,0,0,.35)!important;transition:filter .12s,transform .12s!important
+}
+button:hover,.product-btn:hover,.btn-action-prestige:hover,.btn-utility:hover,.tab-trigger-button:hover{filter:brightness(1.18)!important}
+button:active,.product-btn:active,.btn-action-prestige:active,.btn-utility:active,.tab-trigger-button:active{transform:translateY(2px)!important;box-shadow:0 1px 0 rgba(0,0,0,.4)!important}
+.product-btn,.btn-action-prestige,.btn-utility{border:1px solid #496987!important}
+.tab-navigation-bar{gap:6px!important;padding:7px!important;background:#0b1423!important;border:1px solid #30465f!important;border-radius:7px!important}
+.tab-trigger-button{background:#17283b!important;color:#b8cbe0!important;border:1px solid #304b68!important}
+.tab-trigger-button.active{background:#285b78!important;color:#fff!important;border-color:#67e8f9!important}
+.upgrade-matrix-grid{gap:8px!important}
+.prestige-node,.event-card,.eh-row,.stat-item-line{border-radius:5px!important;border-color:#344f6c!important;box-shadow:none!important}
+input,select,textarea{background:#081321!important;color:#e5f0ff!important;border:1px solid #3b5876!important;border-radius:5px!important}
+#neonDock{background:#0d1a2a!important;border:2px solid #36536f!important;border-radius:7px!important;box-shadow:0 4px 0 #030711!important}
+#neonDock header b,#neonDock header .nd-fps{color:#67e8f9!important}
+#neonDock .nd-grid button.nd,#neonDock .nd-cats button{border-radius:4px!important}
+#dopaArcade .box{background:#101b2c!important;border:2px solid #4b7196!important;border-radius:8px!important;box-shadow:0 8px 0 #050914!important}
+#dopaCV{background:#07101d!important;border:2px solid #355777!important;border-radius:5px!important}
+#dopaArcadeBtn{background:#14283d!important;color:#67e8f9!important;border:1px solid #3f6788!important;border-radius:5px!important}
+.event-flash-ring,.event-shock,.event-white-slam{filter:none!important}
+.copyright{color:#7d91a8!important}
+@media(max-width:900px){.column-left,.column-center,.column-right{border-radius:5px!important}.upgrade-matrix-grid{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+
+<style id="mega-visual-overhaul">
+:root{--mega-edge:#315574;--mega-panel:#0b1728;--mega-accent:#53f3ff}
+html{scrollbar-color:#315574 #08111f;scrollbar-width:thin}
+body{background-color:#060b15!important;background-image:radial-gradient(ellipse at 50% 0%,#12314a66,transparent 55%),linear-gradient(#11223835 1px,transparent 1px),linear-gradient(90deg,#11223835 1px,transparent 1px)!important;background-size:auto,20px 20px,20px 20px!important}
+.column-left,.column-center,.column-right{border:1px solid #315574!important;box-shadow:0 8px 0 #030711,0 0 0 1px #132a40,0 12px 34px #0005!important}
+.display-group,.stat-scroller-box,.settings-group,.prestige-wrapper,.upgrade-matrix-grid,.tab-pane,.guide-text-block{background:linear-gradient(145deg,#12243aee,#091526f5)!important;border:1px solid #294965!important}
+.pane-heading,.prestige-title-bar,.right-header{background:linear-gradient(90deg,#163b55,#12243a)!important;border-bottom:1px solid #4bdcf0!important}
+button,.product-btn,.btn-action-prestige,.btn-utility,.tab-trigger-button{outline-offset:2px}
+button:focus-visible,.product-btn:focus-visible,.tab-trigger-button:focus-visible{outline:2px solid #67e8f9!important}
+.resource-value,.eh-val,.event-result-big{color:#f3fbff!important;text-shadow:0 0 14px #67e8f933!important}
+.click-core-btn{position:relative!important;isolation:isolate;border-radius:50%!important;background:radial-gradient(circle at 35% 25%,#70f7ff,#1471a8 42%,#092747 78%)!important;border:3px solid #a5f3fc!important;box-shadow:0 0 0 6px #10253a,0 0 0 8px #277d9a,0 10px 0 #04111f,0 0 45px #22d3ee66,inset 0 3px 9px #ffffff66!important}
+.click-core-btn::before{border-color:#9cf7ff99!important}.click-core-btn::after{border-color:#c4ff5988!important}
+.product-btn,.btn-action-prestige,.btn-utility{background-image:linear-gradient(180deg,#24415d,#11243a)!important}
+.product-btn:hover,.btn-action-prestige:hover,.btn-utility:hover{border-color:#67e8f9!important;box-shadow:0 0 0 1px #67e8f933,0 0 16px #22d3ee18!important}
+.tab-navigation-bar{position:relative;border:1px solid #284761!important;background:#071321!important}
+.tab-trigger-button.active{box-shadow:inset 0 -2px 0 #67e8f9,0 0 15px #22d3ee18!important}
+#neonDock{box-shadow:0 8px 0 #020712,0 0 25px #22d3ee12!important}
+@media(max-width:760px){.column-left,.column-center,.column-right{min-width:0!important}.click-core-btn{max-width:min(70vw,320px)}}
+</style>
+
+<!-- OMEGA Overdrive v4: polished UI dock, stable interactions, and correct 1e1000 goal progress -->
+<script src="js/omega-polish-v4.js"></script>
+<script src="js/omega-polish-v5.js"></script>
 </body>
 </html>
